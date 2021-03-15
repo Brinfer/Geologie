@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# Basé sur: https://stackoverflow.com/posts/44423052/revisions
+
+INPUT_FILE=$1
+COMMIT=`head -n1 $INPUT_FILE`
+PATTERN="^#[[:digit:]]{4}+ "
+LENGHT=`echo $COMMIT | wc -c`
+
+if ! [[ "$COMMIT" =~ $PATTERN ]]; then
+      echo "Message du commit invalide:"
+      echo "Le tag n'est pas valide"
+      echo "Voir l'exemple: #1234 commit message"
+      echo "Pattern: <Tache>: <description_claire_des_modifications_executées>"
+      exit 1
+
+# elif (("$LENGHT" >= 72)); then
+#       echo "Message du commit invalide:"
+#       echo "Celui-ci est trop long, celui-ci est limité à 72 caractères"
+#       echo "Voir l'exemple: #1234 commit message"
+#       echo "<Tache>: <description_claire_des_modifications_executées>"
+#       exit 1
+fi
