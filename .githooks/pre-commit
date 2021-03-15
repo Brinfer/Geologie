@@ -3,6 +3,6 @@
 branch="$(git rev-parse --abbrev-ref HEAD)"
 
 if [ "$branch" = "master" ]; then
-  cat ./.githooks/ascii-art.txt
+  cat ./.githooks/asciiArtGandalf.txt
   exit 1
 fi

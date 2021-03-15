@@ -7,6 +7,12 @@ cd path/vers/le/dossier/du/projet
 
 ## Installation
 
+Après le clonage du dépot, pensez à executer cette commande:
+```bash
+git config core.hooksPath .githooks
+```
+Et ce afin que tout le monde utilise les même [git hook](https://www.atlassian.com/git/tutorials/git-hooks).
+
 ## Règle sur le Git
 
 Pour plus de détails ou d'information, il y de nombreuses ressources sur [internet](https://www.atlassian.com/fr/git/tutorials/learn-git-with-bitbucket-cloud)
