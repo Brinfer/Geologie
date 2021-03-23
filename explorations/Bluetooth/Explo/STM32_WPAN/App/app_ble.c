@@ -227,7 +227,7 @@ uint8_t index_con_int, mutex;
  * Advertising Data
  */
 #if (P2P_SERVER1 != 0)
-static const char local_name[] = { AD_TYPE_COMPLETE_LOCAL_NAME ,'E','x','p','l','o'};
+static const char local_name[] = { AD_TYPE_COMPLETE_LOCAL_NAME ,'E','X','P','L','O'};
 uint8_t manuf_data[14] = {
     sizeof(manuf_data)-1, AD_TYPE_MANUFACTURER_SPECIFIC_DATA,
     0x01/*SKD version */,
@@ -791,7 +791,7 @@ static void Ble_Hci_Gap_Gatt_Init(void){
 
   if (role > 0)
   {
-    const char *name = "Explo";
+    const char *name = "EXPLO";
     aci_gap_init(role, 0,
                  APPBLE_GAP_DEVICE_NAME_LENGTH,
                  &gap_service_handle, &gap_dev_name_char_handle, &gap_appearance_char_handle);
