@@ -2,3 +2,10 @@
 **/.settings/
 **/Debug/
 **/*.launch
+**/*.elf
+**/*.hex
+**/_htmresc/
+**/html
+**/*.html
+**/doc
+**/template
