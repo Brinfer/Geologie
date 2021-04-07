@@ -3,7 +3,7 @@
   <FileVersion>3.0</FileVersion>
   <Workspace>
     <WorkspaceType>Single-project</WorkspaceType>
-    <WorkspacePath>/home/gautier/Documents/ProSE/se2022-a1.c/explorations/Bluetooth/BLE_p2pServer/</WorkspacePath>
+    <WorkspacePath>/home/gautier/Documents/ProSE/se2022-a1.c/explorations/Bluetooth/BLE_p2pServer/BLE_p2pServer/</WorkspacePath>
     <underRoot>false</underRoot>
     <TrustZone>0</TrustZone>
     <HAL_Driver>/home/gautier/STM32Cube/Repository//STM32Cube_FW_WB_V1.11.0</HAL_Driver>
@@ -14,29 +14,7 @@
       <ProjectName>BLE_p2pServer</ProjectName>
       <ProjectNature>C</ProjectNature>
       <Secure/>
-      <filestoremove>
-        <file>
-          <name>STM32_WPAN/App/ibeacon_service.c</name>
-        </file>
-        <file>
-          <name>STM32_WPAN/App/eddystone_tlm_service.c</name>
-        </file>
-        <file>
-          <name>STM32_WPAN/App/eddystone_uid_service.c</name>
-        </file>
-        <file>
-          <name>STM32_WPAN/App/eddystone_url_service.c</name>
-        </file>
-        <file>
-          <name>Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_pcd.c</name>
-        </file>
-        <file>
-          <name>Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_hal_pcd_ex.c</name>
-        </file>
-        <file>
-          <name>Drivers/STM32WBxx_HAL_Driver/Src/stm32wbxx_ll_usb.c</name>
-        </file>
-      </filestoremove>
+      <filestoremove/>
       <configs>
         <config>
           <name>BLE_p2pServer</name>
@@ -297,6 +275,24 @@
               <name>Core</name>
               <file>
                 <name>Core/Src/main.c</name>
+              </file>
+              <file>
+                <name>Core/Src/gpio.c</name>
+              </file>
+              <file>
+                <name>Core/Src/dma.c</name>
+              </file>
+              <file>
+                <name>Core/Src/ipcc.c</name>
+              </file>
+              <file>
+                <name>Core/Src/usart.c</name>
+              </file>
+              <file>
+                <name>Core/Src/rf.c</name>
+              </file>
+              <file>
+                <name>Core/Src/rtc.c</name>
               </file>
               <file>
                 <name>Core/Src/app_entry.c</name>
