@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><templates><template autoinsert="false" context="org.eclipse.cdt.ui.text.codetemplates.filecomment_context" deleted="false" description="Comment for created C/C++ files" enabled="true" id="org.eclipse.cdt.ui.text.codetemplates.filecomment" name="filecomment">/*
+ * @file ${file_name}
+ *
+ * @brief Résumé de ce que propose le module (rôle)
+ *
+ * Vous pouvez ici mettre un descriptif un peu plus long de ce que propose
+ * le module (fichiers .h + .c). C'est là que vous expliquez les modalités
+ * générales d'utilisation (préconditions, contexte d'utilisation, avertissements,
+ * ...).
+ *
+ * Vous pouvez créer plusieurs paragraphes en laissant une ligne vide après
+ * le paragraphe précédent.
+ *
+ * Vous noterez que les identifiants du code source sont en anglais, tandis
+ * que les commentaires sont écrits en français.
+ *
+ * @version 1.0									TODO
+ * @date ${date}
+ * @author ${user}
+ * @copyright BSD 2-clauses
+ * 
+ */
+</template></templates>
