@@ -3,7 +3,7 @@
 
 INPUT_FILE=$1
 COMMIT=`head -n1 $INPUT_FILE`
-PATTERN="^#[[:digit:]]{4}+"
+PATTERN="#[[:digit:]]{4}+"
 LENGHT=`echo $COMMIT | wc -c`
 
 if ! [[ "$COMMIT" =~ $PATTERN ]]; then
