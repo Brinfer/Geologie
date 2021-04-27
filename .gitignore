@@ -1,11 +1,29 @@
+# Ignore les fichiers sans extension (fichier binaire genere par gcc)
+## https://stackoverflow.com/a/19023985
+*
+!/**/
+!*.*
+
+# IDLE settings
 **/.vscode/
 **/.settings/
+
+# Fichiers genere par eclipse lors de la compilation
 **/Debug/
 **/*.launch
 **/*.elf
 **/*.hex
+
+# Fichiers genere pour la documentation
+
 **/_htmresc/
 **/html
 **/*.html
 **/doc
 **/template
+
+# Fichier binaire genere
+**/*.out
+
+# dossier utilise pour certain fichier template propre au projet
+!/template
