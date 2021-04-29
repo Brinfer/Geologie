@@ -1,7 +1,7 @@
 /**
  * @file testHostReachable
  *
- * @brief Permet de tester s'il est possible de se connecter à un server a un port donne.
+ * @brief Permet d'envoyer des informations à travers les sockets de manière continue.
  *
  * @version 1.0
  * @date 29 avr. 2021
@@ -44,18 +44,19 @@ typedef struct {
     char msg[15];
 } Data;
 
-static int s_keepGoing = 0;
+static int s_keepGoing = 1;  // TODO protect with mutex
 static int s_socketListen;
 static struct sockaddr_in s_serverAddress;
-static int s_socketClient[MAX_PENDING] = { NO_CLIENT_SOCKET_VALUE };
+static int s_socketClient[MAX_PENDING] = { NO_CLIENT_SOCKET_VALUE, NO_CLIENT_SOCKET_VALUE };
 static pthread_t s_spamThread;
+static pthread_t s_socketThread;
 static pthread_mutex_t s_mutexSocket = PTHREAD_MUTEX_INITIALIZER;
 
 static void intHandler(int _);
 static int createSocket(void);
 static void createServerAdress(void);
 static int startServer(void);
-static int run(void);
+static void* run(void* _);
 static int connectClient(void);
 static int readMsg(const int p_clientIndex);
 static int disconnectClient(const int p_clientIndex);
@@ -82,16 +83,24 @@ int main(int argc, char* argv[]) {
             l_returnValue = pthread_create(&s_spamThread, NULL, &spamClientSocket, NULL);
 
             if (l_returnValue == EXIT_SUCCESS) {
-                l_returnValue = run();
+                l_returnValue = pthread_create(&s_spamThread, NULL, &run, NULL);
+
+                if (l_returnValue != EXIT_SUCCESS) {
+                    s_keepGoing = 1;
+                }
             }
         }
     }
 
     void* l_returnValueThread;
     pthread_join(s_spamThread, &l_returnValueThread);
+    l_returnValue += *(int*) l_returnValueThread;
+
+    pthread_join(s_socketThread, l_returnValueThread);
+    l_returnValue += *(int*) l_returnValueThread;
+
     pthread_mutex_destroy(&s_mutexSocket);
 
-    l_returnValue += *(int *) l_returnValueThread;
 
     return l_returnValue;
 }
@@ -138,11 +147,11 @@ static int startServer(void) {
     return l_returnValue;
 }
 
-static int run(void) {
+static void* run(void *_) {
     int l_returnValue = EXIT_FAILURE;
     fd_set l_env;
 
-    while (s_keepGoing == 0) {
+    while (s_keepGoing) {
         /* https://broux.developpez.com/articles/c/sockets/#LV-C-2 */
         /* https://www.blaess.fr/christophe/2013/12/27/comprendre-le-fonctionnement-de-select/ */
 
@@ -187,18 +196,17 @@ static int run(void) {
                 }
             }
         }
-
-        for (int i = 0; i < MAX_PENDING; i++) {
-            pthread_mutex_lock(&s_mutexSocket);
-            int l_socketClientValue = s_socketClient[i];
-            pthread_mutex_unlock(&s_mutexSocket);
-            if (l_socketClientValue != NO_CLIENT_SOCKET_VALUE) {
-                l_returnValue += disconnectClient(i);
-            }
-        }
     }
 
-    return l_returnValue;
+    for (int i = 0; i < MAX_PENDING; i++) {
+        pthread_mutex_lock(&s_mutexSocket);
+        int l_socketClientValue = s_socketClient[i];
+        pthread_mutex_unlock(&s_mutexSocket);
+        if (l_socketClientValue != NO_CLIENT_SOCKET_VALUE) {
+            l_returnValue += disconnectClient(i);
+        }
+    }
+    pthread_exit(&l_returnValue);
 }
 
 static int connectClient(void) {
@@ -209,7 +217,7 @@ static int connectClient(void) {
         pthread_mutex_lock(&s_mutexSocket);
         int l_socketClientValue = s_socketClient[i];
         pthread_mutex_unlock(&s_mutexSocket);
-        if (l_socketClientValue != NO_CLIENT_SOCKET_VALUE) {
+        if (l_socketClientValue == NO_CLIENT_SOCKET_VALUE) {
             l_indexClient = i;
             break; // i
         }
@@ -221,6 +229,7 @@ static int connectClient(void) {
         if (l_socketValue < 0) {
             printf("%sError when connecting the client%s\n", "\033[41m", "\033[0m");
         } else {
+            printf("%sConnection of a client%s\n", "\033[42m", "\033[0m");
             l_returnValue = EXIT_SUCCESS;
             pthread_mutex_lock(&s_mutexSocket);
             s_socketClient[l_indexClient] = l_socketValue; // in case of the Macro value is not -1
@@ -290,7 +299,7 @@ static int disconnectClient(const int p_clientIndex) {
 static void* spamClientSocket(void* _) {
     int l_returnValue = EXIT_FAILURE;
 
-    do {
+    while (s_keepGoing) {
         for (int i = 0; i < MAX_PENDING; i++) {
             pthread_mutex_lock(&s_mutexSocket);
             int l_socketClientValue = s_socketClient[i];
@@ -299,11 +308,13 @@ static void* spamClientSocket(void* _) {
             if (l_socketClientValue != NO_CLIENT_SOCKET_VALUE) {
                 l_returnValue = sendMsg(i);
             }
+
+            if (l_returnValue != EXIT_SUCCESS) {
+                break; // s_keepGoing
+            }
         }
-
         sleep(1);
-
-    } while (s_keepGoing && l_returnValue == EXIT_SUCCESS);
+    }
 
     pthread_exit(&l_returnValue);
 }
@@ -334,6 +345,5 @@ static int sendMsg(const int p_clientIndex) {
     if (l_quantityToWrite == 0) {
         l_returnValue = EXIT_SUCCESS;
     }
-
     return l_returnValue;
 }
