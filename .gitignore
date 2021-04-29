@@ -3,6 +3,7 @@
 *
 !/**/
 !*.*
+!Makefile
 
 # IDLE settings
 **/.vscode/
@@ -24,6 +25,8 @@
 
 # Fichier binaire genere
 **/*.out
+**/*.d
+**/*.o
 
 # dossier utilise pour certain fichier template propre au projet
 !/template
