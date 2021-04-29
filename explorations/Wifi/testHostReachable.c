@@ -248,5 +248,7 @@ static int readMsg(Data* p_data) {
 
 static void displayMsg(Data* p_data) {
     // TODO
-    printf("Get a new message\n");
+    static int l_counter = 1;
+    printf("Get a new message %d\n", l_counter);
+    l_counter++;
 }
