@@ -9,24 +9,28 @@
 **/.vscode/
 **/.settings/
 
-# Fichiers genere par eclipse lors de la compilation
+# Fichiers generes par eclipse lors de la compilation
 **/Debug/
 **/*.launch
 **/*.elf
 **/*.hex
 
-# Fichiers genere pour la documentation
-
+# Fichiers generes pour la documentation
 **/_htmresc/
 **/html
 **/*.html
 **/doc
 **/template
+**/coverage
 
-# Fichier binaire genere
+# Fichiers binaires genere
 **/*.out
 **/*.d
 **/*.o
+
+# Fichiers generes pour la couverture de code
+**/*.gcno
+**/*.gcda
 
 # dossier utilise pour certain fichier template propre au projet
 !/template
