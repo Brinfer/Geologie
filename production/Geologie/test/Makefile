@@ -8,7 +8,8 @@
 PACKAGES = Geographer \
 	ManagerLOG \
 	Mathematician \
-	UI
+	UI \
+	ReceptionistLOG
 
 #################################################################################
 #																				#
