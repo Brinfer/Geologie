@@ -44,11 +44,11 @@ build:
 # Nettoyage
 clean:
 	@for i in $(SRC_DIR); do (cd $$i; make $@); done
-	@rm -f $(PROD) core* $(BIN_DIR)/core*
+	@rm -f $(EXEC) core* $(BIN_DIR)/core*
 
 # Execute le code
 run:
-	$(PROD)
+	$(EXEC)
 
 update: clean build
 
