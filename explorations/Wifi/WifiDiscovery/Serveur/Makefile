@@ -1,5 +1,3 @@
-CC = gcc
-
 # options de compilation
 CCFLAGS += -O0
 CCFLAGS += -g -DDEBUG # avec debuggage : -g -DDEBUG # sans debuggage : -DNDEBUG
