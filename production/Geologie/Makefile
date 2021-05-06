@@ -19,11 +19,8 @@ SUB_DIR = $(TST_DIR) $(SRC_DIR)
 #																				#
 #################################################################################
 
-# Compilateur
-export CC = gcc # TODO remplacer par arm-none
-
 # Couverture du code
-GCOVR = gcovr
+export GCOVR = gcovr
 
 # Options de compilation
 export CCFLAGS += -O0
@@ -44,11 +41,16 @@ build:
 # Nettoyage
 clean:
 	@for i in $(SRC_DIR); do (cd $$i; make $@); done
-	@rm -f $(EXEC) core* $(BIN_DIR)/core*
+	@rm -f $(BIN_DIR)/*
+
+update: clean build
 
 # Execute le code
-run:
-	$(EXEC)
+run: build
+	$(PROD)
+
+run_test: build
+	$(TEST)
 
 update: clean build
 

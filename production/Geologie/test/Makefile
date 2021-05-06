@@ -18,7 +18,7 @@ PACKAGES = Geographer \
 #################################################################################
 
 # Framework de test CMocka.
-export CMOCKA = ../cmocka-1.1.5_x86_64
+CMOCKA = $(realpath ../../../../cmocka-1.1.5_x86_64/)
 
 #################################################################################
 #																				#
@@ -31,7 +31,7 @@ export CMOCKA = ../cmocka-1.1.5_x86_64
 LDWRAP =
 
 # Inclusion depuis le niveau du package.
-CCFLAGS += -I. -I$(CMOCKA)/include
+CCFLAGS += -I$(CMOCKA)/include
 
 # Liens pour les tests.
 LDFLAGS += -L$(CMOCKA)/lib
