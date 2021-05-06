@@ -87,19 +87,7 @@
         }                                                         \
     } while (0)
 #else
-#define STOP_ON_ERROR(error_condition)                            \
-    do                                                            \
-    {                                                             \
-        if (error_condition)                                      \
-        {                                                         \
-            PRINT("*** Error (%s) at %s:%d\nExiting\n",           \
-                    #error_condition, __FILE__, __LINE__);        \
-            perror("");                                           \
-            _exit(1);                                             \
-        }                                                         \
-    } while (0)
-
-//#define STOP_ON_ERROR(error_condition) #error "STOP_ON_ERROR must not be used in release builds"
+#define STOP_ON_ERROR(error_condition) #error "STOP_ON_ERROR must not be used in release builds"
 #endif
 
 /**
@@ -116,8 +104,8 @@
  * @param fmt chaine de caractere formatee, voir la documentation de #printf.
  */
 #ifndef NDEBUG
-#define TRACE(fmt, ...)                                         \
-    PRINT("%s:%d:%s(): " fmt, __FILE__, __LINE__, \
+#define TRACE(fmt, ...)                                            \
+    PRINT("%s:%d:%s(): " fmt, __FILE__, __LINE__,                  \
                 __func__, ##__VA_ARGS__)
 #else
 #define TRACE(fmt, ...)
@@ -131,5 +119,13 @@
  * @param array Le tableau.
  */
 #define ARRAY_COUNT(array) ((sizeof(array)) / sizeof(array[0]))
+
+
+#define ARRAY_CONCATENATE(arraySource, arrayDest, indexStart, indexStop)    \
+    do {                                                                    \
+        for(int i = 0; i < (indexStart - indexStop); i++) {                 \
+            arrayDest[indexStart + i] = arraySource[i];                     \
+        }                                                                   \
+    } while(0)
 
 #endif /* DEBUG_TOOLS_ */
