@@ -19,9 +19,6 @@ SUB_DIR = $(TST_DIR) $(SRC_DIR)
 #																				#
 #################################################################################
 
-# Couverture du code
-export GCOVR = gcovr
-
 # Options de compilation
 export CCFLAGS += -O0
 export CCFLAGS += -g -DDEBUG 		# avec debuggage : -g -DDEBUG # sans debuggage : -DNDEBUG
