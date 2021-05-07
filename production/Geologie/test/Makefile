@@ -20,6 +20,9 @@ PACKAGES = Geographer \
 # Framework de test CMocka.
 CMOCKA = $(realpath ../../../../cmocka-1.1.5_x86_64/)
 
+# Couverture du code
+export GCOVR = gcovr
+
 #################################################################################
 #																				#
 # 							Regles du compilateur								#

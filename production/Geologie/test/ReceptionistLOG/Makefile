@@ -8,6 +8,11 @@ SRC = $(wildcard *.c)
 OBJ = $(SRC:.c=.o)
 DEP = $(SRC:.c=.d)
 
+# Gcov informations
+GCDA = $(SRC:.c=.gcda)
+GCNO = $(SRC:.c=.gcno)
+
+
 # Inclusion depuis le niveau du package.
 CCFLAGS += -I.. -I../../$(SRC_DIR)
 
