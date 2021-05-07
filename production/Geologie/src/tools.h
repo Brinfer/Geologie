@@ -123,7 +123,7 @@
 
 #define ARRAY_CONCATENATE(arraySource, arrayDest, indexStart, indexStop)    \
     do {                                                                    \
-        for(int i = 0; i < (indexStart - indexStop); i++) {                 \
+        for(int i = 0; i < (indexStop - indexStart); i++) {                 \
             arrayDest[indexStart + i] = arraySource[i];                     \
         }                                                                   \
     } while(0)

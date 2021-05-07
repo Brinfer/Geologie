@@ -78,51 +78,51 @@ static void test_TRANSLATOR_convertPosition(void** state) {
 
     //                                        | <---------X---------> | <---------Y---------> |
     const unsigned char expectedResult_A[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-    const unsigned char expectedResult_B[8] = { 0xEF, 0x80, 0x00, 0x00, 0x3F, 0x00, 0x00, 0x00 };
-    const unsigned char expectedResult_C[8] = { 0x3F, 0x00, 0x00, 0x00, 0xEF, 0x80, 0x00, 0x00 };
+    const unsigned char expectedResult_B[8] = { 0xBF, 0x80, 0x00, 0x00, 0x3F, 0x80, 0x00, 0x00 };
+    const unsigned char expectedResult_C[8] = { 0x3F, 0x80, 0x00, 0x00, 0xBF, 0x80, 0x00, 0x00 };
     const unsigned char expectedResult_D[8] = { 0x3D, 0xF5, 0xC2, 0x8F, 0xC2, 0xF6, 0xE6, 0x66 };
     const unsigned char expectedResult_E[8] = { 0xC2, 0xF6, 0xE6, 0x66, 0x3D, 0xF5, 0xC2, 0x8F };
-    const unsigned char expectedResult_F[8] = { 0xED, 0xF5, 0xC2, 0x8F, 0x42, 0xF6, 0xE6, 0x66 };
-    const unsigned char expectedResult_G[8] = { 0x42, 0xF6, 0xE6, 0x66, 0xED, 0xF5, 0xC2, 0x8F };
+    const unsigned char expectedResult_F[8] = { 0xBD, 0xF5, 0xC2, 0x8F, 0x42, 0xF6, 0xE6, 0x66 };
+    const unsigned char expectedResult_G[8] = { 0x42, 0xF6, 0xE6, 0x66, 0xBD, 0xF5, 0xC2, 0x8F };
 
     /* Test de A */
-    unsigned char result_A[8] = { 0 };
+    unsigned char result_A[8];
     TRANSLATOR_convertPosition(&positionTest_A, result_A);
 
     assert_memory_equal(result_A, expectedResult_A, 8);
 
     /* Test de B */
-    unsigned char result_B[8] = { 0 };
+    unsigned char result_B[8];
     TRANSLATOR_convertPosition(&positionTest_B, result_B);
 
     assert_memory_equal(result_B, expectedResult_B, 8);
 
     /* Test de C */
-    unsigned char result_C[8] = { 0 };
+    unsigned char result_C[8];
     TRANSLATOR_convertPosition(&positionTest_C, result_C);
 
     assert_memory_equal(result_C, expectedResult_C, 8);
 
     /* Test de D */
-    unsigned char result_D[8] = { 0 };
+    unsigned char result_D[8];
     TRANSLATOR_convertPosition(&positionTest_D, result_D);
 
     assert_memory_equal(result_D, expectedResult_D, 8);
 
     /* Test de E */
-    unsigned char result_E[8] = { 0 };
+    unsigned char result_E[8];
     TRANSLATOR_convertPosition(&positionTest_E, result_E);
 
     assert_memory_equal(result_E, expectedResult_E, 8);
 
     /* Test de F */
-    unsigned char result_F[8] = { 0 };
+    unsigned char result_F[8];
     TRANSLATOR_convertPosition(&positionTest_F, result_F);
 
     assert_memory_equal(result_F, expectedResult_F, 8);
 
     /* Test de G */
-    unsigned char result_G[8] = { 0 };
+    unsigned char result_G[8];
     TRANSLATOR_convertPosition(&positionTest_G, result_G);
 
     assert_memory_equal(result_G, expectedResult_G, 8);
