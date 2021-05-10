@@ -1,11 +1,15 @@
 /**
  * @file translator_test.c
  *
+ * @brief Ensemble de fonction permettant de tester le module translator.
+ *
  * @version 1.0
  * @date 6 may 2021
  * @author GAUTIER Pierre-Louis
  * @copyright ESD 2-clauses
  *
+ * @see ReceptionistLOG/translator.h
+ * @see ReceptionistLOG/translator.c
  */
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -31,17 +35,26 @@
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-static int set_up(void** state);
-static int tear_down(void** state);
-
+/**
+ * @struct ParametersTestPosition
+ *
+ * @brief Structure des donnees passees en parametre des fonction de test pour la conversion des Position
+ * en tableau d'octet.
+ */
 typedef struct {
-    Position positionTested;
-    unsigned char expectedResult[8];
+    Position positionTested;            /**< La Position a convertir */
+    unsigned char expectedResult[8];    /**< Le resultat de la conversion attendue */
 } ParametersTestPosition;
 
+/**
+ * @struct ParametersTestBeacon
+ *
+ * @brief Structure des donnees passees en parametre des fonction de test pour la conversion des BeaconData
+ * en tableau d'octet.
+ */
 typedef struct {
-    BeaconData beaconTested;
-    unsigned char expectedResult[32];
+    BeaconData beaconTested;            /**< Le BeaconData a convertir */
+    unsigned char expectedResult[32];   /**< Le resultat de la conversion attendue */
 } ParametersTestBeacon;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -50,6 +63,10 @@ typedef struct {
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/**
+ * @brief Tableau contenant les donnees de test pour la conversion des Position.
+ *
+ */
 ParametersTestPosition parametersTestPosition[] = {
     //                                                                     | <---------X---------> | <---------Y---------> |
     {.positionTested = {.X = 0, .Y = 0 },               .expectedResult = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }},
@@ -62,6 +79,10 @@ ParametersTestPosition parametersTestPosition[] = {
     {.positionTested = {.X = INT_MAX, .Y = INT_MIN },   .expectedResult = { 0x7F, 0xFF, 0xFF, 0xFF, 0x80, 0x00, 0x00, 0x00 }}
 };
 
+/**
+ * @brief Tableau contenant les donnees de test pour la conversion des BeaconData.
+ *
+ */
 ParametersTestBeacon parametersTestBeacon[] = {
     // Beacon A
     {
@@ -139,11 +160,27 @@ ParametersTestBeacon parametersTestBeacon[] = {
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/**
+ * @brief Teste la conversion d'une Position en un tableau d'octet.
+ *
+ * @param state
+ */
 static void test_TRANSLATOR_convertPosition(void** state);
+
+/**
+ * @brief Teste la conversion d'un BeaconData en un tableau d'octet.
+ *
+ * @param state
+ */
 static void test_TRANSLATOR_convertBeaconData(void** state);
 
+/**
+ * @brief Suite de test de la conversion des structures de donnees en tableau d'octet.
+ *
+ */
 static const struct CMUnitTest tests[] =
 {
+    // Position
     cmocka_unit_test_prestate(test_TRANSLATOR_convertPosition, &(parametersTestPosition[0])),
     cmocka_unit_test_prestate(test_TRANSLATOR_convertPosition, &(parametersTestPosition[1])),
     cmocka_unit_test_prestate(test_TRANSLATOR_convertPosition, &(parametersTestPosition[2])),
@@ -153,21 +190,19 @@ static const struct CMUnitTest tests[] =
     cmocka_unit_test_prestate(test_TRANSLATOR_convertPosition, &(parametersTestPosition[6])),
     cmocka_unit_test_prestate(test_TRANSLATOR_convertPosition, &(parametersTestPosition[7])),
 
+    // BeaconData
     cmocka_unit_test_prestate(test_TRANSLATOR_convertBeaconData, &(parametersTestBeacon[0])),
     cmocka_unit_test_prestate(test_TRANSLATOR_convertBeaconData, &(parametersTestBeacon[1])),
     cmocka_unit_test_prestate(test_TRANSLATOR_convertBeaconData, &(parametersTestBeacon[2]))
 };
 
+/**
+ * @brief Lance la suite de test du module translator.
+ *
+ * @return 0 en cas de succee ou le numero du test qui a echoue.
+ */
 int translator_run_tests() {
-    return cmocka_run_group_tests_name("Test of the module translator", tests, set_up, tear_down);
-}
-
-static int set_up(void** state) {
-    return 0;
-}
-
-static int tear_down(void** state) {
-    return 0;
+    return cmocka_run_group_tests_name("Test of the module translator", tests, NULL, NULL);
 }
 
 static void test_TRANSLATOR_convertPosition(void** state) {
