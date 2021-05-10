@@ -8,5 +8,5 @@ int main()
 {
     ReceptionistLOG_new();
     ReceptionistLOG_start();
-    
+
 }

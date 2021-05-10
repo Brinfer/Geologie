@@ -19,20 +19,17 @@ SUB_DIR = $(TST_DIR) $(SRC_DIR)
 #																				#
 #################################################################################
 
-# Compilateur
-
-# Couverture du code
-GCOVR = gcovr
-
 # Options de compilation
 export CCFLAGS += -O0
 export CCFLAGS += -g -DDEBUG 		# avec debuggage : -g -DDEBUG # sans debuggage : -DNDEBUG
 export CCFLAGS += -MMD -MP 			# gestion automatique des dépendances
 export CCFLAGS += -D_BSD_SOURCE -D_XOPEN_SOURCE_EXTENDED -D_XOPEN_SOURCE -D_DEFAULT_SOURCE -D_GNU_SOURCE
 export CCFLAGS += -std=c99 -Wall -pedantic
-export CCFLAGS += -pthread -lpthread         # Include pthread library
-export CCFLAGS += -D_REENTRANT     # define a macro
-all : build test
+export CCFLAGS += -D_REENTRANT					# define a macro
+export CCFLAGS += -pthread -lpthread			# Include pthread library
+export CCFLAGS += -lm							# Include math library
+
+all : build
 
 # Compilation
 build:
@@ -44,11 +41,16 @@ build:
 # Nettoyage
 clean:
 	@for i in $(SRC_DIR); do (cd $$i; make $@); done
-	@rm -f $(EXEC) core* $(BIN_DIR)/core*
+	@rm -f $(BIN_DIR)/*
+
+update: clean build
 
 # Execute le code
-run:
-	$(EXEC)
+run: build
+	$(PROD)
+
+run_test: build
+	$(TEST)
 
 update: clean build
 

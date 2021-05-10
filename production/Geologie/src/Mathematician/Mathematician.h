@@ -13,18 +13,20 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//                                              Define 
+//                                              Define
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #ifndef MATHEMATICIAN_H
-#define MATHEMATICIAN_H 
+#define MATHEMATICIAN_H
 
 #define NUMBER_OF_BEACONS
+#define SIZE_BEACON_ID (3)
+#define NB_CALIBRATION_POSITION (3)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//                                              Include 
+//                                              Include
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -36,14 +38,14 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * 
+ *
  * @brief création d'un tableau constant public .
- * 
+ *
  */
 extern float tab[];
 
 /**
- * @struct type 
+ * @struct type
  * @brief création d'une structure Position qui va prendre les coordonnees d'un point
  */
 typedef struct {
@@ -60,13 +62,17 @@ typedef float AttenuationCoefficientAverage;
 typedef float BeaconCoefficients[NUMBER_OF_BEACONS];
 
 /**
- * @struct type 
+ * @struct type
  * @brief création d'une structure qui va prendre les données d'une balise
  */
 typedef struct {
-    int id;
-    float beaconCoefficients[];
-}BeaconData;
+    char ID[SIZE_BEACON_ID];
+    Position position;
+    Power power;
+    AttenuationCoefficientAverage attenuationCoefficient;
+    unsigned char nbCoefficientAttenuations;
+    AttenuationCoefficient attenuationCoefficientsArray[NB_CALIBRATION_POSITION];
+} BeaconData;
 
 
 /**
@@ -77,7 +83,7 @@ typedef struct {
  */
 typedef struct {
   char exampleChar;
-  size_t len;
+  unsigned long len;
 } Example;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -94,9 +100,9 @@ typedef struct {
  *
  * @param [in] power prend la puissance recue de la balise
  * @param [in] beaconPosition position connue de la balise a calibrer
- * @param [in] calibrationPosition position a calibrer 
+ * @param [in] calibrationPosition position a calibrer
  * @return le coefficient d'attenuation calcule
- * 
+ *
  */
 extern AttenuationCoefficient getAttenuationCoefficient(Power power, Position beaconPosition, Position calibrationPosition);
 
