@@ -1,5 +1,5 @@
 /**
- * @file serveurWifi.c
+ * @file receptionistLOG.c
  *
  * @brief Permet d'envoyer des informations à travers les sockets de manière continue.
  *
@@ -28,7 +28,8 @@
 #include <pthread.h>
 #include <signal.h>
 
-#include "serveurWifi.h"
+#include "tools.h"
+#include "receptionistLOG.h"
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -36,17 +37,16 @@
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#define IP_SERVER "192.168.1.74" //Adresse en wlan0 de la carte
+///#define IP_SERVER "192.168.1.74" //Adresse en wlan0 de la carte
+#define IP_SERVER "192.168.7.1" //Adresse en usb0 de la carte
+
 #define PORT_SERVER (12345)
 #define MAX_PENDING (2)
 #define NO_CLIENT_SOCKET_VALUE (-1)
 
 #define MAX_IP_LENGTH 16 ///taille max de l'ip
 
-typedef struct {
-    int integer;
-    unsigned char data[15];
-} Data;
+typedef char Data[15];                         ///TODO changer nom structure
 
 static int keepGoing = 1; /// TODO protect with mutex
 static int socketListen;
@@ -57,13 +57,13 @@ static pthread_t socketThread;
 static pthread_mutex_t mutexSocket = PTHREAD_MUTEX_INITIALIZER;
 
 static void intHandler(int _);
-static int createSocket(void);
-static void createServerAdress(void);
-static int startServer(void);
-static void* run(void* _);
-static int connectClient(void);
+static int createSocketLOG(void);
+static void configureServerAdressLOG(void);
+static int startServerLOG(void);
+static void* runLOG(void* _);
+static int connectToClient(void);
 static int readMsg(const int clientIndex);
-static int disconnectClient(const int clientIndex);
+static int disconnectToClient(const int clientIndex);
 static void spamClientSocket(void);
 static int sendMsg(const int clientIndex);
 
@@ -73,71 +73,29 @@ static int sendMsg(const int clientIndex);
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-/**
- * @fn int main(int argc, char* argv[])
- * @brief fonction princiipale de serveurWifi.c
- *
- * @param argc premier argument correspondant au nombre d'arguments
- * @param argv arguments
- */
-int main(int argc, char* argv[]) {
-    int returnValue = EXIT_FAILURE;
-    signal(SIGINT, intHandler);                                                             /// Si pb avec ctr c
-
-    returnValue = createSocket();                                                         /// on créer le socket : AF_INET = IP, SOCK_STREAM = TCP
-    if (returnValue == EXIT_SUCCESS)     {
-        createServerAdress();                                                               /// configuration socket
-
-        returnValue = startServer();                                                      /// démarrage du socket et mise en écoute
-        if (returnValue == EXIT_SUCCESS)         {
-            pthread_mutex_init(&mutexSocket, NULL);                 ///initialisation                       /// peut etre pas utile, besoin protéger socket en lecture écriture
-            //returnValue = pthread_create(&spamThread, NULL, &spamClientSocket, NULL);      
-            /// premier thread pr envoyer
-            
-            if (returnValue == EXIT_SUCCESS)             {
-                returnValue = pthread_create(&socketThread, NULL, &run, NULL);
-            /// premier thread pr recevoir
-                spamClientSocket(); 
-                if (returnValue != EXIT_SUCCESS)                 {
-                    keepGoing = 1;
-                }
-            }
-        }
-    }
-
-    void* returnValueThread;
-    pthread_join(spamThread, &returnValueThread);
-    returnValue += *(int*) returnValueThread;
-
-    pthread_join(socketThread, returnValueThread);
-    returnValue += *(int*) returnValueThread;
-
-    pthread_mutex_destroy(&mutexSocket);
-
-    return returnValue;
-}
 
 /**
  * @fn static void intHandler(int _)
- * @brief fonction 
+ * @brief fonction permettant de mettre a jour la variable keepGoing
+ * si on a une erreur, on la mettra a 0
  *
  * @param 
  */
-static void intHandler(int _) {
+static void intHandler(int _) { /// _ pour dire que ca sera ignore
     keepGoing = 0;
 }
 
 /**
- * @fn static int createSocket(void)
- * @brief création du socket serveur
+ * @fn static int createSocketLOG(void)
+ * @brief création du socket sur serveurLOG
  *
  */
-static int createSocket(void) {
+static int createSocketLOG(void) {
     socketListen = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     int returnValue = EXIT_FAILURE;
 
     if (socketListen < 0)     {
-        printf("%sError socket%s\n", "\033[41m", "\033[0m");
+        PRINT("%sError socket%s\n", "\033[41m", "\033[0m");
     }     else     {
         returnValue = EXIT_SUCCESS;
     }
@@ -145,7 +103,12 @@ static int createSocket(void) {
     return returnValue;
 }
 
-static void createServerAdress(void) {
+/**
+ * @fn static void configureServerAdressLOG(void) 
+ * @brief configure le serveur, les ports, ...
+ *
+ */
+static void configureServerAdressLOG(void) {
     serverAddress.sin_family = AF_INET;                               /// Type d'adresse = IP 
     serverAddress.sin_port = htons(PORT_SERVER);                      /// Port TCP ou le service est accessible
     serverAddress.sin_addr.s_addr = htonl(INADDR_ANY);                /// On s'attache a toutes les interfaces
@@ -153,22 +116,22 @@ static void createServerAdress(void) {
 
 
 /**
- * @fn static int startServer(void)
+ * @fn static int startServerLOG(void)
  * @brief demarrage du socket
  *
  */
 
-static int startServer(void) {
+static int startServerLOG(void) {
     int returnValue = EXIT_FAILURE;
 
-    printf("%sThe server is serving on port %d at the address %s%s\n",
+    PRINT("%sThe server is serving on port %d at the address %s%s\n",
         "\033[32m", PORT_SERVER, IP_SERVER, "\033[0m");
-    printf("%sTo shutdown the server press enter%s\n\n", "\033[36m", "\033[0m");
+    PRINT("%sTo shutdown the server press enter%s\n\n", "\033[36m", "\033[0m");
 
     bind(socketListen, (struct sockaddr*) &serverAddress, sizeof(serverAddress));   /// On attache le socket a l'adresse indiquee
 
     if (listen(socketListen, MAX_PENDING) < 0)     {                                    /// on met le socket en ecoute et on accepte que MAX_PENDING connexions
-        printf("%sError while listenning the port%s\n", "\033[41m", "\033[0m");
+        PRINT("%sError while listenning the port%s\n", "\033[41m", "\033[0m");
     }     else     {
         returnValue = EXIT_SUCCESS;
     }
@@ -176,14 +139,14 @@ static int startServer(void) {
     return returnValue;
 }
 /**
- * @fn static void* run(void* _) {
+ * @fn static void* runLOG(void* _) {
  * @brief méthode qui va tourner en boucle pour recevoir lire le socket
  *
  * @param argc premier argument correspondant au nombre d'arguments
  * @param argv arguments
  */
 
-static void* run(void* _) {
+static void* runLOG(void* _) {
     int returnValue = EXIT_FAILURE;
     fd_set env;
 
@@ -205,16 +168,16 @@ static void* run(void* _) {
         }
 
         if (select(FD_SETSIZE, &env, NULL, NULL, NULL) == -1)         {
-            printf("%sError with %sselect()%s\n", "\033[41m", "\033[21m", "\033[0m");
+            PRINT("%sError with %sselect()%s\n", "\033[41m", "\033[21m", "\033[0m");
             break; ///keepGoing
         }
 
         if (FD_ISSET(STDIN_FILENO, &env))         {
-            printf("\n%sAsk for exit%s\n", "\033[41m", "\033[0m");
+            PRINT("\n%sAsk for exit%s\n", "\033[41m", "\033[0m");
             returnValue = EXIT_SUCCESS;
             break; ///keepGoing
         }         else if (FD_ISSET(socketListen, &env))         {
-            returnValue = connectClient();
+            returnValue = connectToClient();
             if (returnValue != EXIT_SUCCESS)             {
                 break; ///keepGoing
             }
@@ -238,19 +201,19 @@ static void* run(void* _) {
         int socketClientValue = socketClient[i];
         pthread_mutex_unlock(&mutexSocket);
         if (socketClientValue != NO_CLIENT_SOCKET_VALUE)         {
-            returnValue += disconnectClient(i);
+            returnValue += disconnectToClient(i);
         }
     }
     pthread_exit(&returnValue);
 }
 
 /**
- * @fn static int connectClient(void) 
+ * @fn static int connectToClient(void) 
  * @brief Connection au client
  *
  */
 
-static int connectClient(void) {
+static int connectToClient(void) {
     int returnValue = EXIT_FAILURE;
     int indexClient = MAX_PENDING;
 
@@ -268,9 +231,9 @@ static int connectClient(void) {
         int socketValue = accept(socketListen, NULL, 0);
 
         if (socketValue < 0)         {
-            printf("%sError when connecting the client%s\n", "\033[41m", "\033[0m");
+            PRINT("%sError when connecting the client%s\n", "\033[41m", "\033[0m");
         }         else         {
-            printf("%sConnection of a client%s\n", "\033[42m", "\033[0m");
+            PRINT("%sConnection of a client%s\n", "\033[42m", "\033[0m");
             returnValue = EXIT_SUCCESS;
             pthread_mutex_lock(&mutexSocket);
             socketClient[indexClient] = socketValue; ///in case of the Macro value is not -1
@@ -303,11 +266,11 @@ static int readMsg(const int clientIndex) {
         pthread_mutex_unlock(&mutexSocket);
 
         if (quantityReaddean < 0)         {
-            printf("%sError when receiving the message%s\n\n", "\033[41m", "\033[0m");
+            PRINT("%sError when receiving the message%s\n\n", "\033[41m", "\033[0m");
             break; ///quantityWritten
         }         else if (quantityReaddean == 0)         {
             /* Client leave */
-            disconnectClient(clientIndex);
+            disconnectToClient(clientIndex);
             returnValue = EXIT_SUCCESS;
             break; ///quantityWritten
         }         else         {
@@ -324,12 +287,12 @@ static int readMsg(const int clientIndex) {
 }
 
 /**
- * @fn static int disconnectClient(const int clientIndex)
+ * @fn static int disconnectToClient(const int clientIndex)
  * @brief méthode pour se déconnecter d'un client
  *
  * @param clientIndex correspond à l'index du client (2 clients max)
  */
-static int disconnectClient(const int clientIndex) {
+static int disconnectToClient(const int clientIndex) {
     pthread_mutex_lock(&mutexSocket);
     int returnValue = close(socketClient[clientIndex]);
     pthread_mutex_unlock(&mutexSocket);
@@ -337,7 +300,7 @@ static int disconnectClient(const int clientIndex) {
     if (returnValue < 0)     {
         returnValue = EXIT_FAILURE;
     }     else     {
-        printf("%s%sClient %d is disconnect%s\n\n", "\033[43m", "\033[30m", clientIndex, "\033[0m");
+        PRINT("%s%sClient %d is disconnect%s\n\n", "\033[43m", "\033[30m", clientIndex, "\033[0m");
         pthread_mutex_lock(&mutexSocket);
         socketClient[clientIndex] = NO_CLIENT_SOCKET_VALUE;
         pthread_mutex_unlock(&mutexSocket);
@@ -394,9 +357,7 @@ static int sendMsg(const int clientIndex) {
     Data data;
     int quantityWritten = 0;
     int quantityToWrite = sizeof(data);
-    char texte[15]=IP_SERVER;
-    sprintf(data.data, "%s", IP_SERVER); //on met l'adresse ip dans le message à envoyer au client
-    data.integer = 666;
+    sprintf(data, "%s", IP_SERVER); //on met l'adresse ip dans le message à envoyer au client
 
     while (quantityToWrite > 0)     {   ///pas garantie qu'on écrit tous les octets
         pthread_mutex_lock(&mutexSocket);
@@ -404,7 +365,7 @@ static int sendMsg(const int clientIndex) {
         pthread_mutex_unlock(&mutexSocket);
 
         if (quantityWritten < 0)         {
-            printf("%sError when sending the message %s\n", "\033[41m", "\033[0m");
+            PRINT("%sError when sending the message %s\n", "\033[41m", "\033[0m");
             break; ///quantityWritten
         }         else         {
             quantityToWrite -= quantityWritten;
@@ -414,6 +375,65 @@ static int sendMsg(const int clientIndex) {
     if (quantityToWrite == 0)     {
         returnValue = EXIT_SUCCESS;
     }
+    return returnValue;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//                                              Fonctions publiques
+//
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * @fn int ReceptionistLOG_new()
+ * @brief fonction qui créer le socket
+ *  
+ */
+extern int ReceptionistLOG_new(void) {                                                                /// configuration socket
+    int returnValue = EXIT_FAILURE;
+
+    returnValue = createSocketLOG();                                                         /// on créer le socket : AF_INET = IP, SOCK_STREAM = TCP
+    if (returnValue == EXIT_SUCCESS)     {
+        configureServerAdressLOG();   
+    }
+    return returnValue;
+}
+
+/**
+ * @fn int ReceptionistLOG_start()
+ * @brief fonction principale de receptionistLOG.c qui sera appelee de l'exterieur
+ *  pour l'instant 
+ */
+extern int ReceptionistLOG_start(void) {
+    int returnValue = EXIT_FAILURE;
+    signal(SIGINT, intHandler);                                                             /// Si pb avec ctr c
+
+    returnValue = startServerLOG();                                                      /// démarrage du socket et mise en écoute
+    if (returnValue == EXIT_SUCCESS)         {
+        pthread_mutex_init(&mutexSocket, NULL);                 ///initialisation                       /// peut etre pas utile, besoin protéger socket en lecture écriture
+        //returnValue = pthread_create(&spamThread, NULL, &spamClientSocket, NULL);      
+        /// premier thread pr envoyer
+            
+        if (returnValue == EXIT_SUCCESS)             {
+            returnValue = pthread_create(&socketThread, NULL, &runLOG, NULL);
+            /// premier thread pr recevoir
+            spamClientSocket(); 
+            if (returnValue != EXIT_SUCCESS)                 {
+                keepGoing = 1;
+            }
+        }
+    }
+    
+
+    void* returnValueThread;     ///TODO
+    pthread_join(spamThread, &returnValueThread);
+    returnValue += *(int*) returnValueThread;
+
+    pthread_join(socketThread, returnValueThread);
+    returnValue += *(int*) returnValueThread;
+
+    pthread_mutex_destroy(&mutexSocket);
+
     return returnValue;
 }
 

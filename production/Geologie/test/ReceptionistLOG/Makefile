@@ -1,25 +1,34 @@
-# options de compilation
-CCFLAGS += -O0
-CCFLAGS += -g -DDEBUG # avec debuggage : -g -DDEBUG # sans debuggage : -DNDEBUG
-CCFLAGS += -MMD -MP # gestion automatique des dépendances
-CCFLAGS += -D_BSD_SOURCE -D_XOPEN_SOURCE_EXTENDED -D_XOPEN_SOURCE -D_DEFAULT_SOURCE -D_GNU_SOURCE
-CCFLAGS += -std=c99 -Wall -pedantic
-CCFLAGS += -lpthread         # Include pthread library
-CCFLAGS += -D_REENTRANT     # define a macro
+#################################################################################
+#																				#
+# 							Organisation des sources							#
+#																				#
+#################################################################################
 
-SRC_2 = serveurWifi.c
+SRC = $(wildcard *.c)
+OBJ = $(SRC:.c=.o)
+DEP = $(SRC:.c=.d)
 
-EXEC_2 = $(SRC_2:.c=.out)
+# Inclusion depuis le niveau du package.
+CCFLAGS += -I..
 
+#################################################################################
+#																				#
+# 							Regles du Makefile 		.							#
+#																				#
+#################################################################################
 
-# Compilation.
-all: $(EXEC_2)
+all: build
 
-$(EXEC_2):
-	$(CC) $(SRC_2) $(CCFLAGS) -o $(EXEC_2)
+# Compilation
+build: $(OBJ)
 
-# Nettoyage.
+.c.o:
+	$(CC) -c $(CCFLAGS) $< -o $@
+
+# Nettoyage
 .PHONY: clean
 
 clean:
-	@rm -f $(EXEC_2)
+	@rm -f $(OBJ) $(DEP)
+
+-include $(DEP)

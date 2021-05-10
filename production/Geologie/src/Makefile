@@ -7,9 +7,8 @@
 # Packages.
 PACKAGES = Geographer \
 	ManagerLOG \
-	Mathematician \
 	UI \
-	ReceptionistLOG
+	ReceptionistLOG\
 
 SRC  = $(wildcard */*.c)
 OBJ = $(SRC:.c=.o)

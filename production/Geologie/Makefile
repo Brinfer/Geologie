@@ -20,7 +20,6 @@ SUB_DIR = $(TST_DIR) $(SRC_DIR)
 #################################################################################
 
 # Compilateur
-export CC = gcc # TODO remplacer par arm-none
 
 # Couverture du code
 GCOVR = gcovr
@@ -31,7 +30,8 @@ export CCFLAGS += -g -DDEBUG 		# avec debuggage : -g -DDEBUG # sans debuggage : 
 export CCFLAGS += -MMD -MP 			# gestion automatique des dépendances
 export CCFLAGS += -D_BSD_SOURCE -D_XOPEN_SOURCE_EXTENDED -D_XOPEN_SOURCE -D_DEFAULT_SOURCE -D_GNU_SOURCE
 export CCFLAGS += -std=c99 -Wall -pedantic
-
+export CCFLAGS += -pthread -lpthread         # Include pthread library
+export CCFLAGS += -D_REENTRANT     # define a macro
 all : build test
 
 # Compilation
