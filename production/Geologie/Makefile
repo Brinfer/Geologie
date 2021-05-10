@@ -22,13 +22,13 @@ SUB_DIR = $(TST_DIR) $(SRC_DIR)
 # Options de compilation
 export CCFLAGS += -O0
 export CCFLAGS += -g -DDEBUG 		# avec debuggage : -g -DDEBUG # sans debuggage : -DNDEBUG
-export CCFLAGS += -MMD -MP 			# gestion automatique des dépendances
+export CCFLAGS += -MMD -MP 			# gestion automatique des dpendances
 export CCFLAGS += -D_BSD_SOURCE -D_XOPEN_SOURCE_EXTENDED -D_XOPEN_SOURCE -D_DEFAULT_SOURCE -D_GNU_SOURCE
 export CCFLAGS += -std=c99 -Wall -pedantic
 export CCFLAGS += -D_REENTRANT					# define a macro
 export CCFLAGS += -lm							# Include math library
 export CCFLAGS += -pthread -lpthread			# Include pthread library
-
+export CCFLAGS += -lbluetooth					# Include bluetooth library
 all : build
 
 # Compilation

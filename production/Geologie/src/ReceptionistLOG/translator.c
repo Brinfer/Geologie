@@ -87,12 +87,12 @@ static void convertDoubleToBytes(double d, unsigned char* dest);
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-extern void TRANSLATOR_convertBeaconData(const BeaconData* beaconData, unsigned char dest[32]) {
+extern void Translator_convertBeaconData(const BeaconData* beaconData, unsigned char dest[32]) {
     /* ID */
     memcpy(dest, beaconData->ID, 3);
 
     /* Position */
-    TRANSLATOR_convertPosition(&(beaconData->position), dest + 3);
+    Translator_convertPosition(&(beaconData->position), dest + 3);
 
     /* Puissance */
     convertIntToBytes(beaconData->power, dest + 11);
@@ -109,7 +109,7 @@ extern void TRANSLATOR_convertBeaconData(const BeaconData* beaconData, unsigned 
     }
 }
 
-extern void TRANSLATOR_convertPosition(const Position* position, unsigned char dest[8]) {
+extern void Translator_convertPosition(const Position* position, unsigned char dest[8]) {
     convertIntToBytes(position->X, dest);
     convertIntToBytes(position->Y, dest + 4);
 }

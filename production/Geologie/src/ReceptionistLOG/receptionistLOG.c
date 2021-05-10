@@ -1,7 +1,7 @@
 /**
  * @file receptionistLOG.c
  *
- * @brief Permet d'envoyer des informations à travers les sockets de manière continue.
+ * @brief Permet d'envoyer des informations à travers les sockets de manire continue.
  *
  * @version 1.0.1
  * @date 5 mai 2021
@@ -31,6 +31,7 @@
 #include "tools.h"
 #include "receptionistLOG.h"
 #include <string.h>
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //                                              Define
@@ -87,7 +88,7 @@ static void intHandler(int _) { /// _ pour dire que ca sera ignore
 
 /**
  * @fn static int createSocketLOG(void)
- * @brief création du socket sur serveurLOG
+ * @brief cration du socket sur serveurLOG
  *
  */
 static int createSocketLOG(void) {
@@ -140,7 +141,7 @@ static int startServerLOG(void) {
 }
 /**
  * @fn static void* runLOG(void* _) {
- * @brief méthode qui va tourner en boucle pour recevoir lire le socket
+ * @brief mthode qui va tourner en boucle pour recevoir lire le socket
  *
  * @param argc premier argument correspondant au nombre d'arguments
  * @param argv arguments
@@ -243,7 +244,7 @@ static int connectToClient(void) {
 
 /**
  * @fn static int readMsg()
- * @brief méthode pour lire contenu socket
+ * @brief mthode pour lire contenu socket
  *
  * @param clientIndex correspond à l'index du client (2 clients max)
  */
@@ -283,7 +284,7 @@ static int readMsg() {
 
 /**
  * @fn static int disconnectToClient()
- * @brief méthode pour se déconnecter d'un client
+ * @brief mthode pour se dconnecter d'un client
  *
  * @param clientIndex correspond à l'index du client (2 clients max)
  */
@@ -312,7 +313,7 @@ static int disconnectToClient() {
 
 /**
  * @fn static void spamClientSocket(void)
- * @brief méthode pour envoyer des messages au client de facon repetitive
+ * @brief mthode pour envoyer des messages au client de facon repetitive
  *
  */
 
@@ -342,7 +343,7 @@ static void spamClientSocket(void) {            ///tant que le prog fonctionne o
 
 /**
  * @fn static void spamClientSocket(void)
- * @brief méthode pour envoyer des messages au client
+ * @brief mthode pour envoyer des messages au client
  *
  * @param clientIndex correspond à l'index du client auquel on va envoyer (2 clients max)
  */
@@ -355,7 +356,7 @@ static int sendMsg(Data dataToSend) {
     int quantityToWrite = sizeof(data);
     sprintf(data,"%s", dataToSend); //la data a envoyer dans une data
 
-    while (quantityToWrite > 0)     {   ///pas garantie qu'on écrit tous les octets
+    while (quantityToWrite > 0)     {   ///pas garantie qu'on crit tous les octets
         pthread_mutex_lock(&mutexSocket);
         quantityWritten = write(socketClient, &data + quantityWritten, quantityToWrite);
         pthread_mutex_unlock(&mutexSocket);
@@ -382,13 +383,13 @@ static int sendMsg(Data dataToSend) {
 
 /**
  * @fn int ReceptionistLOG_new()
- * @brief fonction qui créer le socket
+ * @brief fonction qui crer le socket
  *
  */
 extern int ReceptionistLOG_new(void) {                                                                /// configuration socket
     int returnValue = EXIT_FAILURE;
 
-    returnValue = createSocketLOG();                                                         /// on créer le socket : AF_INET = IP, SOCK_STREAM = TCP
+    returnValue = createSocketLOG();                                                         /// on crer le socket : AF_INET = IP, SOCK_STREAM = TCP
     if (returnValue == EXIT_SUCCESS)     {
         configureServerAdressLOG();
     }
@@ -404,9 +405,9 @@ extern int ReceptionistLOG_start(void) {
     int returnValue = EXIT_FAILURE;
     signal(SIGINT, intHandler);                                                             /// Si pb avec ctr c
 
-    returnValue = startServerLOG();                                                      /// démarrage du socket et mise en écoute
+    returnValue = startServerLOG();                                                      /// dmarrage du socket et mise en coute
     if (returnValue == EXIT_SUCCESS)         {
-        pthread_mutex_init(&mutexSocket, NULL);                 ///initialisation                       /// peut etre pas utile, besoin protéger socket en lecture écriture
+        pthread_mutex_init(&mutexSocket, NULL);                 ///initialisation                       /// peut etre pas utile, besoin protger socket en lecture criture
         //returnValue = pthread_create(&spamThread, NULL, &spamClientSocket, NULL);
         /// premier thread pr envoyer
 
@@ -431,7 +432,7 @@ extern int ReceptionistLOG_start(void) {
     return returnValue;
 }
 
-/// read et set dans deux thread différent est il necessaire de verouiller les mutex pour pouvoir écrire et lire
-/// risque qu'on écrive et lise sur le meme client en mm tps
+/// read et set dans deux thread diffrent est il necessaire de verouiller les mutex pour pouvoir crire et lire
+/// risque qu'on crive et lise sur le meme client en mm tps
 /// est il necessaire de proteger par des mutex les sockets
-/// est ce que while pr verifier tout vérfier tous les octet nécessaire
+/// est ce que while pr verifier tout vrfier tous les octet ncessaire

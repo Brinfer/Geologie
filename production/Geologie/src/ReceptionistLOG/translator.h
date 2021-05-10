@@ -70,7 +70,7 @@ typedef enum {
  * @warning Le tableau @p dest doit etre un tableau dont la taille fait au minimum 32
  * Aucune verification de la taille de celui-ci ne sera faite.
  */
-extern void TRANSLATOR_convertBeaconData(const BeaconData* beaconData, unsigned char* dest);
+extern void Translator_convertBeaconData(const BeaconData* beaconData, unsigned char* dest);
 
 /**
  * @brief Convertie une structure Position en un tableau d'octect.
@@ -83,6 +83,6 @@ extern void TRANSLATOR_convertBeaconData(const BeaconData* beaconData, unsigned 
  * @warning Le tableau @p dest doit etre un tableau dont la taille fait au minimum 8
  * Aucune verification de la taille de celui-ci ne sera faite.
  */
-extern void TRANSLATOR_convertPosition(const Position* position, unsigned char* dest);
+extern void Translator_convertPosition(const Position* position, unsigned char* dest);
 
 #endif /* TRANSLATOR_ */
