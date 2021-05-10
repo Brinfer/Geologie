@@ -1,34 +1,65 @@
+/**
+ * @file receivers.c
+ *
+ * @brief Permet d'obtenir le RSSI des balises.
+ *
+ * @version 1.0.1
+ * @date 5 mai 2021
+ * @author LECENNE Gabriel
+ * @copyright BSD 2-clauses
+ *
+ */
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//                                              Include
+//
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <unistd.h>
 #include <signal.h>
 #include <time.h>
-
 #include <sys/socket.h>
 #include <sys/ioctl.h>
 #include <sys/poll.h>
-
 #include <bluetooth/bluetooth.h>
 #include <bluetooth/hci.h>
 #include <bluetooth/hci_lib.h>
 #include <bluetooth/rfcomm.h>
 
-inquiry_info *ii = NULL;
-int max_rsp, num_rsp;
-int dev_id, sock, len, flags;
-int i;
-char addresse[19] = { 0 };
-char name[248] = { 0 };
-int8_t rssi;
-uint16_t handle;
-uint16_t ptype = HCI_DM1 | HCI_DM3 | HCI_DM5 | HCI_DH1 | HCI_DH3 | HCI_DH5;
-int co;
-int rs;
-//hciStatus_t rs2;
-int debug = 0;
 
-int btrssi(char *dest) {
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//                                              Define
+//
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+static inquiry_info *ii = NULL;
+static int max_rsp, num_rsp;
+static int dev_id, sock, len, flags;
+static int i;
+static char addresse[19] = { 0 };
+static char name[248] = { 0 };
+static int8_t rssi;
+static uint16_t handle;
+
+static void btscan();
+static int btconnect(char *dest);
+static int btrssi(char *dest);
+
+
+/**
+ * @fn static int btrssi(char *dest) {
+ * @brief méthode qui permet d'obtenir le RSSI
+ *
+ * @param dest correspond à l'adresse du peripherique dont on veut le RSSI
+ */
+
+static int btrssi(char *dest) {
     int dev_id = -1;
     struct hci_conn_info_req *cr;
     bdaddr_t bdaddr;
@@ -78,7 +109,14 @@ int btrssi(char *dest) {
     return 0;
 }
 
-int btconnect(char *dest)
+/**
+ * @fn static void btconnect(char *dest) {
+ * @brief méthode qui permet de se connecter à un peripherique
+ *
+ * @param dest correspond à l'adresse du peripherique dont on veut le RSSI
+ */
+
+static int btconnect(char *dest)
 {
     int rfsock = -1;
     struct sockaddr_rc addr = { 0 };
@@ -95,7 +133,7 @@ int btconnect(char *dest)
     printf("adresse %s\n", dest);
 
     // connect to server
-    if( debug ) printf("Connecting to %s ...\n", dest);
+    printf("Connecting to %s ...\n", dest);
     status = connect(rfsock, (struct sockaddr *)&addr, sizeof(addr));
     printf("connexion %d\n", status);
 
@@ -105,12 +143,18 @@ int btconnect(char *dest)
         return -1;
     }
     else {
-        if( debug ) printf("Connection established, rfsock = %d\n", rfsock);
+        printf("Connection established, rfsock = %d\n", rfsock);
         return rfsock;
     }
 }
 
-void btscan(){
+/**
+ * @fn static void btscan() {
+ * @brief méthode qui permet de scanner les peripheriques disponibles
+ *
+ */
+
+static void btscan(){
 	printf("On demarre le scan des peripheriques BLE.\n");
     dev_id = hci_get_route(NULL);
     sock = hci_open_dev( dev_id );
@@ -132,11 +176,6 @@ void btscan(){
         if (hci_read_remote_name(sock, &(ii+i)->bdaddr, sizeof(name), name, 0) < 0){
         	strcpy(name, "[unknown]");
         }
-        //co = hci_create_connection(sock, &(ii+i)->bdaddr, ACL_PTYPE_MASK, 0, 0x01, &handle, 25000);
-        //printf("connexion : %d\n", co);
-        //rs = hci_read_rssi(sock, handle, &rssi, 1000);
-        //rs2 = HCI_ReadRssiCmd(handle);
-        //printf("rssi : %d\n", rs);
         printf("%s  %s %d\n", addresse, name, rssi);
         btconnect(addresse);
         btrssi(addresse);
@@ -145,6 +184,11 @@ void btscan(){
     free( ii );
     close( sock );
 }
+
+/**
+ * @fn int main(int argc, char **argv) {
+ * @brief méthode principale de receivers.c
+ */
 
 int main(int argc, char **argv)
 {
