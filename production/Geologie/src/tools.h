@@ -31,11 +31,11 @@
  *
  * @brief Affiche un message.
  *
- * Cette macro peut être utilisee comme la fonction printf,
+ * Cette macro peut etre utilisee comme la fonction printf,
  * le premier argument est la chaîne de caractere et les arguments
- * suivants peuvent être specifies en fonction du format choisi.
+ * suivants peuvent etre specifies en fonction du format choisi.
  *
- * Le flux peut être redirige vers un fichier si la macro NDEBUG
+ * Le flux peut etre redirige vers un fichier si la macro NDEBUG
  * est defini.
  *
  * @param fmt chaine de charactere  formatee, voir la documentation de #printf.
@@ -61,15 +61,15 @@
 /**
  * @def STOP_ON_ERROR
  *
- * @brief Arrête l'execution en cas d'erreur et fournit des informations utiles.
+ * @brief Arrete l'execution en cas d'erreur et fournit des informations utiles.
  * sur l'erreur.
  *
  * Cette macro est utile pour evacuer la gestion des erreurs pour les experimentations.
  *
- * @param error_condition doit être vrai pour signifier qu'il y a une erreur, alors
- * l'execution s'arrête avec un message d'erreur, rien n'est fait si la condition est fausse.
+ * @param error_condition doit etre vrai pour signifier qu'il y a une erreur, alors
+ * l'execution s'arrete avec un message d'erreur, rien n'est fait si la condition est fausse.
  *
- * @warning Cette macro ne doit pas être utilisee dans du code de production
+ * @warning Cette macro ne doit pas etre utilisee dans du code de production
  * ni dans aucun code pouvant arriver a un etat de production car
  * c'est un moyen de ne pas gerer les erreurs. C'est pourquoi vous obtiendrez
  * une erreur de preprocesseur si vous definissez la macro NDEBUG.
@@ -95,11 +95,11 @@
  *
  * @brief Affiche un message de debug.
  *
- * Cette macro peut être utilisee comme la fonction printf,
+ * Cette macro peut etre utilisee comme la fonction printf,
  * le premier argument est la chaîne de caracteres, les arguments
- * suivants peuvent être specifies en fonction du format choisi.
+ * suivants peuvent etre specifies en fonction du format choisi.
  *
- * L'affichage peut être desactivee en definissant la macro NDEBUG.
+ * L'affichage peut etre desactivee en definissant la macro NDEBUG.
  *
  * @param fmt chaine de caractere formatee, voir la documentation de #printf.
  */
