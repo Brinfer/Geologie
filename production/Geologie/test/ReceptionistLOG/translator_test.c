@@ -18,6 +18,7 @@
 #include <stdarg.h>
 #include <stddef.h>
 #include <setjmp.h>
+#include <limits.h>
 
 #include "cmocka.h"
 
@@ -35,8 +36,14 @@ static int tear_down(void** state);
 
 typedef struct {
     Position positionTested;
-    char expectedResult[8];
+    unsigned char expectedResult[8];
 } ParametersTestPosition;
+
+typedef struct {
+    BeaconData beaconTested;
+    unsigned char expectedResult[32];
+} ParametersTestBeacon;
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //                                              Variable et structure extern
@@ -44,6 +51,17 @@ typedef struct {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 ParametersTestPosition parametersTestPosition[] = {
+    //                                                                     | <---------X---------> | <---------Y---------> |
+    {.positionTested = {.X = 0, .Y = 0 },               .expectedResult = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }},
+    {.positionTested = {.X = 0.05, .Y = 0.05 },         .expectedResult = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }},
+    {.positionTested = {.X = -1, .Y = 1 },              .expectedResult = { 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x01 }},
+    {.positionTested = {.X = 1, .Y = -1 },              .expectedResult = { 0x00, 0x00, 0x00, 0x01, 0xFF, 0xFF, 0xFF, 0xFF }},
+    {.positionTested = {.X = 1.05, .Y = -1.05 },        .expectedResult = { 0x00, 0x00, 0x00, 0x01, 0xFF, 0xFF, 0xFF, 0xFF }},
+    {.positionTested = {.X = -12345, .Y = 12345 },      .expectedResult = { 0xFF, 0xFF, 0xCF, 0xC7, 0x00, 0x00, 0x30, 0x39 }},
+    {.positionTested = {.X = 12345, .Y = -12345 },      .expectedResult = { 0x00, 0x00, 0x30, 0x39, 0xFF, 0xFF, 0xCF, 0xC7 }},
+    {.positionTested = {.X = INT_MAX, .Y = INT_MIN },   .expectedResult = { 0x7F, 0xFF, 0xFF, 0xFF, 0x80, 0x00, 0x00, 0x00 }}
+};
+
 ParametersTestBeacon parametersTestBeacon[] = {
     // Beacon A
     {
@@ -122,7 +140,7 @@ ParametersTestBeacon parametersTestBeacon[] = {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 static void test_TRANSLATOR_convertPosition(void** state);
-
+static void test_TRANSLATOR_convertBeaconData(void** state);
 
 static const struct CMUnitTest tests[] =
 {
@@ -131,6 +149,9 @@ static const struct CMUnitTest tests[] =
     cmocka_unit_test_prestate(test_TRANSLATOR_convertPosition, &(parametersTestPosition[2])),
     cmocka_unit_test_prestate(test_TRANSLATOR_convertPosition, &(parametersTestPosition[3])),
     cmocka_unit_test_prestate(test_TRANSLATOR_convertPosition, &(parametersTestPosition[4])),
+    cmocka_unit_test_prestate(test_TRANSLATOR_convertPosition, &(parametersTestPosition[5])),
+    cmocka_unit_test_prestate(test_TRANSLATOR_convertPosition, &(parametersTestPosition[6])),
+    cmocka_unit_test_prestate(test_TRANSLATOR_convertPosition, &(parametersTestPosition[7])),
 
     cmocka_unit_test_prestate(test_TRANSLATOR_convertBeaconData, &(parametersTestBeacon[0])),
     cmocka_unit_test_prestate(test_TRANSLATOR_convertBeaconData, &(parametersTestBeacon[1])),
@@ -140,8 +161,6 @@ static const struct CMUnitTest tests[] =
 int translator_run_tests() {
     return cmocka_run_group_tests_name("Test of the module translator", tests, set_up, tear_down);
 }
-
-
 
 static int set_up(void** state) {
     return 0;
@@ -154,13 +173,10 @@ static int tear_down(void** state) {
 static void test_TRANSLATOR_convertPosition(void** state) {
     ParametersTestPosition* param = (ParametersTestPosition*) *state;
 
-    const Position* positionTest = &(param->positionTested);
-    const char* expectedResult = &(param->expectedResult);
+    unsigned char result[8];
+    TRANSLATOR_convertPosition(&(param->positionTested), result);
 
-    char result[8];
-    TRANSLATOR_convertPosition(positionTest, &result);
-
-    assert_memory_equal(&result, expectedResult, 8);
+    assert_memory_equal(result, param->expectedResult, 8);
 }
 
 static void test_TRANSLATOR_convertBeaconData(void** state) {
