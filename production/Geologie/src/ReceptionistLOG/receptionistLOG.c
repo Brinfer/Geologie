@@ -52,7 +52,7 @@ static int keepGoing = 1; /// TODO protect with mutex
 static int socketListen;
 static struct sockaddr_in serverAddress;
 static int socketClient;
-static pthread_t spamThread;
+// static pthread_t spamThread;
 static pthread_t socketThread;
 static pthread_mutex_t mutexSocket = PTHREAD_MUTEX_INITIALIZER;
 
@@ -79,7 +79,7 @@ static int sendMsg(Data dataToSend);
  * @brief fonction permettant de mettre a jour la variable keepGoing
  * si on a une erreur, on la mettra a 0
  *
- * @param 
+ * @param
  */
 static void intHandler(int _) { /// _ pour dire que ca sera ignore
     keepGoing = 0;
@@ -104,12 +104,12 @@ static int createSocketLOG(void) {
 }
 
 /**
- * @fn static void configureServerAdressLOG(void) 
+ * @fn static void configureServerAdressLOG(void)
  * @brief configure le serveur, les ports, ...
  *
  */
 static void configureServerAdressLOG(void) {
-    serverAddress.sin_family = AF_INET;                               /// Type d'adresse = IP 
+    serverAddress.sin_family = AF_INET;                               /// Type d'adresse = IP
     serverAddress.sin_port = htons(PORT_SERVER);                      /// Port TCP ou le service est accessible
     serverAddress.sin_addr.s_addr = htonl(INADDR_ANY);                /// On s'attache a toutes les interfaces
 }
@@ -164,7 +164,7 @@ static void* runLOG(void* _) {
         if (socketClientValue != NO_CLIENT_SOCKET_VALUE){
             FD_SET(socketClientValue, &env);
         }
-        
+
 
         if (select(FD_SETSIZE, &env, NULL, NULL, NULL) == -1)         {
             PRINT("%sError with %sselect()%s\n", "\033[41m", "\033[21m", "\033[0m");
@@ -175,7 +175,7 @@ static void* runLOG(void* _) {
             PRINT("\n%sAsk for exit%s\n", "\033[41m", "\033[0m");
             returnValue = EXIT_SUCCESS;
             break; ///keepGoing
-        } 
+        }
         else if (FD_ISSET(socketListen, &env))         {
             returnValue = connectToClient();
             if (returnValue != EXIT_SUCCESS)             {
@@ -191,7 +191,7 @@ static void* runLOG(void* _) {
                        break; ///i
                 }
             }
-            
+
         }
     }
 
@@ -201,12 +201,12 @@ static void* runLOG(void* _) {
     if (socketClientValue != NO_CLIENT_SOCKET_VALUE)         {
         returnValue += disconnectToClient();
     }
-    
+
     pthread_exit(&returnValue);
 }
 
 /**
- * @fn static int connectToClient(void) 
+ * @fn static int connectToClient(void)
  * @brief Connection au client
  *
  */
@@ -220,7 +220,7 @@ static int connectToClient(void) {
     if (socketClientValue == NO_CLIENT_SOCKET_VALUE)         {
         PRINT("%sError when connecting the client%s\n", "\033[41m", "\033[0m");
     }
-    
+
 
     int socketValue = accept(socketListen, NULL, 0);
 
@@ -333,7 +333,7 @@ static void spamClientSocket(void) {            ///tant que le prog fonctionne o
         if (returnValue != EXIT_SUCCESS)             {
             break; ///keepGoing
         }
-        
+
         sleep(1);
     }
 
@@ -383,14 +383,14 @@ static int sendMsg(Data dataToSend) {
 /**
  * @fn int ReceptionistLOG_new()
  * @brief fonction qui créer le socket
- *  
+ *
  */
 extern int ReceptionistLOG_new(void) {                                                                /// configuration socket
     int returnValue = EXIT_FAILURE;
 
     returnValue = createSocketLOG();                                                         /// on créer le socket : AF_INET = IP, SOCK_STREAM = TCP
     if (returnValue == EXIT_SUCCESS)     {
-        configureServerAdressLOG();   
+        configureServerAdressLOG();
     }
     return returnValue;
 }
@@ -398,7 +398,7 @@ extern int ReceptionistLOG_new(void) {                                          
 /**
  * @fn int ReceptionistLOG_start()
  * @brief fonction principale de receptionistLOG.c qui sera appelee de l'exterieur
- *  pour l'instant 
+ *  pour l'instant
  */
 extern int ReceptionistLOG_start(void) {
     int returnValue = EXIT_FAILURE;
@@ -407,19 +407,19 @@ extern int ReceptionistLOG_start(void) {
     returnValue = startServerLOG();                                                      /// démarrage du socket et mise en écoute
     if (returnValue == EXIT_SUCCESS)         {
         pthread_mutex_init(&mutexSocket, NULL);                 ///initialisation                       /// peut etre pas utile, besoin protéger socket en lecture écriture
-        //returnValue = pthread_create(&spamThread, NULL, &spamClientSocket, NULL);      
+        //returnValue = pthread_create(&spamThread, NULL, &spamClientSocket, NULL);
         /// premier thread pr envoyer
-            
+
         if (returnValue == EXIT_SUCCESS)             {
             returnValue = pthread_create(&socketThread, NULL, &runLOG, NULL);
             /// premier thread pr recevoir
-            spamClientSocket(); 
+            spamClientSocket();
             if (returnValue != EXIT_SUCCESS)                 {
                 keepGoing = 1;
             }
         }
     }
-    
+
 
     void* returnValueThread;     ///TODO
     returnValueThread=malloc(sizeof(int));
