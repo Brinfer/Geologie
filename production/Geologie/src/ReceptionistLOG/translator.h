@@ -71,7 +71,7 @@ typedef enum {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-extern int TRANSLATOR_convertPosition(const Position* position, unsigned char dest[]);
+extern int TRANSLATOR_convertPosition(const Position* position, char dest[]);
 
 
 #endif /* TRANSLATOR_ */

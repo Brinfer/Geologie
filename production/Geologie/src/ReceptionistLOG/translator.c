@@ -28,9 +28,10 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-static void convertToMSB(unsigned char array[], unsigned int size);
-static void convertFloatToBytes(float f, unsigned char dest[]);
-static void convertDoubleToBytes(double d, unsigned char dest[]);
+static void convertToMSB(char array[], unsigned int size);
+static void convertFloatToBytes(float f, char dest[]);
+static void convertDoubleToBytes(double d, char dest[]);
+static void convertIntToBytes(int i, char dest[]);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -45,14 +46,14 @@ static void convertDoubleToBytes(double d, unsigned char dest[]);
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-extern int TRANSLATOR_convertPosition(const Position* position, unsigned char dest[8]) {
+extern int TRANSLATOR_convertPosition(const Position* position, char dest[8]) {
     int returnValue = EXIT_FAILURE;
-    unsigned char tempArray[4];
-    convertFloatToBytes(position->X, tempArray);
+    char tempArray[4];
+    convertIntToBytes(position->X, tempArray);
     convertToMSB(tempArray, 4);
     ARRAY_CONCATENATE(tempArray, dest, 0, 4);
 
-    convertFloatToBytes(position->Y, tempArray);
+    convertIntToBytes(position->Y, tempArray);
     convertToMSB(tempArray, 4);
     ARRAY_CONCATENATE(tempArray, dest, 4, 8);
 
@@ -65,18 +66,22 @@ extern int TRANSLATOR_convertPosition(const Position* position, unsigned char de
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-static void convertToMSB(unsigned char array[], unsigned int size) {
+static void convertToMSB(char array[], unsigned int size) {
     for (int i = 0; i < size / 2; i++) {
-        unsigned char temp = array[i];
+        char temp = array[i];
         array[i] = array[size - 1 - i];
         array[size - 1 - i] = temp;
     }
 }
 
-static void convertFloatToBytes(float f, unsigned char dest[]) {
+static void convertIntToBytes(int i, char dest[]) {
+    memcpy(dest, (unsigned char*) (&i), sizeof(float));
+}
+
+static void convertFloatToBytes(float f, char dest[]) {
     memcpy(dest, (unsigned char*) (&f), sizeof(float));
 }
 
-static void convertDoubleToBytes(double d, unsigned char dest[]) {
+static void convertDoubleToBytes(double d, char dest[]) {
     memcpy(dest, (unsigned char*) (&d), sizeof(double));
 }
