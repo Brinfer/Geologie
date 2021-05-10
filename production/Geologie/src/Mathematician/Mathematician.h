@@ -75,16 +75,7 @@ typedef struct {
 } BeaconData;
 
 
-/**
- * @struct Example
- * @brief objet chaine de caractère
- * Example est un objet de gestion de chaine de caractère et on connait
- * la taille de cette chaine de caractère
- */
-typedef struct {
-  char exampleChar;
-  unsigned long len;
-} Example;
+
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
