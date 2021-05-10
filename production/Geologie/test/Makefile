@@ -7,8 +7,8 @@
 # Packages.
 PACKAGES = Geographer \
 	ManagerLOG \
-	Mathematician \
 	UI \
+	Mathematician \
 	ReceptionistLOG
 
 #################################################################################
@@ -18,7 +18,7 @@ PACKAGES = Geographer \
 #################################################################################
 
 # Framework de test CMocka.
-export CMOCKA = ../cmocka-1.1.5_x86_64
+export CMOCKA = ../../../../cmocka-1.1.5_x86_64
 
 #################################################################################
 #																				#
