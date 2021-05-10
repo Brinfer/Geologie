@@ -23,7 +23,7 @@ all: build
 build: $(OBJ)
 
 .c.o:
-	$(CC) -c $(CCFLAGS) $< -o $@ -lbluetooth
+	$(CC) -c $(CCFLAGS) $< -o $@
 
 # Nettoyage
 .PHONY: clean

@@ -39,14 +39,14 @@
 
 /**
  *
- * @brief création d'un tableau constant public .
+ * @brief cration d'un tableau constant public .
  *
  */
 extern float tab[];
 
 /**
  * @struct type
- * @brief création d'une structure Position qui va prendre les coordonnees d'un point
+ * @brief cration d'une structure Position qui va prendre les coordonnees d'un point
  */
 typedef struct {
     int X;
@@ -63,7 +63,7 @@ typedef float BeaconCoefficients[NUMBER_OF_BEACONS];
 
 /**
  * @struct type
- * @brief création d'une structure qui va prendre les données d'une balise
+ * @brief cration d'une structure qui va prendre les donnes d'une balise
  */
 typedef struct {
     char ID[SIZE_BEACON_ID];

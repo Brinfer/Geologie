@@ -12,8 +12,8 @@
 
 /**
  * @fn int ReceptionistLOG_new()
- * @brief fonction qui créer le socket
- *  
+ * @brief fonction qui crer le socket
+ *
  */
 extern int ReceptionistLOG_new(void);
 
@@ -24,4 +24,3 @@ extern int ReceptionistLOG_new(void);
  *
  */
 extern int ReceptionistLOG_start(void);
-

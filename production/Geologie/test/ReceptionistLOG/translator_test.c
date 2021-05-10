@@ -165,14 +165,14 @@ ParametersTestBeacon parametersTestBeacon[] = {
  *
  * @param state
  */
-static void test_TRANSLATOR_convertPosition(void** state);
+static void test_Translator_convertPosition(void** state);
 
 /**
  * @brief Teste la conversion d'un BeaconData en un tableau d'octet.
  *
  * @param state
  */
-static void test_TRANSLATOR_convertBeaconData(void** state);
+static void test_Translator_convertBeaconData(void** state);
 
 /**
  * @brief Suite de test de la conversion des structures de donnees en tableau d'octet.
@@ -181,19 +181,19 @@ static void test_TRANSLATOR_convertBeaconData(void** state);
 static const struct CMUnitTest tests[] =
 {
     // Position
-    cmocka_unit_test_prestate(test_TRANSLATOR_convertPosition, &(parametersTestPosition[0])),
-    cmocka_unit_test_prestate(test_TRANSLATOR_convertPosition, &(parametersTestPosition[1])),
-    cmocka_unit_test_prestate(test_TRANSLATOR_convertPosition, &(parametersTestPosition[2])),
-    cmocka_unit_test_prestate(test_TRANSLATOR_convertPosition, &(parametersTestPosition[3])),
-    cmocka_unit_test_prestate(test_TRANSLATOR_convertPosition, &(parametersTestPosition[4])),
-    cmocka_unit_test_prestate(test_TRANSLATOR_convertPosition, &(parametersTestPosition[5])),
-    cmocka_unit_test_prestate(test_TRANSLATOR_convertPosition, &(parametersTestPosition[6])),
-    cmocka_unit_test_prestate(test_TRANSLATOR_convertPosition, &(parametersTestPosition[7])),
+    cmocka_unit_test_prestate(test_Translator_convertPosition, &(parametersTestPosition[0])),
+    cmocka_unit_test_prestate(test_Translator_convertPosition, &(parametersTestPosition[1])),
+    cmocka_unit_test_prestate(test_Translator_convertPosition, &(parametersTestPosition[2])),
+    cmocka_unit_test_prestate(test_Translator_convertPosition, &(parametersTestPosition[3])),
+    cmocka_unit_test_prestate(test_Translator_convertPosition, &(parametersTestPosition[4])),
+    cmocka_unit_test_prestate(test_Translator_convertPosition, &(parametersTestPosition[5])),
+    cmocka_unit_test_prestate(test_Translator_convertPosition, &(parametersTestPosition[6])),
+    cmocka_unit_test_prestate(test_Translator_convertPosition, &(parametersTestPosition[7])),
 
     // BeaconData
-    cmocka_unit_test_prestate(test_TRANSLATOR_convertBeaconData, &(parametersTestBeacon[0])),
-    cmocka_unit_test_prestate(test_TRANSLATOR_convertBeaconData, &(parametersTestBeacon[1])),
-    cmocka_unit_test_prestate(test_TRANSLATOR_convertBeaconData, &(parametersTestBeacon[2]))
+    cmocka_unit_test_prestate(test_Translator_convertBeaconData, &(parametersTestBeacon[0])),
+    cmocka_unit_test_prestate(test_Translator_convertBeaconData, &(parametersTestBeacon[1])),
+    cmocka_unit_test_prestate(test_Translator_convertBeaconData, &(parametersTestBeacon[2]))
 };
 
 /**
@@ -205,20 +205,20 @@ int translator_run_tests() {
     return cmocka_run_group_tests_name("Test of the module translator", tests, NULL, NULL);
 }
 
-static void test_TRANSLATOR_convertPosition(void** state) {
+static void test_Translator_convertPosition(void** state) {
     ParametersTestPosition* param = (ParametersTestPosition*) *state;
 
     unsigned char result[8];
-    TRANSLATOR_convertPosition(&(param->positionTested), result);
+    Translator_convertPosition(&(param->positionTested), result);
 
     assert_memory_equal(result, param->expectedResult, 8);
 }
 
-static void test_TRANSLATOR_convertBeaconData(void** state) {
+static void test_Translator_convertBeaconData(void** state) {
     ParametersTestBeacon* param = (ParametersTestBeacon*) *state;
 
     unsigned char result[32];
-    TRANSLATOR_convertBeaconData(&(param->beaconTested), result);
+    Translator_convertBeaconData(&(param->beaconTested), result);
 
     assert_memory_equal(result, param->expectedResult, 32);
 }

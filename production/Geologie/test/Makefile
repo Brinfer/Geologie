@@ -29,7 +29,7 @@ export GCOVR = gcovr
 #																				#
 #################################################################################
 
-# Wrap des méthodes du Stock pour bouchonage.
+# Wrap des mthodes du Stock pour bouchonage.
 #exemple LDWRAP  = -Wl,--wrap=<symbol>
 LDWRAP =
 
@@ -56,13 +56,13 @@ CCFLAGS += -fprofile-arcs -ftest-coverage -fprofile-abs-path
 SRC  = $(wildcard */*.c)
 OBJ = $(SRC:.c=.o)
 
-# Point d'entrée du programme
+# Point d'entre du programme
 MAIN = main_test.c
 
-# Gestion automatique des dépendances
+# Gestion automatique des dpendances
 DEP = $(MAIN:.c=.d)
 
-# Executable à générer.
+# Executable à gnrer.
 EXEC = ../$(TEST)
 
 # Inclusion depuis le niveau du package

@@ -29,13 +29,14 @@
 #include <bluetooth/hci.h>
 #include <bluetooth/hci_lib.h>
 #include <bluetooth/rfcomm.h>
+#include <pthread.h>
 
-#include "tools.h"
+#include "../tools.h"   // TODO
 #include "receivers.h"
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//                                              Define
+//                                              Variable et structure extern
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -48,10 +49,17 @@ static char name[248] = { 0 };
 static int8_t rssi;
 static uint16_t handle;
 
-static void btscan();
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//                                              Fonctions static
+//
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+static void* btscan(void *arg);
 static int btconnect(char* dest);
 static int btrssi(char* dest);
 
+static pthread_t pthreadScan;
 
 /**
  * @fn static int btrssi(char *dest) {
@@ -72,7 +80,7 @@ static int btrssi(char* dest) {
     if (dev_id < 0) {
         dev_id = hci_for_each_dev(HCI_UP, (void*) btscan, (long) &bdaddr);
         if (dev_id < 0) {
-            PRINT(stderr, "Not connected.\n");
+            PRINT("Not connected.\n");
             exit(1);
         }
     }
@@ -141,7 +149,7 @@ static int btconnect(char* dest) {
     if (status < 0) {
         perror("Error connecting");
         return -1;
-    }else {
+    } else {
         PRINT("Connection established, rfsock = %d\n", rfsock);
         return rfsock;
     }
@@ -153,7 +161,7 @@ static int btconnect(char* dest) {
  *
  */
 
-static void btscan() {
+static void* btscan(void *arg) {
     PRINT("On demarre le scan des peripheriques BLE.\n");
     dev_id = hci_get_route(NULL);
     sock = hci_open_dev(dev_id);
@@ -182,14 +190,21 @@ static void btscan() {
 
     free(ii);
     close(sock);
+
+    return NULL;
 }
 
-/**
- * @fn int main(int argc, char **argv) {
- * @brief methode principale de receivers.c
- */
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//                                              Fonctions publiques
+//
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-int main(int argc, char** argv) {
-    btscan();
-    return 0;
+
+extern void Receivers_start(Receivers_t* this) {
+    pthread_create(&pthreadScan, NULL, btscan, NULL);
+}
+
+extern void Receivers_stop(Receivers_t* this) {
+    pthread_join(pthreadScan, NULL);
 }

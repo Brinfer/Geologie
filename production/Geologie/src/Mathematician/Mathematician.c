@@ -5,13 +5,13 @@
  * @date 9/05/2021
  * @author Nathan BRIENT
  * @copyright BSD 2-clauses
- * 
+ *
  */
 
 #include "Mathematician.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h> /// pour les racines carré, carré...
+#include <math.h> /// pour les racines carr, carr...
 
 /**
  * @fn static float distanceCalcul(Position p1, Position p2)
@@ -20,7 +20,7 @@
  * @param p1 position du premier point
  * @param p2 position du deuxieme point
  * @return la distance entre ces deux points
- * 
+ *
  */
 static float distanceCalcul(Position p1, Position p2){
     float distance;
@@ -36,9 +36,9 @@ static float distanceCalcul(Position p1, Position p2){
  *
  * @param power prend la puissance recue de la balise
  * @param beaconPosition position connue de la balise a calibrer
- * @param calibrationPosition position a calibrer 
+ * @param calibrationPosition position a calibrer
  * @return le coefficient d'attenuation calcule
- * 
+ *
  */
 extern AttenuationCoefficient getAttenuationCoefficient(Power power, Position beaconPosition, Position calibrationPosition){
     AttenuationCoefficient attenuationCoefficient;
