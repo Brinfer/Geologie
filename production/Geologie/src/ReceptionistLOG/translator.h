@@ -70,8 +70,9 @@ typedef enum {
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+extern int TRANSLATOR_convertBeaconData(const BeaconData* beaconData, unsigned char dest[32]);
 
-extern int TRANSLATOR_convertPosition(const Position* position, char dest[]);
+extern int TRANSLATOR_convertPosition(const Position* position, unsigned char dest[8]);
 
 
 #endif /* TRANSLATOR_ */
