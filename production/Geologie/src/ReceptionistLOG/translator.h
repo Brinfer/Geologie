@@ -1,7 +1,8 @@
 /**
  * @file translator.c
  *
- * @brief TODO
+ * @brief Contient differrente fonction permettant de convertir les structures de donnees en
+ * un tableau d'octect.
  *
  * @version 1.0
  * @date 5 mai 2021
@@ -9,10 +10,6 @@
  * @copyright BSD 2-clauses
  *
  */
-
-#include "tools.h"
-#include "config.h"
-#include "Geographer/geographer.h"
 
 #ifndef TRANSLATOR_
 #define TRANSLATOR_
@@ -23,19 +20,20 @@
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
+#include "tools.h"
+#include "config.h"
+#include "Geographer/geographer.h"
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//                                              Define
+//                                              Variable et structure extern
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
  * @typedef Commande
  *
- * @brief
- *
+ * @brief Enumeration contenant l'identifiant des differentes commandes.
  */
 typedef enum {
     ERROR = -1,
@@ -55,24 +53,36 @@ typedef enum {
     MAX_VALUE = SIGNAL_CALIBRATION_END
 } Commande;
 
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-//                                              Variable et structure extern
-//
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //                                              Fonctions publiques
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-extern int TRANSLATOR_convertBeaconData(const BeaconData* beaconData, unsigned char dest[32]);
+/**
+ * @brief Convertie une structure BeaconData en un tableau d'octect.
+ *
+ * La conversion est ecrite dans le tableau @p dest.
+ *
+ * @param beaconData Un pointeur vers la stucture a convertir.
+ * @param dest Le pointeur vers tableau dans lequel ecrire la conversion.
+ *
+ * @warning Le tableau @p dest doit etre un tableau dont la taille fait au minimum 32
+ * Aucune verification de la taille de celui-ci ne sera faite.
+ */
+extern void TRANSLATOR_convertBeaconData(const BeaconData* beaconData, unsigned char* dest);
 
-extern int TRANSLATOR_convertPosition(const Position* position, unsigned char dest[8]);
-
+/**
+ * @brief Convertie une structure Position en un tableau d'octect.
+ *
+ * La conversion est ecrite dans le tableau @p dest.
+ *
+ * @param position Un pointeur vers la stucture a convertir.
+ * @param dest Le pointeur vesr tableau dans lequel ecrire la conversion.
+ *
+ * @warning Le tableau @p dest doit etre un tableau dont la taille fait au minimum 8
+ * Aucune verification de la taille de celui-ci ne sera faite.
+ */
+extern void TRANSLATOR_convertPosition(const Position* position, unsigned char* dest);
 
 #endif /* TRANSLATOR_ */
