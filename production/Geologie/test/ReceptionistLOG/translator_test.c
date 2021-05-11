@@ -181,11 +181,25 @@ static void test_Translator_convertBeaconDataToByte(void** state);
 static void test_Translator_convertByteToPosition(void** state);
 
 /**
+ * @brief Teste la conversion d'un tableau d'octet en un BeaconData.
+ *
+ * @param state
+ */
+static void test_Translator_convertByteToBeaconData(void** state);
+
+/**
  * @brief
  * TODO
  * @param current
  */
 static void checkExpectedPosition(Position* current);
+
+/**
+ * @brief
+ * TODO
+ * @param current
+ */
+static void checkExpectedBeaconData(BeaconData* current);
 
 /**
  * @brief Suite de test de la conversion des structures de donnees en tableau d'octet.
@@ -213,7 +227,12 @@ static const struct CMUnitTest tests[] = {
     // BeaconData
     cmocka_unit_test_prestate(test_Translator_convertBeaconDataToByte, &(parametersTestBeaconToByte[0])),
     cmocka_unit_test_prestate(test_Translator_convertBeaconDataToByte, &(parametersTestBeaconToByte[1])),
-    cmocka_unit_test_prestate(test_Translator_convertBeaconDataToByte, &(parametersTestBeaconToByte[2]))
+    cmocka_unit_test_prestate(test_Translator_convertBeaconDataToByte, &(parametersTestBeaconToByte[2])),
+
+    cmocka_unit_test_prestate(test_Translator_convertByteToBeaconData, &(parametersTestBeaconToByte[0])),
+    cmocka_unit_test_prestate(test_Translator_convertByteToBeaconData, &(parametersTestBeaconToByte[1])),
+    cmocka_unit_test_prestate(test_Translator_convertByteToBeaconData, &(parametersTestBeaconToByte[2]))
+
 };
 
 /**
@@ -252,6 +271,19 @@ static void test_Translator_convertByteToPosition(void** state) {
     checkExpectedPosition(&result);
 }
 
+static void test_Translator_convertByteToBeaconData(void** state) {
+    ParametersTestBeacon* param = (ParametersTestBeacon*) *state;
+    expect_memory(checkExpectedBeaconData, current, &(param->beacon), sizeof(param->beacon));
+
+    BeaconData result;
+    Translator_convertByteToBeaconData(param->arrayBite, &result);
+    checkExpectedBeaconData(&result);
+}
+
 static void checkExpectedPosition(Position* current) {
+    check_expected(current);
+}
+
+static void checkExpectedBeaconData(BeaconData* current) {
     check_expected(current);
 }
