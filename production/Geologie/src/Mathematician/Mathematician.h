@@ -1,3 +1,4 @@
+
 /**
  * @file Mathematician.h
  *
@@ -20,10 +21,10 @@
 #ifndef MATHEMATICIAN_H
 #define MATHEMATICIAN_H
 
-#define NUMBER_OF_BEACONS
+#define NB_BEACONS
 #define SIZE_BEACON_ID (3)
-#define NB_CALIBRATION_POSITION (3)
-
+#define NB_CALIBRATION_POSITIONS (3)
+#define ATT_COEFF_1_METER (4)
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //                                              Include
@@ -59,7 +60,7 @@ typedef float AttenuationCoefficient;
 
 typedef float AttenuationCoefficientAverage;
 
-typedef float BeaconCoefficients[NUMBER_OF_BEACONS];
+typedef float BeaconCoefficients[NB_BEACONS];
 
 /**
  * @struct type
@@ -71,7 +72,7 @@ typedef struct {
     Power power;
     AttenuationCoefficientAverage attenuationCoefficient;
     unsigned char nbCoefficientAttenuations;
-    AttenuationCoefficient attenuationCoefficientsArray[NB_CALIBRATION_POSITION];
+    AttenuationCoefficient attenuationCoefficientsArray[NB_CALIBRATION_POSITIONS];
 } BeaconData;
 
 
@@ -125,4 +126,4 @@ extern AttenuationCoefficientAverage getAverageCalcul(BeaconCoefficients beaconC
 */
 extern Position getCurrentPosition(BeaconData beaconsData[]);
 
-#endif /* EXAMPLE_H */
+#endif 
