@@ -68,18 +68,6 @@ static void convertIntToBytes(int i, unsigned char* dest);
  */
 static void convertFloatToBytes(float f, unsigned char* dest);
 
-/**
- * @brief Convertie un double en un tableau d'octect.
- *
- * Copie dans le tableau @p dest la valeur des octects du double.
- *
- * @param d Le double a convertire.
- * @param dest Le pointeur vers le tableau ou ecrire les octects.
- *
- * @warning Le tableau @p dest doit etre un tableau dont la taille fait au minimum 4
- * Aucune verification de la taille de celui-ci ne sera faite.
- */
-static void convertDoubleToBytes(double d, unsigned char* dest);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -140,11 +128,4 @@ static void convertFloatToBytes(float f, unsigned char* dest) {
     memcpy(tempArray, (unsigned char*) (&f), sizeof(float));
     convertToBigEndian(tempArray, sizeof(float));
     memcpy(dest, tempArray, sizeof(float));
-}
-
-static void convertDoubleToBytes(double d, unsigned char* dest) {
-    unsigned char tempArray[sizeof(double)];
-    memcpy(tempArray, (unsigned char*) (&d), sizeof(double));
-    convertToBigEndian(tempArray, sizeof(double));
-    memcpy(dest, tempArray, sizeof(double));
 }
