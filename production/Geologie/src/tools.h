@@ -10,6 +10,7 @@
  * #ARRAY_SIZE
  * #PRINT
  * #DEBUG_FILE_PATH
+ * #bool_e
  *
  * @version 1.0
  * @date 5 mai 2021
@@ -52,7 +53,7 @@
 #define PRINT(fmt, ...)                                         \
     do                                                          \
     {                                                           \
-        FILE *stream = fopen(DEBUG_FILE_PATH, "a");                 \
+        FILE *stream = fopen(DEBUG_FILE_PATH, "a");             \
         fprintf(stream, fmt, ##__VA_ARGS__);                    \
         fclose(stream);                                         \
     } while (0)
@@ -127,5 +128,14 @@
             arrayDest[indexStart + i] = arraySource[i];                     \
         }                                                                   \
     } while(0)
+
+/**
+ * @enum bool_e
+ * @brief Enumeration pour remplacer le type bool d'autre langage.
+ */
+typedef enum {
+    FALSE = 0, /**< Valeur false */
+    TRUE = 1   /**< Valuer true */
+} bool_e;
 
 #endif /* DEBUG_TOOLS_ */
