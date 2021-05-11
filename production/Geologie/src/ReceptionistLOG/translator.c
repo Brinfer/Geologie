@@ -33,9 +33,9 @@
 #define COMMAND_SIZE (1)
 
 /**
- * @brief Inverse l'endianness du tableau d'octect.
+ * @brief Inverse l'ordre du tableau d'octet.
  *
- * Intervertie les elements du tableau @p dest (equivalent a un retournement).
+ * Intervertie les elements du tableau @p dest.
  *
  * @param array Le pointeur vers le tableau a inverser.
  * @param size La taille du tableau.
@@ -43,7 +43,7 @@
 static void reverseArray(unsigned char* array, unsigned int size);
 
 /**
- * @brief Convertie un entier en un tableau d'octect.
+ * @brief Convertie un entier en un tableau d'octet.
  *
  * Copie dans le tableau @p dest la valeur des octects de l'entier.
  *
@@ -56,7 +56,7 @@ static void reverseArray(unsigned char* array, unsigned int size);
 static void convertIntToBytes(int i, unsigned char* dest);
 
 /**
- * @brief Convertie un floattant en un tableau d'octect.
+ * @brief Convertie un floattant en un tableau d'octet.
  *
  * Copie dans le tableau @p dest la valeur des octects du floattant.
  *
@@ -69,20 +69,21 @@ static void convertIntToBytes(int i, unsigned char* dest);
 static void convertFloatToBytes(float f, unsigned char* dest);
 
 /**
- * @brief
- * TODO
- * @param src
- * @return int
+ * @brief Convertie un tableau d'octet en un entier.
+ *
+ * @param src Le pointeur vers le tableau d'octet.
+ * @return int Le nombre entier en base 10 des octets.
  */
 static int convertBytesToInt(const unsigned char* src);
 
 /**
- * @brief
- * TODO
- * @param src
- * @return float
+ * @brief Convertie un tableau d'octet en un entier.
+ *
+ * @param src Le pointeur vers le tableau d'octet.
+ * @return float Le nombre reel en base 10 des octets.
  */
 static float convertBytesToFloat(const unsigned char* src);
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //                                              Fonctions publiques
