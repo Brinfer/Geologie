@@ -13,4 +13,10 @@
 #ifndef CONFIG_
 #define CONFIG_
 
+/**
+ * @brief
+ * TODO
+ */
+#define EPSILON (0.01)
+
 #endif // CONFIG_
