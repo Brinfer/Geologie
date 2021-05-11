@@ -23,6 +23,7 @@
 #include <setjmp.h>
 #include <stdint.h>
 #include <limits.h>
+#include <float.h>
 
 #include "cmocka.h"
 
@@ -189,16 +190,18 @@ static void test_Translator_convertByteToPosition(void** state);
 static void test_Translator_convertByteToBeaconData(void** state);
 
 /**
- * @brief
- * TODO
- * @param current
+ * @brief Compare deux structure Position entre elles.
+ *
+ * @param expected Le pointeur vers la structure de reference.
+ * @param current Le pointeur vers la structure a comparer avec @p expected.
  */
 static void assert_positionEquals(Position* expected, Position* current);
 
 /**
- * @brief
- * TODO
- * @param current
+ * @brief Compare deux structure BeaconData entre elles.
+ *
+ * @param expected Le pointeur vers la structure de reference.
+ * @param current Le pointeur vers la structure a comparer avec @p expected.
  */
 static void assert_beaconDataEquals(BeaconData* expected, BeaconData* current);
 
@@ -289,8 +292,8 @@ static void assert_beaconDataEquals(BeaconData* expected, BeaconData* current) {
     assert_int_equal(expected->power, current->power);
     assert_int_equal(expected->nbCoefficientAttenuations, current->nbCoefficientAttenuations);
     assert_positionEquals(&(expected->position), &(current->position));
-    assert_float_equal(expected->attenuationCoefficient, current->attenuationCoefficient, EPSILON);
+    assert_float_equal(expected->attenuationCoefficient, current->attenuationCoefficient, DBL_EPSILON);
     for (int i = 0; i < expected->attenuationCoefficient; i++) {
-        assert_float_equal(expected->attenuationCoefficientsArray[i], current->attenuationCoefficientsArray[i], EPSILON);
+        assert_float_equal(expected->attenuationCoefficientsArray[i], current->attenuationCoefficientsArray[i], DBL_EPSILON);
     }
 }
