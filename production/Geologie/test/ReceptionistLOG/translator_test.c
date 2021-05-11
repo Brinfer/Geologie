@@ -18,16 +18,17 @@
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <string.h>
 #include <stdarg.h>
 #include <stddef.h>
 #include <setjmp.h>
+#include <stdint.h>
 #include <limits.h>
 
 #include "cmocka.h"
 
 #include "Mathematician/Mathematician.h"
 #include "ReceptionistLOG/translator.c"
+#include "config.h"
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -43,7 +44,7 @@
  */
 typedef struct {
     Position position;            /**< La Position a convertir */
-    unsigned char arrayBite[8];    /**< Le resultat de la conversion attendue */
+    unsigned char arrayByte[8];    /**< Le resultat de la conversion attendue */
 } ParametersTestPosition;
 
 /**
@@ -54,7 +55,7 @@ typedef struct {
  */
 typedef struct {
     BeaconData beacon;            /**< Le BeaconData */
-    unsigned char arrayBite[32];   /**< Le tableau d'octets */
+    unsigned char arrayByte[32];   /**< Le tableau d'octets */
 } ParametersTestBeacon;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -69,13 +70,13 @@ typedef struct {
  */
 ParametersTestPosition parametersTestPositionToBytes[] = {
     //                                                          | <---------X---------> | <---------Y---------> |
-    {.position = {.X = 0, .Y = 0 },               .arrayBite = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }},
-    {.position = {.X = -1, .Y = 1 },              .arrayBite = { 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x01 }},
-    {.position = {.X = 1, .Y = -1 },              .arrayBite = { 0x00, 0x00, 0x00, 0x01, 0xFF, 0xFF, 0xFF, 0xFF }},
-    {.position = {.X = -12345, .Y = 12345 },      .arrayBite = { 0xFF, 0xFF, 0xCF, 0xC7, 0x00, 0x00, 0x30, 0x39 }},
-    {.position = {.X = 12345, .Y = -12345 },      .arrayBite = { 0x00, 0x00, 0x30, 0x39, 0xFF, 0xFF, 0xCF, 0xC7 }},
-    {.position = {.X = INT_MAX, .Y = INT_MIN },   .arrayBite = { 0x7F, 0xFF, 0xFF, 0xFF, 0x80, 0x00, 0x00, 0x00 }},
-    {.position = {.X = INT_MIN, .Y = INT_MAX },   .arrayBite = { 0x80, 0x00, 0x00, 0x00, 0x7F, 0xFF, 0xFF, 0xFF }},
+    {.position = {.X = 0, .Y = 0 },               .arrayByte = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }},
+    {.position = {.X = -1, .Y = 1 },              .arrayByte = { 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x01 }},
+    {.position = {.X = 1, .Y = -1 },              .arrayByte = { 0x00, 0x00, 0x00, 0x01, 0xFF, 0xFF, 0xFF, 0xFF }},
+    {.position = {.X = -12345, .Y = 12345 },      .arrayByte = { 0xFF, 0xFF, 0xCF, 0xC7, 0x00, 0x00, 0x30, 0x39 }},
+    {.position = {.X = 12345, .Y = -12345 },      .arrayByte = { 0x00, 0x00, 0x30, 0x39, 0xFF, 0xFF, 0xCF, 0xC7 }},
+    {.position = {.X = INT_MAX, .Y = INT_MIN },   .arrayByte = { 0x7F, 0xFF, 0xFF, 0xFF, 0x80, 0x00, 0x00, 0x00 }},
+    {.position = {.X = INT_MIN, .Y = INT_MAX },   .arrayByte = { 0x80, 0x00, 0x00, 0x00, 0x7F, 0xFF, 0xFF, 0xFF }},
 };
 
 /**
@@ -93,7 +94,7 @@ ParametersTestBeacon parametersTestBeaconToByte[] = {
             .nbCoefficientAttenuations = 3,                     // Fixed in the prod code
             .attenuationCoefficientsArray = { -1.05, 1, -1 }
         },
-        .arrayBite = {
+        .arrayByte = {
             0x41, 0x61, 0x00,                                   // ID
             0x00, 0x00, 0x30, 0x39,                             // position X
             0xFF, 0xFF, 0xCF, 0xC7,                             // position Y
@@ -116,7 +117,7 @@ ParametersTestBeacon parametersTestBeaconToByte[] = {
             .nbCoefficientAttenuations = 3,                     // Fixed in the prod code
             .attenuationCoefficientsArray = { 666, -666, 0 }
         },
-        .arrayBite = {
+        .arrayByte = {
             0x23, 0x7D, 0x00,                                   // ID
             0xFF, 0xFF, 0xCF, 0xC7,                             // position X
             0x00, 0x00, 0x30, 0x39,                             // position Y
@@ -139,7 +140,7 @@ ParametersTestBeacon parametersTestBeaconToByte[] = {
             .nbCoefficientAttenuations = 3,                     // Fixed in the prod code
             .attenuationCoefficientsArray = { -1, 0, 1 }
         },
-        .arrayBite = {
+        .arrayByte = {
             0x7F, 0x0A, 0x00,                                   // ID
             0x00, 0x00, 0x00, 0x00,                             // position X
             0x00, 0x00, 0x00, 0x00,                             // position Y
@@ -192,14 +193,14 @@ static void test_Translator_convertByteToBeaconData(void** state);
  * TODO
  * @param current
  */
-static void checkExpectedPosition(Position* current);
+static void assert_positionEquals(Position* expected, Position* current);
 
 /**
  * @brief
  * TODO
  * @param current
  */
-static void checkExpectedBeaconData(BeaconData* current);
+static void assert_beaconDataEquals(BeaconData* expected, BeaconData* current);
 
 /**
  * @brief Suite de test de la conversion des structures de donnees en tableau d'octet.
@@ -250,7 +251,7 @@ static void test_Translator_convertPositionToByte(void** state) {
     unsigned char result[8];
     Translator_convertPositionToByte(&(param->position), result);
 
-    assert_memory_equal(result, param->arrayBite, 8);
+    assert_memory_equal(result, param->arrayByte, 8);
 }
 
 static void test_Translator_convertBeaconDataToByte(void** state) {
@@ -259,31 +260,37 @@ static void test_Translator_convertBeaconDataToByte(void** state) {
     unsigned char result[32];
     Translator_convertBeaconDataToByte(&(param->beacon), result);
 
-    assert_memory_equal(result, param->arrayBite, 32);
+    assert_memory_equal(result, param->arrayByte, 32);
 }
 
 static void test_Translator_convertByteToPosition(void** state) {
     ParametersTestPosition* param = (ParametersTestPosition*) *state;
-    expect_memory(checkExpectedPosition, current, &(param->position), sizeof(param->position));
 
     Position result;
-    Translator_convertByteToPosition(param->arrayBite, &result);
-    checkExpectedPosition(&result);
+    Translator_convertByteToPosition(param->arrayByte, &result);
+    assert_positionEquals(&(param->position), &result);
 }
 
 static void test_Translator_convertByteToBeaconData(void** state) {
     ParametersTestBeacon* param = (ParametersTestBeacon*) *state;
-    expect_memory(checkExpectedBeaconData, current, &(param->beacon), sizeof(param->beacon));
 
     BeaconData result;
-    Translator_convertByteToBeaconData(param->arrayBite, &result);
-    checkExpectedBeaconData(&result);
+    Translator_convertByteToBeaconData(param->arrayByte, &result);
+    assert_beaconDataEquals(&(param->beacon), &result);
 }
 
-static void checkExpectedPosition(Position* current) {
-    check_expected(current);
+static void assert_positionEquals(Position* expected, Position* current) {
+    assert_int_equal(expected->X, current->X);
+    assert_int_equal(expected->Y, current->Y);
 }
 
-static void checkExpectedBeaconData(BeaconData* current) {
-    check_expected(current);
+static void assert_beaconDataEquals(BeaconData* expected, BeaconData* current) {
+    assert_string_equal(expected->ID, current->ID);
+    assert_int_equal(expected->power, current->power);
+    assert_int_equal(expected->nbCoefficientAttenuations, current->nbCoefficientAttenuations);
+    assert_positionEquals(&(expected->position), &(current->position));
+    assert_float_equal(expected->attenuationCoefficient, current->attenuationCoefficient, EPSILON);
+    for (int i = 0; i < expected->attenuationCoefficient; i++) {
+        assert_float_equal(expected->attenuationCoefficientsArray[i], current->attenuationCoefficientsArray[i], EPSILON);
+    }
 }
