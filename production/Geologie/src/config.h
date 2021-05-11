@@ -13,13 +13,4 @@
 #ifndef CONFIG_
 #define CONFIG_
 
-/**
- * @enum bool_e
- * @brief Enumeration pour remplacer le type bool d'autre langage.
- */
-typedef enum {
-    FALSE = 0, /**< Valeur false */
-    TRUE = 1   /**< Valuer true */
-} bool_e;
-
 #endif // CONFIG_

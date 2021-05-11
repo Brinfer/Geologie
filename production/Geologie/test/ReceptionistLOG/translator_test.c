@@ -70,13 +70,12 @@ typedef struct {
 ParametersTestPosition parametersTestPosition[] = {
     //                                                                     | <---------X---------> | <---------Y---------> |
     {.positionTested = {.X = 0, .Y = 0 },               .expectedResult = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }},
-    {.positionTested = {.X = 0.05, .Y = 0.05 },         .expectedResult = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }},
     {.positionTested = {.X = -1, .Y = 1 },              .expectedResult = { 0xFF, 0xFF, 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x01 }},
     {.positionTested = {.X = 1, .Y = -1 },              .expectedResult = { 0x00, 0x00, 0x00, 0x01, 0xFF, 0xFF, 0xFF, 0xFF }},
-    {.positionTested = {.X = 1.05, .Y = -1.05 },        .expectedResult = { 0x00, 0x00, 0x00, 0x01, 0xFF, 0xFF, 0xFF, 0xFF }},
     {.positionTested = {.X = -12345, .Y = 12345 },      .expectedResult = { 0xFF, 0xFF, 0xCF, 0xC7, 0x00, 0x00, 0x30, 0x39 }},
     {.positionTested = {.X = 12345, .Y = -12345 },      .expectedResult = { 0x00, 0x00, 0x30, 0x39, 0xFF, 0xFF, 0xCF, 0xC7 }},
-    {.positionTested = {.X = INT_MAX, .Y = INT_MIN },   .expectedResult = { 0x7F, 0xFF, 0xFF, 0xFF, 0x80, 0x00, 0x00, 0x00 }}
+    {.positionTested = {.X = INT_MAX, .Y = INT_MIN },   .expectedResult = { 0x7F, 0xFF, 0xFF, 0xFF, 0x80, 0x00, 0x00, 0x00 }},
+    {.positionTested = {.X = INT_MIN, .Y = INT_MAX },   .expectedResult = { 0x80, 0x00, 0x00, 0x00, 0x7F, 0xFF, 0xFF, 0xFF }},
 };
 
 /**
@@ -134,7 +133,7 @@ ParametersTestBeacon parametersTestBeacon[] = {
     {
         .beaconTested = {
             .ID = {127, 10, 0},
-            .position = {.X = -0.05, .Y = 0.05 },
+            .position = {.X = -0, .Y = 0 },
             .power = 0.05,
             .attenuationCoefficient = -1.05,
             .nbCoefficientAttenuations = 3,                     // Fixed in the prod code
@@ -188,7 +187,6 @@ static const struct CMUnitTest tests[] =
     cmocka_unit_test_prestate(test_Translator_convertPosition, &(parametersTestPosition[4])),
     cmocka_unit_test_prestate(test_Translator_convertPosition, &(parametersTestPosition[5])),
     cmocka_unit_test_prestate(test_Translator_convertPosition, &(parametersTestPosition[6])),
-    cmocka_unit_test_prestate(test_Translator_convertPosition, &(parametersTestPosition[7])),
 
     // BeaconData
     cmocka_unit_test_prestate(test_Translator_convertBeaconData, &(parametersTestBeacon[0])),
