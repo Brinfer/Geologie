@@ -40,7 +40,7 @@
  * @param array Le pointeur vers le tableau a inverser.
  * @param size La taille du tableau.
  */
-static void convertToBigEndian(unsigned char* array, unsigned int size);
+static void reverseArray(unsigned char* array, unsigned int size);
 
 /**
  * @brief Convertie un entier en un tableau d'octect.
@@ -68,19 +68,19 @@ static void convertIntToBytes(int i, unsigned char* dest);
  */
 static void convertFloatToBytes(float f, unsigned char* dest);
 
-
+static int convertBytesToInt(const unsigned char* src);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //                                              Fonctions publiques
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-extern void Translator_convertBeaconData(const BeaconData* beaconData, unsigned char dest[32]) {
+extern void Translator_convertBeaconDataToByte(const BeaconData* beaconData, unsigned char* dest) {
     /* ID */
     memcpy(dest, beaconData->ID, 3);
 
     /* Position */
-    Translator_convertPosition(&(beaconData->position), dest + 3);
+    Translator_convertPositionToByte(&(beaconData->position), dest + 3);
 
     /* Puissance */
     convertIntToBytes(beaconData->power, dest + 11);
@@ -97,18 +97,22 @@ extern void Translator_convertBeaconData(const BeaconData* beaconData, unsigned 
     }
 }
 
-extern void Translator_convertPosition(const Position* position, unsigned char dest[8]) {
+extern void Translator_convertPositionToByte(const Position* position, unsigned char* dest) {
     convertIntToBytes(position->X, dest);
     convertIntToBytes(position->Y, dest + 4);
 }
 
+extern void Translator_convertByteToPosition(const unsigned char* src, Position* dest) {
+    dest->X = convertBytesToInt(src);
+    dest->Y = convertBytesToInt(src + 4);
+}
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //                                              Fonctions static
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-static void convertToBigEndian(unsigned char* array, unsigned int size) {
+static void reverseArray(unsigned char* array, unsigned int size) {
     for (int i = 0; i < size / 2; i++) {
         char temp = array[i];
         array[i] = array[size - 1 - i];
@@ -119,13 +123,28 @@ static void convertToBigEndian(unsigned char* array, unsigned int size) {
 static void convertIntToBytes(int i, unsigned char* dest) {
     unsigned char tempArray[sizeof(int)];
     memcpy(tempArray, (unsigned char*) (&i), sizeof(int));
-    convertToBigEndian(tempArray, sizeof(int));
+    reverseArray(tempArray, sizeof(int));
     memcpy(dest, tempArray, sizeof(int));
 }
 
 static void convertFloatToBytes(float f, unsigned char* dest) {
     unsigned char tempArray[sizeof(float)];
     memcpy(tempArray, (unsigned char*) (&f), sizeof(float));
-    convertToBigEndian(tempArray, sizeof(float));
+    reverseArray(tempArray, sizeof(float));
     memcpy(dest, tempArray, sizeof(float));
+}
+
+static int convertBytesToInt(const unsigned char* src) {
+    int returnVal;
+    unsigned char tempArray[sizeof(int)];
+
+    memcpy(tempArray, src, sizeof(int));
+    reverseArray(tempArray, sizeof(int));
+
+  /*    for (int i = 1; i < 5; i++) {
+         returnVal = (returnVal << 8) + *(src + (4 - i))
+     } */
+
+    returnVal = *(int*) tempArray;
+    return returnVal;
 }
