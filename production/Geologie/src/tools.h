@@ -11,7 +11,7 @@
  * #PRINT
  * #DEBUG_FILE_PATH
  * #bool_e
- * 
+ *
  * @version 1.0
  * @date 5 mai 2021
  * @author GAUTIER Pierre-louis
@@ -53,7 +53,7 @@
 #define PRINT(fmt, ...)                                         \
     do                                                          \
     {                                                           \
-        FILE *stream = fopen(DEBUG_FILE_PATH, "a");                 \
+        FILE *stream = fopen(DEBUG_FILE_PATH, "a");             \
         fprintf(stream, fmt, ##__VA_ARGS__);                    \
         fclose(stream);                                         \
     } while (0)
