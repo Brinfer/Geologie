@@ -68,7 +68,21 @@ static void convertIntToBytes(int i, unsigned char* dest);
  */
 static void convertFloatToBytes(float f, unsigned char* dest);
 
+/**
+ * @brief
+ * TODO
+ * @param src
+ * @return int
+ */
 static int convertBytesToInt(const unsigned char* src);
+
+/**
+ * @brief
+ * TODO
+ * @param src
+ * @return float
+ */
+static float convertBytesToFloat(const unsigned char* src);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //                                              Fonctions publiques
@@ -82,7 +96,7 @@ extern void Translator_convertBeaconDataToByte(const BeaconData* beaconData, uns
     /* Position */
     Translator_convertPositionToByte(&(beaconData->position), dest + 3);
 
-    /* Puissance */
+    /* Power */
     convertIntToBytes(beaconData->power, dest + 11);
 
     /* Attenuation coefficient */
@@ -92,7 +106,7 @@ extern void Translator_convertBeaconDataToByte(const BeaconData* beaconData, uns
     memcpy(dest + 19, &(beaconData->nbCoefficientAttenuations), 1);
 
     /* Attenuation coefficients */
-    for (unsigned int i; i < beaconData->nbCoefficientAttenuations; i++) {
+    for (unsigned int i = 0; i < beaconData->nbCoefficientAttenuations; i++) {
         convertFloatToBytes(beaconData->attenuationCoefficientsArray[i], dest + 20 + (i * 4));
     }
 }
@@ -106,6 +120,29 @@ extern void Translator_convertByteToPosition(const unsigned char* src, Position*
     dest->X = convertBytesToInt(src);
     dest->Y = convertBytesToInt(src + 4);
 }
+
+extern void Translator_convertByteToBeaconData(const unsigned char* src, BeaconData* dest) {
+    /* ID */
+    memcpy(dest->ID, src, 3);
+
+    /* Position */
+    Translator_convertByteToPosition(src + 3, &(dest->position));
+
+    /* Power */
+    dest->power = convertBytesToInt(src + 11);
+
+    /* Attenuation coefficient */
+    dest->attenuationCoefficient = convertBytesToFloat(src + 15);
+
+    /* NB Attenuation coefficient */
+    memcpy(&(dest->nbCoefficientAttenuations), src + 19, 1);
+
+    /* Attenuation coefficients */
+    for (unsigned int i = 0; i < dest->nbCoefficientAttenuations; i++) {
+        dest->attenuationCoefficientsArray[i] = convertBytesToFloat(src + 20 + (i * 4));
+    }
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //                                              Fonctions static
@@ -141,10 +178,17 @@ static int convertBytesToInt(const unsigned char* src) {
     memcpy(tempArray, src, sizeof(int));
     reverseArray(tempArray, sizeof(int));
 
-  /*    for (int i = 1; i < 5; i++) {
-         returnVal = (returnVal << 8) + *(src + (4 - i))
-     } */
-
     returnVal = *(int*) tempArray;
+    return returnVal;
+}
+
+static float convertBytesToFloat(const unsigned char* src) {
+    float returnVal;
+    unsigned char tempArray[sizeof(float)];
+
+    memcpy(tempArray, src, sizeof(float));
+    reverseArray(tempArray, sizeof(float));
+
+    returnVal = *(float*) tempArray;
     return returnVal;
 }

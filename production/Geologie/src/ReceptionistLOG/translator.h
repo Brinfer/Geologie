@@ -92,4 +92,12 @@ extern void Translator_convertPositionToByte(const Position* position, unsigned 
  * @param dest
  */
 extern void Translator_convertByteToPosition(const unsigned char* src, Position* dest);
+
+/**
+ * @brief
+ * TODO
+ * @param src
+ * @param dest
+ */
+extern void Translator_convertByteToBeaconData(const unsigned char* src, BeaconData* dest);
 #endif /* TRANSLATOR_ */
