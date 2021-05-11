@@ -26,9 +26,9 @@ export CCFLAGS += -MMD -MP 			# gestion automatique des dpendances
 export CCFLAGS += -D_BSD_SOURCE -D_XOPEN_SOURCE_EXTENDED -D_XOPEN_SOURCE -D_DEFAULT_SOURCE -D_GNU_SOURCE
 export CCFLAGS += -std=c99 -Wall -pedantic
 export CCFLAGS += -D_REENTRANT					# define a macro
-export CCFLAGS += -lm							# Include math library
-export CCFLAGS += -pthread -lpthread			# Include pthread library
-export CCFLAGS += -lbluetooth					# Include bluetooth library
+export LDFLAGS += -lm							# Include math library
+export LDFLAGS += -pthread -lpthread			# Include pthread library
+export LDFLAGS += -lbluetooth					# Include bluetooth library
 all : build
 
 # Compilation
