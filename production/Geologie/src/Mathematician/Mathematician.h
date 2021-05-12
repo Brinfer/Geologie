@@ -26,7 +26,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
+#include "../config.h"
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -61,26 +61,26 @@ extern float tab[];
 extern AttenuationCoefficient getAttenuationCoefficient(Power power, Position beaconPosition, Position calibrationPosition);
 
 /**
-* @fn extern AttenuationCoefficientAverage getAverageCalcul(BeaconCoefficients beaconCoefficients)
+* @fn extern AttenuationCoefficient getAverageCalcul(BeaconCoefficients beaconCoefficients)
 * @brief calcul la moyenne des coefficients d'attenuations
 *
 * @param [in] beaconCoefficients tableau contenant les coefficients d'attenuations pour une balise
 * @return la moyenne des coefficients d'attenuations
 */
-extern AttenuationCoefficientAverage getAverageCalcul(BeaconCoefficients beaconCoefficients);
+extern AttenuationCoefficient getAverageCalcul(BeaconCoefficients beaconCoefficients);
 
 
 /**
-* @fn extern AttenuationCoefficientAverage getAverageCalcul(BeaconCoefficients beaconCoefficients)
+* @fn extern AttenuationCoefficient getAverageCalcul(BeaconCoefficients beaconCoefficients)
 * @brief calcul la moyenne des coefficients d'attenuations
 *
 * @param [in] beaconCoefficients tableau contenant les coefficients d'attenuations pour une balise
 * @return la moyenne des coefficients d'attenuations
 */
-extern AttenuationCoefficientAverage getAverageCalcul(BeaconCoefficients beaconCoefficients);
+extern AttenuationCoefficient getAverageCalcul(BeaconCoefficients beaconCoefficients);
 
 /**
-* @fn extern AttenuationCoefficientAverage getAverageCalcul(BeaconCoefficients beaconCoefficients)
+* @fn extern AttenuationCoefficient getAverageCalcul(BeaconCoefficients beaconCoefficients)
 * @brief calcul la moyenne des coefficients d'attenuations
 *
 * @param [in] beaconsData tableau contenant les informations des balises
