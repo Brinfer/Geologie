@@ -20,10 +20,6 @@
 #ifndef MATHEMATICIAN_H
 #define MATHEMATICIAN_H
 
-#define NUMBER_OF_BEACONS
-#define SIZE_BEACON_ID (3)
-#define NB_CALIBRATION_POSITION (3)
-
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //                                              Include
@@ -43,39 +39,6 @@
  *
  */
 extern float tab[];
-
-/**
- * @struct type
- * @brief cration d'une structure Position qui va prendre les coordonnees d'un point
- */
-typedef struct {
-    int X;
-    int Y;
-}Position;
-
-typedef float Power;
-
-typedef float AttenuationCoefficient;
-
-typedef float AttenuationCoefficientAverage;
-
-typedef float BeaconCoefficients[NUMBER_OF_BEACONS];
-
-/**
- * @struct type
- * @brief cration d'une structure qui va prendre les donnes d'une balise
- */
-typedef struct {
-    char ID[SIZE_BEACON_ID];
-    Position position;
-    Power power;
-    AttenuationCoefficientAverage attenuationCoefficient;
-    unsigned char nbCoefficientAttenuations;
-    AttenuationCoefficient attenuationCoefficientsArray[NB_CALIBRATION_POSITION];
-} BeaconData;
-
-
-
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
