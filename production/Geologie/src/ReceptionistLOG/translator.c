@@ -19,6 +19,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <arpa/inet.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -31,16 +32,6 @@
 
 #define COMMAND_POSITION_START (0)
 #define COMMAND_SIZE (1)
-
-/**
- * @brief Inverse l'ordre du tableau d'octet.
- *
- * Intervertie les elements du tableau @p dest.
- *
- * @param array Le pointeur vers le tableau a inverser.
- * @param size La taille du tableau.
- */
-static void reverseArray(unsigned char* array, unsigned int size);
 
 /**
  * @brief Convertie un entier en un tableau d'octet.
@@ -150,26 +141,14 @@ extern void Translator_convertByteToBeaconData(const unsigned char* src, BeaconD
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-static void reverseArray(unsigned char* array, unsigned int size) {
-    for (int i = 0; i < size / 2; i++) {
-        char temp = array[i];
-        array[i] = array[size - 1 - i];
-        array[size - 1 - i] = temp;
-    }
-}
-
 static void convertIntToBytes(int i, unsigned char* dest) {
-    unsigned char tempArray[sizeof(int)];
-    memcpy(tempArray, (unsigned char*) (&i), sizeof(int));
-    reverseArray(tempArray, sizeof(int));
-    memcpy(dest, tempArray, sizeof(int));
+    const int reversed = htonl(i);
+    memcpy(dest, (unsigned char*) &reversed, sizeof(int));
 }
 
 static void convertFloatToBytes(float f, unsigned char* dest) {
-    unsigned char tempArray[sizeof(float)];
-    memcpy(tempArray, (unsigned char*) (&f), sizeof(float));
-    reverseArray(tempArray, sizeof(float));
-    memcpy(dest, tempArray, sizeof(float));
+    const int reversed = htonl(*(int*) &f);
+    memcpy(dest, (unsigned char*) &reversed, sizeof(float));
 }
 
 static int convertBytesToInt(const unsigned char* src) {
@@ -177,19 +156,21 @@ static int convertBytesToInt(const unsigned char* src) {
     unsigned char tempArray[sizeof(int)];
 
     memcpy(tempArray, src, sizeof(int));
-    reverseArray(tempArray, sizeof(int));
-
     returnVal = *(int*) tempArray;
+    returnVal = ntohl(returnVal);
+
     return returnVal;
 }
 
 static float convertBytesToFloat(const unsigned char* src) {
     float returnVal;
+    int temp;   // ntohl accept uint32_t not the float
     unsigned char tempArray[sizeof(float)];
 
     memcpy(tempArray, src, sizeof(float));
-    reverseArray(tempArray, sizeof(float));
+    temp = *(int*) tempArray;
+    temp = ntohl(temp);
+    returnVal = *(float *) &temp;
 
-    returnVal = *(float*) tempArray;
     return returnVal;
 }
