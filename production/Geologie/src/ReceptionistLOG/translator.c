@@ -27,12 +27,6 @@
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#define SIZE_BEACON_DATA (19 * 8)
-#define SIZE_POSITION_DATA (8 * 8)
-
-#define COMMAND_POSITION_START (0)
-#define COMMAND_SIZE (1)
-
 /**
  * @brief Convertie un entier en un tableau d'octet.
  *

@@ -27,7 +27,6 @@
 
 #include "cmocka.h"
 
-#include "Mathematician/Mathematician.h"
 #include "ReceptionistLOG/translator.c"
 #include "config.h"
 
