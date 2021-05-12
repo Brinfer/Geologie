@@ -8,10 +8,12 @@
 #define NB_SUITE_TESTS 1
 
 extern int translator_run_tests(void);
+///extern int mathematician_run_test(void);
 
 /** Liste des suites de tests à excuter. */
 int (*suite_tests[])(void) = {
     translator_run_tests
+    //mathematician_run_test
 };
 
 /**
