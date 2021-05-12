@@ -22,7 +22,6 @@
 
 #include "tools.h"
 #include "config.h"
-#include "Mathematician/Mathematician.h"
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -30,28 +29,6 @@
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-/**
- * @typedef Commande
- *
- * @brief Enumeration contenant l'identifiant des differentes commandes.
- */
-typedef enum {
-    ERROR = -1,
-
-    ASK_CONNECTION = 0,
-    ASK_EXPERIMENTAL_POSITION,
-    ASK_ALL_BEACONS_DATA,
-    ASK_CURRENT_POSITION,
-    ASK_CALIBRATION_POSITION,
-    ASK_MEMORY_PROCESSOR_LOAD,
-
-    SIGNAL_CALIBRATION_START,
-    SIGNAL_CALIBRATION_POSITION,
-    SIGNAL_CALIBRATION_END,
-
-    MIN_VALUE = 0,
-    MAX_VALUE = SIGNAL_CALIBRATION_END
-} Commande;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
