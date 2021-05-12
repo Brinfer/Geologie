@@ -23,9 +23,9 @@
  * @return la distance entre ces deux points
  *
  */
-static float distanceCalculWithPosition(Position p1, Position p2){
-    float distance=0;
-    distance=sqrtf((p1.X-p2.X)*(p1.X-p2.X)+(p1.Y-p2.Y)*(p1.Y-p2.Y));
+static float distanceCalculWithPosition(const Position * p1, const Position * p2) { ///const pour pas modifier adresse
+    float distance = 0;
+    distance = sqrtf((p1->X - p2->X) * (p1->X - p2->X) + (p1->Y - p2->Y) * (p1->Y - p2->Y));
     return distance;
 }
 
@@ -38,11 +38,11 @@ static float distanceCalculWithPosition(Position p1, Position p2){
  * @return la distance entre ces deux points
  *
  */
-static float distanceCalculWithPower(Power power, AttenuationCoefficientAverage attenuationCoefficientAverage){
-    float distance=0;
-    float A=0; ///correspond a ce qui est dans la puissance 
-    A=(power-ATT_COEFF_1_METER)/(-10*attenuationCoefficientAverage);
-    distance=pow(10,A);
+static float distanceCalculWithPower(Power power, AttenuationCoefficientAverage attenuationCoefficientAverage) {
+    float distance = 0;
+    float A = 0; ///correspond a ce qui est dans la puissance 
+    A = (power - ATT_COEFF_1_METER) / (-10 * attenuationCoefficientAverage);
+    distance = pow(10, A);
     return distance;
 }
 
@@ -59,12 +59,12 @@ static float distanceCalculWithPower(Power power, AttenuationCoefficientAverage 
  * @return le coefficient d'attenuation calcule
  *
  */
-extern AttenuationCoefficient getAttenuationCoefficient(Power power, Position beaconPosition, Position calibrationPosition){
+extern AttenuationCoefficient getAttenuationCoefficient(Power power, Position beaconPosition, Position calibrationPosition) {
     AttenuationCoefficient attenuationCoefficient;
-    float distance = distanceCalculWithPosition(beaconPosition,calibrationPosition);
-    
-    
-    attenuationCoefficient=(power-ATT_COEFF_1_METER)/(-10*log10f(distance)); ///TODO revoir le calcuul, pas sur
+    float distance = distanceCalculWithPosition(&beaconPosition, &calibrationPosition);
+
+
+    attenuationCoefficient = (power - ATT_COEFF_1_METER) / (-10 * log10f(distance)); ///TODO revoir le calcuul, pas sur
     return attenuationCoefficient;
 }
 
@@ -75,13 +75,13 @@ extern AttenuationCoefficient getAttenuationCoefficient(Power power, Position be
 * @param beaconCoefficients tableau contenant les coefficients d'attenuations pour une balise
 * @return la moyenne des coefficients d'attenuations
 */
-extern AttenuationCoefficientAverage getAverageCalcul(BeaconCoefficients beaconCoefficients){
-    AttenuationCoefficientAverage somme=0;
-    AttenuationCoefficientAverage attenuationCoefficientAverage=0;
-    for(int i=0; i<NB_CALIBRATION_POSITIONS; i++){
-        somme=somme+beaconCoefficients[i];
+extern AttenuationCoefficientAverage getAverageCalcul(BeaconCoefficients beaconCoefficients) {
+    AttenuationCoefficientAverage somme = 0;
+    AttenuationCoefficientAverage attenuationCoefficientAverage = 0;
+    for (int i = 0; i < NB_CALIBRATION_POSITIONS; i++) {
+        somme = somme + beaconCoefficients[i];
     }
-    attenuationCoefficientAverage=somme/NB_CALIBRATION_POSITIONS;
+    attenuationCoefficientAverage = somme / NB_CALIBRATION_POSITIONS;
     return attenuationCoefficientAverage;
 }
 
@@ -93,10 +93,10 @@ extern AttenuationCoefficientAverage getAverageCalcul(BeaconCoefficients beaconC
 * @param [in] beaconsData tableau contenant les informations des balises
 * @return la position actuelle de la carte
 */
-extern Position getCurrentPosition(BeaconData beaconsData[NB_BEACONS]){
-    Position b1Position=beaconsData[0].position;
-    Position b2Position=beaconsData[1].position;
-    Position b3Position=beaconsData[2].position;
+extern Position getCurrentPosition(BeaconData beaconsData[NB_BEACONS]) {
+    Position b1Position = beaconsData[0].position;
+    Position b2Position = beaconsData[1].position;
+    Position b3Position = beaconsData[2].position;
 
 
 }
