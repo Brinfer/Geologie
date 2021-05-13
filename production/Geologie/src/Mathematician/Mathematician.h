@@ -21,17 +21,13 @@
 #ifndef MATHEMATICIAN_H
 #define MATHEMATICIAN_H
 
-#define NB_BEACONS
-#define SIZE_BEACON_ID (3)
-#define NB_CALIBRATION_POSITIONS (3)
-#define ATT_COEFF_1_METER (4)
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //                                              Include
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
+#include "../config.h"
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -44,39 +40,6 @@
  *
  */
 extern float tab[];
-
-/**
- * @struct type
- * @brief cration d'une structure Position qui va prendre les coordonnees d'un point
- */
-typedef struct {
-    int X;
-    int Y;
-}Position;
-
-typedef float Power;
-
-typedef float AttenuationCoefficient;
-
-typedef float AttenuationCoefficientAverage;
-
-typedef float BeaconCoefficients[NB_BEACONS];
-
-/**
- * @struct type
- * @brief cration d'une structure qui va prendre les donnes d'une balise
- */
-typedef struct {
-    char ID[SIZE_BEACON_ID];
-    Position position;
-    Power power;
-    AttenuationCoefficientAverage attenuationCoefficient;
-    unsigned char nbCoefficientAttenuations;
-    AttenuationCoefficient attenuationCoefficientsArray[NB_CALIBRATION_POSITIONS];
-} BeaconData;
-
-
-
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -99,26 +62,26 @@ typedef struct {
 extern AttenuationCoefficient getAttenuationCoefficient(Power power, Position beaconPosition, Position calibrationPosition);
 
 /**
-* @fn extern AttenuationCoefficientAverage getAverageCalcul(BeaconCoefficients beaconCoefficients)
+* @fn extern AttenuationCoefficient getAverageCalcul(BeaconCoefficients beaconCoefficients)
 * @brief calcul la moyenne des coefficients d'attenuations
 *
 * @param [in] beaconCoefficients tableau contenant les coefficients d'attenuations pour une balise
 * @return la moyenne des coefficients d'attenuations
 */
-extern AttenuationCoefficientAverage getAverageCalcul(BeaconCoefficients beaconCoefficients);
+extern AttenuationCoefficient getAverageCalcul(BeaconCoefficients beaconCoefficients);
 
 
 /**
-* @fn extern AttenuationCoefficientAverage getAverageCalcul(BeaconCoefficients beaconCoefficients)
+* @fn extern AttenuationCoefficient getAverageCalcul(BeaconCoefficients beaconCoefficients)
 * @brief calcul la moyenne des coefficients d'attenuations
 *
 * @param [in] beaconCoefficients tableau contenant les coefficients d'attenuations pour une balise
 * @return la moyenne des coefficients d'attenuations
 */
-extern AttenuationCoefficientAverage getAverageCalcul(BeaconCoefficients beaconCoefficients);
+extern AttenuationCoefficient getAverageCalcul(BeaconCoefficients beaconCoefficients);
 
 /**
-* @fn extern AttenuationCoefficientAverage getAverageCalcul(BeaconCoefficients beaconCoefficients)
+* @fn extern AttenuationCoefficient getAverageCalcul(BeaconCoefficients beaconCoefficients)
 * @brief calcul la moyenne des coefficients d'attenuations
 *
 * @param [in] beaconsData tableau contenant les informations des balises
