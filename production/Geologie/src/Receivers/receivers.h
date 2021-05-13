@@ -18,6 +18,12 @@
 typedef struct {
 } Receivers_t;
 
+typedef struct {
+    char name;
+    int8_t rssi;
+} BeaconsData;
+
+extern void Receivers_getAllBeaconsData();
 
 extern Receivers_t * Receivers_new();
 extern void Receivers_free(Receivers_t * this);
