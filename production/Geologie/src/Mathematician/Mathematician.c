@@ -12,7 +12,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h> /// pour les racines carr, carr...
-
 /**
  * @fn static float distanceCalcul(Position p1, Position p2)
  * @brief methode privee permettant de calculer la distance entre deux positions
@@ -48,26 +47,26 @@ extern AttenuationCoefficient getAttenuationCoefficient(Power power, Position be
 }
 
 /**
-* @fn extern AttenuationCoefficientAverage getAverageCalcul(BeaconCoefficients beaconCoefficients)
+* @fn extern AttenuationCoefficient getAverageCalcul(BeaconCoefficients beaconCoefficients)
 * @brief calcul la moyenne des coefficients d'attenuations
 *
 * @param beaconCoefficients tableau contenant les coefficients d'attenuations pour une balise
 * @return la moyenne des coefficients d'attenuations
 */
-extern AttenuationCoefficientAverage getAverageCalcul(BeaconCoefficients beaconCoefficients);
+extern AttenuationCoefficient getAverageCalcul(BeaconCoefficients beaconCoefficients);
 
 
 /**
-* @fn extern AttenuationCoefficientAverage getAverageCalcul(BeaconCoefficients beaconCoefficients)
+* @fn extern AttenuationCoefficient getAverageCalcul(BeaconCoefficients beaconCoefficients)
 * @brief calcul la moyenne des coefficients d'attenuations
 *
 * @param beaconCoefficients tableau contenant les coefficients d'attenuations pour une balise
 * @return la moyenne des coefficients d'attenuations
 */
-extern AttenuationCoefficientAverage getAverageCalcul(BeaconCoefficients beaconCoefficients);
+extern AttenuationCoefficient getAverageCalcul(BeaconCoefficients beaconCoefficients);
 
 /**
-* @fn extern AttenuationCoefficientAverage getAverageCalcul(BeaconCoefficients beaconCoefficients)
+* @fn extern AttenuationCoefficient getAverageCalcul(BeaconCoefficients beaconCoefficients)
 * @brief calcul la moyenne des coefficients d'attenuations
 *
 * @param [in] beaconsData tableau contenant les informations des balises
