@@ -21,29 +21,6 @@ struct hci_request ble_hci_request(uint16_t ocf, int clen, void * status, void *
 	return rq;
 }
 
-/*char getName(uint32_t device){
-	char name;
-
-	le_set_scan_parameters_cp scan_params_cp;
-	memset(&scan_params_cp, 0, sizeof(scan_params_cp));
-	scan_params_cp.type 			= 0x00; 
-	scan_params_cp.interval 		= htobs(0x0010);
-	scan_params_cp.window 			= htobs(0x0010);
-	scan_params_cp.own_bdaddr_type 	= 0x00; // Public Device Address (default).
-	scan_params_cp.filter 			= 0x00; // Accept all.
-
-	struct hci_request scan_params_rq = ble_hci_request(OCF_LE_SET_SCAN_PARAMETERS, LE_SET_SCAN_PARAMETERS_CP_SIZE, &status, &scan_params_cp);
-	
-	ret = hci_send_req(device, &scan_params_rq, 1000);
-	if ( ret < 0 ) {
-		hci_close_dev(device);
-		perror("Failed to set scan parameters data.");
-		return 0;
-	}
-
-
-	return name;
-}*/
 
 int main()
 {
@@ -137,10 +114,31 @@ int main()
 					char addr[18];
 					char name[248];
 					int nom;
+					int n;
+					int m;
 					//nom = hci_read_remote_name(device, &(info->bdaddr), sizeof(name), name, 0);
 					ba2str(&(info->bdaddr), addr);
-					//printf("Test GetName :%d", nom);
-					printf("Nom : %d - MAC : %s - RSSI %d\n", (char)info->data[0x010],  addr, (int8_t)info->data[info->length]);
+					//printf("Test GetName :%d\n", nom);
+					printf("MAC : %s - RSSI %d\n", addr, (int8_t)info->data[info->length]);
+					printf("Name : ");
+					for(n = 15; n < 17; n++){
+						if(n == 16){
+							printf("%d\n", info->data[n]);
+						}
+						else{
+							printf("%d", info->data[n]);
+						}						
+					}
+					/*printf("UUID : ");
+					for(n = 5; n < 14; n++){
+						if(n == 13){
+							printf("%c\n", (char) info->data[n]);
+						}
+						else{
+							printf("%c", (char) info->data[n]);
+						}						
+					}					
+					}*/				
 					offset = info->data + info->length + 2;
 				}
 			}
