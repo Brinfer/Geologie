@@ -13,6 +13,11 @@
 #include <stdlib.h>
 #include <math.h> /// pour les racines carr, carr...
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//                                              Fonctions static
+//
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
  * @fn static float distanceCalculWithPosition(Position p1, Position p2)
@@ -38,65 +43,45 @@ static float distanceCalculWithPosition(const Position * p1, const Position * p2
  * @return la distance entre ces deux points
  *
  */
-static float distanceCalculWithPower(Power power, AttenuationCoefficientAverage attenuationCoefficientAverage) {
+static float distanceCalculWithPower(const Power * power, const AttenuationCoefficient * attenuationCoefficient) {
     float distance = 0;
     float A = 0; ///correspond a ce qui est dans la puissance 
-    A = (power - ATT_COEFF_1_METER) / (-10 * attenuationCoefficientAverage);
+    A = ((*power) - ATT_COEFF_1_METER) / (-10 * (*attenuationCoefficient));
     distance = pow(10, A);
     return distance;
 }
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//                                              Fonctions extern
+//
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-/**
- * @fn extern getAttenuationCoefficient(Power power, Position position, Position calibrationPosition)
- * @brief calcul du coefficient d'attenuation
- *
- * Alloue et initialise un objet de la classe Example
- *
- * @param power prend la puissance recue de la balise
- * @param beaconPosition position connue de la balise a calibrer
- * @param calibrationPosition position a calibrer
- * @return le coefficient d'attenuation calcule
- *
- */
-extern AttenuationCoefficient getAttenuationCoefficient(Power power, Position beaconPosition, Position calibrationPosition) {
+
+extern AttenuationCoefficient Mathematician_getAttenuationCoefficient(const Power * power, const Position * beaconPosition, const Position * calibrationPosition) {
     AttenuationCoefficient attenuationCoefficient;
-    float distance = distanceCalculWithPosition(&beaconPosition, &calibrationPosition);
+    float distance = distanceCalculWithPosition(beaconPosition, calibrationPosition);
 
 
-    attenuationCoefficient = (power - ATT_COEFF_1_METER) / (-10 * log10f(distance)); ///TODO revoir le calcuul, pas sur
+    attenuationCoefficient = ((*power) - ATT_COEFF_1_METER) / (-10 * log10f(distance)); ///TODO revoir le calcuul, pas sur
     return attenuationCoefficient;
 }
 
-/**
-* @fn extern AttenuationCoefficientAverage getAverageCalcul(BeaconCoefficients beaconCoefficients)
-* @brief calcul la moyenne des coefficients d'attenuations
-*
-* @param beaconCoefficients tableau contenant les coefficients d'attenuations pour une balise
-* @return la moyenne des coefficients d'attenuations
-*/
-extern AttenuationCoefficientAverage getAverageCalcul(BeaconCoefficients beaconCoefficients) {
-    AttenuationCoefficientAverage somme = 0;
-    AttenuationCoefficientAverage attenuationCoefficientAverage = 0;
+extern AttenuationCoefficient Mathematician_getAverageCalcul(const BeaconCoefficients beaconCoefficients) {
+    AttenuationCoefficient somme = 0;
+    AttenuationCoefficient AttenuationCoefficient = 0;
     for (int i = 0; i < NB_CALIBRATION_POSITIONS; i++) {
         somme = somme + beaconCoefficients[i];
     }
-    attenuationCoefficientAverage = somme / NB_CALIBRATION_POSITIONS;
-    return attenuationCoefficientAverage;
+    AttenuationCoefficient = somme / NB_CALIBRATION_POSITIONS;
+    return AttenuationCoefficient;
 }
 
 
-/**
-* @fn extern AttenuationCoefficientAverage getAverageCalcul(BeaconCoefficients beaconCoefficients)
-* @brief calcul la moyenne des coefficients d'attenuations
-*
-* @param [in] beaconsData tableau contenant les informations des balises
-* @return la position actuelle de la carte
-*/
-extern Position getCurrentPosition(BeaconData beaconsData[NB_BEACONS]) {
+extern Position Mathematician_getCurrentPosition(const BeaconData beaconsData[NB_BEACONS]) {
     Position b1Position = beaconsData[0].position;
-    Position b2Position = beaconsData[1].position;
+    /*Position b2Position = beaconsData[1].position;
     Position b3Position = beaconsData[2].position;
-
-
+*/
+    return b1Position;
 }
