@@ -8,9 +8,9 @@
 int main()
 {
     ReceptionistLOG_new();
-    Receivers_start(NULL);
+    //Receivers_start(NULL); commente car pas de tests pour l'instant
     ReceptionistLOG_start();
-    Receivers_stop(NULL);
+    //Receivers_stop(NULL);
 
     return 0;
 }
