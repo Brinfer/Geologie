@@ -23,7 +23,7 @@
 
 #define NUMBER_OF_BEACONS
 #define SIZE_BEACON_ID (3)
-#define NB_CALIBRATION_POSITION (3)
+#define NB_CALIBRATION_POSITION (10)
 
 /**
  * @typedef Commande
