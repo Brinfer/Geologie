@@ -19,7 +19,7 @@ typedef struct {
 } Receivers_t;
 
 typedef struct {
-    char name;
+    char name[8];
     int8_t rssi;
 } BeaconsData;
 

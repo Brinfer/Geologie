@@ -8,6 +8,17 @@
 #include <bluetooth/hci.h>
 #include <bluetooth/hci_lib.h>
 
+#include "receivers.h"
+
+#define UUID_FIRST_BYTE 15
+#define UUID_LAST_BYTE 16
+
+#define LOCAL_NAME_LENGTH 4
+#define LOCAL_NAME_FIRST_BYTE 5
+#define LOCAL_NAME_LAST_BYTE 13
+
+BeaconsData beaconsData;
+
 struct hci_request ble_hci_request(uint16_t ocf, int clen, void * status, void * cparam)
 {
 	struct hci_request rq;
@@ -21,6 +32,48 @@ struct hci_request ble_hci_request(uint16_t ocf, int clen, void * status, void *
 	return rq;
 }
 
+void getNameAndRSSI(le_advertising_info * info){
+	char name[100];
+	char bit[10];
+	char name_length;
+	name_length = info->data[LOCAL_NAME_LENGTH];
+	int i;
+	int j;
+	for(j = 0; j < name_length+1; j++){
+		for(i = 5; i < 14; i++){
+			if(i == 13){
+				printf("%c\n", (char) info->data[i]);
+			}
+			else{
+				printf("%c", (char) info->data[i]);
+			}			
+		}
+		//bit[j] = (char)info->data[i];
+		//strcat(name, bit);	
+	}
+	//beaconsData.name = "balise";
+	beaconsData.rssi = (int8_t)info->data[info->length];
+	printf("name : %s - RSSI : %d\n", name, beaconsData.rssi);
+}
+
+void checkUUID(le_advertising_info * info){
+	int uuid[2] = {0};
+	int i;
+	for(i = UUID_FIRST_BYTE; i < UUID_LAST_BYTE+1; i++){
+		if(i == UUID_LAST_BYTE){
+			printf("%d\n", info->data[i]);
+			uuid[1] = (char)info->data[i];
+		}
+		else{
+			printf("%d", info->data[i]);
+			uuid[0] = (char)info->data[i];
+		}		
+	}
+	if(uuid[0] == 26 && uuid[1]==24){
+		getNameAndRSSI(info);
+		printf("On entre !!\n");
+	}
+}
 
 int main()
 {
@@ -43,6 +96,7 @@ int main()
 	scan_params_cp.window 			= htobs(0x0010);
 	scan_params_cp.own_bdaddr_type 	= 0x00; // Public Device Address (default).
 	scan_params_cp.filter 			= 0x00; // Accept all.
+
 
 	struct hci_request scan_params_rq = ble_hci_request(OCF_LE_SET_SCAN_PARAMETERS, LE_SET_SCAN_PARAMETERS_CP_SIZE, &status, &scan_params_cp);
 	
@@ -112,33 +166,13 @@ int main()
 				while ( reports_count-- ) {
 					info = (le_advertising_info *)offset;
 					char addr[18];
-					char name[248];
-					int nom;
-					int n;
-					int m;
-					//nom = hci_read_remote_name(device, &(info->bdaddr), sizeof(name), name, 0);
-					ba2str(&(info->bdaddr), addr);
-					//printf("Test GetName :%d\n", nom);
-					printf("MAC : %s - RSSI %d\n", addr, (int8_t)info->data[info->length]);
-					printf("Name : ");
-					for(n = 15; n < 17; n++){
-						if(n == 16){
-							printf("%d\n", info->data[n]);
-						}
-						else{
-							printf("%d", info->data[n]);
-						}						
+					if ( ret < 0 ) {
+						hci_close_dev(device);
+						perror("Failed to enable scan.");
+						return 0;
 					}
-					/*printf("UUID : ");
-					for(n = 5; n < 14; n++){
-						if(n == 13){
-							printf("%c\n", (char) info->data[n]);
-						}
-						else{
-							printf("%c", (char) info->data[n]);
-						}						
-					}					
-					}*/				
+					ba2str(&(info->bdaddr), addr);
+					checkUUID(info);			
 					offset = info->data + info->length + 2;
 				}
 			}
