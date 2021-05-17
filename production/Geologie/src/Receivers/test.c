@@ -7,15 +7,18 @@
 #include <bluetooth/bluetooth.h>
 #include <bluetooth/hci.h>
 #include <bluetooth/hci_lib.h>
+#include <inttypes.h>
 
 #include "receivers.h"
+#include "translator.h"
 
-#define UUID_FIRST_BYTE 15
-#define UUID_LAST_BYTE 16
+#define UUID_FIRST_BYTE 21
+#define UUID_LAST_BYTE 22
 
-#define LOCAL_NAME_LENGTH 4
+#define LOCAL_NAME_INDEX_LENGTH 4
+#define LOCAL_NAME_LENGTH 14
 #define LOCAL_NAME_FIRST_BYTE 5
-#define LOCAL_NAME_LAST_BYTE 13
+#define LOCAL_NAME_LAST_BYTE 18
 
 BeaconsData beaconsData;
 
@@ -34,45 +37,60 @@ struct hci_request ble_hci_request(uint16_t ocf, int clen, void * status, void *
 
 void getNameAndRSSI(le_advertising_info * info){
 	char name[100];
-	char bit[10];
 	char name_length;
-	name_length = info->data[LOCAL_NAME_LENGTH];
+	name_length = info->data[LOCAL_NAME_INDEX_LENGTH];
+	int verif[2];
 	int i;
 	int j;
-	for(j = 0; j < name_length+1; j++){
-		for(i = 5; i < 14; i++){
-			if(i == 13){
-				printf("%c\n", (char) info->data[i]);
-			}
-			else{
-				printf("%c", (char) info->data[i]);
-			}			
+	printf("Device_Name : ");
+	for(i = 5; i < 7; i++){
+		if(i == 6){
+			printf("%c\n", (char) info->data[i]);
 		}
-		//bit[j] = (char)info->data[i];
-		//strcat(name, bit);	
+		else{
+			printf("%c", (char) info->data[i]);
+		}			
 	}
-	//beaconsData.name = "balise";
+	printf("Pos_X : ");
+	for(i = 8; i < 13; i++){
+		if(i == 12){
+			printf("%c\n", (char) info->data[i]);
+		}
+		else{
+			printf("%c", (char) info->data[i]);
+		}			
+	}
+	printf("Pos_Y : ");
+	for(i = 14; i < 19; i++){
+		if(i == 18){
+			printf("%c\n", (char) info->data[i]);
+		}
+		else{
+			printf("%c", (char) info->data[i]);
+		}			
+	}
 	beaconsData.rssi = (int8_t)info->data[info->length];
-	printf("name : %s - RSSI : %d\n", name, beaconsData.rssi);
+	printf("RSSI : %d\n\n", beaconsData.rssi);
 }
 
 void checkUUID(le_advertising_info * info){
+	RawData* rd;
 	int uuid[2] = {0};
 	int i;
 	for(i = UUID_FIRST_BYTE; i < UUID_LAST_BYTE+1; i++){
 		if(i == UUID_LAST_BYTE){
-			printf("%d\n", info->data[i]);
+			//printf("%d\n", info->data[i]);
 			uuid[1] = (char)info->data[i];
 		}
 		else{
-			printf("%d", info->data[i]);
+			//printf("%d", info->data[i]);
 			uuid[0] = (char)info->data[i];
 		}		
 	}
 	if(uuid[0] == 26 && uuid[1]==24){
 		getNameAndRSSI(info);
-		printf("On entre !!\n");
 	}
+	//Translator_convertByteToRawData(info->data, rd);
 }
 
 int main()
