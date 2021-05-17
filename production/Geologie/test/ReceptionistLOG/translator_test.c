@@ -241,7 +241,7 @@ static const struct CMUnitTest tests[] = {
 /**
  * @brief Lance la suite de test du module translator.
  *
- * @return 0 en cas de succee ou le numero du test qui a echoue.
+ * @return int 0 en cas de succee ou le numero du test qui a echoue.
  */
 int translator_run_tests() {
     return cmocka_run_group_tests_name("Test of the module translator", tests, NULL, NULL);
