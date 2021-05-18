@@ -134,8 +134,8 @@
  * @brief Enumeration pour remplacer le type bool d'autre langage.
  */
 typedef enum {
-    FALSE = 0, /**< Valeur false */
-    TRUE = 1   /**< Valuer true */
+    False, /**< Valeur false */
+    True,   /**< Valuer true */
 } bool_e;
 
 #endif /* DEBUG_TOOLS_ */
