@@ -38,6 +38,9 @@ build:
 	[ -d $(BIN_DIR) ] || mkdir -p $(BIN_DIR)
 	@for i in $(SUB_DIR); do (cd $$i; make $@); done
 
+check:
+	cppcheck --enable=all ./
+	
 .PHONY: clean
 
 # Nettoyage
@@ -64,3 +67,11 @@ test_report:
 # Nettoyage du rapport de couverture
 test_report_clean:
 	@cd $(TST_DIR) && $(MAKE) $@
+
+doc:
+	doxygen Doxyfile
+
+doc_clean:
+	rm -rf doc
+
+clean_all : clean test_report_clean doc_clean
