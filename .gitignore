@@ -4,10 +4,12 @@
 !/**/
 !*.*
 !Makefile
+!Doxyfile
 
 # IDLE settings
 **/.vscode/
 **/.settings/
+**/.metadata/
 
 # Fichiers generes par eclipse lors de la compilation
 **/Debug/
