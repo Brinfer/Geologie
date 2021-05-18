@@ -1,5 +1,5 @@
 /**
- * @file Mathematician.c
+ * @file mathematician.c
  *
  * @version 1.0.1
  * @date 9/05/2021
@@ -8,10 +8,10 @@
  *
  */
 
-#include "Mathematician.h"
+#include "mathematician.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h> /// pour les racines carr, carr...
+#include <math.h> // pour les racines carr, carr...
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -28,7 +28,7 @@
  * @return la distance entre ces deux points
  *
  */
-static float distanceCalculWithPosition(const Position * p1, const Position * p2) { ///const pour pas modifier adresse
+static float distanceCalculWithPosition(const Position* p1, const Position* p2) { //const pour pas modifier adresse
     float distance = 0;
     distance = sqrtf((p1->X - p2->X) * (p1->X - p2->X) + (p1->Y - p2->Y) * (p1->Y - p2->Y));
     return distance;
@@ -43,7 +43,7 @@ static float distanceCalculWithPosition(const Position * p1, const Position * p2
  * @return la distance entre ces deux points
  *
  */
-static float distanceCalculWithPower(const Power * power, const AttenuationCoefficient * attenuationCoefficient) {
+static float distanceCalculWithPower(const Power* power, const AttenuationCoefficient* attenuationCoefficient) {
     float distance = 0;
     float A = 0; ///correspond a ce qui est dans la puissance
     A = ((*power) - ATT_COEFF_1_METER) / (-10 * (*attenuationCoefficient));
@@ -58,12 +58,12 @@ static float distanceCalculWithPower(const Power * power, const AttenuationCoeff
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-extern AttenuationCoefficient Mathematician_getAttenuationCoefficient(const Power * power, const Position * beaconPosition, const Position * calibrationPosition) {
+extern AttenuationCoefficient Mathematician_getAttenuationCoefficient(const Power* power, const Position* beaconPosition, const Position* calibrationPosition) {
     AttenuationCoefficient attenuationCoefficient;
     float distance = distanceCalculWithPosition(beaconPosition, calibrationPosition);
 
 
-    attenuationCoefficient = ((*power) - ATT_COEFF_1_METER) / (-10 * log10f(distance)); ///TODO revoir le calcuul, pas sur
+    attenuationCoefficient = ((*power) - ATT_COEFF_1_METER) / (-10 * log10f(distance)); //TODO revoir le calcuul, pas sur
     return attenuationCoefficient;
 }
 
