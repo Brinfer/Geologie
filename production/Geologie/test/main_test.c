@@ -5,7 +5,7 @@
 #include <setjmp.h>
 
 /** Nombre de suites de tests à excuter. */
-#define NB_SUITE_TESTS 1
+#define NB_SUITE_TESTS 2
 
 extern int translator_run_tests(void);
 extern int mathematician_run_tests(void);
