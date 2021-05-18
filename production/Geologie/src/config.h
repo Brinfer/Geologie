@@ -14,6 +14,13 @@
 #define CONFIG_
 
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//                                              Define 
+//
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 #define SIZE_BEACON_DATA (19 * 8)
 #define SIZE_POSITION_DATA (8 * 8)
 
@@ -24,7 +31,16 @@
 #define NUMBER_OF_BEACONS
 #define SIZE_BEACON_ID (3)
 #define NB_CALIBRATION_POSITION (10)
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//                                              Include 
+//
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//                                              Variable et structure extern
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
  * @typedef Commande
  *
@@ -50,22 +66,34 @@ typedef enum {
 
 /**
  * @struct type
- * @brief cration d'une structure Position qui va prendre les coordonnees d'un point
+ * @brief structure qui va prendre les coordonnees d'un point (X et Y seront des entiers et seront en cm)
  */
 typedef struct {
     int X;
     int Y;
 }Position;
 
+/**
+ * @typedef type Power
+ * @brief type representant une puissance de reception d'un signal bluetooth
+ */
 typedef float Power;
 
+/**
+ * @typedef type AttenuationCoefficient
+ * @brief type representant un coefficient d'attenuation 
+ */
 typedef float AttenuationCoefficient;
 
+/**
+ * @typedef type BeaconCoefficients
+ * @brief type representant un tableau de coefficient d'attenuation pour une balise
+ */
 typedef float BeaconCoefficients[NUMBER_OF_BEACONS];
 
 /**
  * @struct type
- * @brief cration d'une structure qui va prendre les donnes d'une balise
+ * @brief cration d'une structure qui va prendre les diffeerentes donnees d'une balise
  */
 typedef struct {
     char ID[SIZE_BEACON_ID];
