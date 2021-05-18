@@ -1,15 +1,15 @@
 /**
  * @file mathematician_test.c
  *
- * @brief Ensemble de fonction permettant de tester le module Mathematician.
+ * @brief Ensemble de fonction permettant de tester le module mathematician.
  *
  * @version 1.0
  * @date 11/05/2021
  * @author BRIENT Nathan
  * @copyright ESD 2-clauses
  *
- * @see ReceptionistLOG/Mathematician.h
- * @see ReceptionistLOG/Mathematician.c
+ * @see ReceptionistLOG/mathematician.h
+ * @see ReceptionistLOG/mathematician.c
  */
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -26,7 +26,7 @@
 
 #include "cmocka.h"
 
-#include "Mathematician/Mathematician.c"
+#include "Mathematician/mathematician.c"
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -119,7 +119,7 @@ static const struct CMUnitTest tests[] =
  * @return 0 en cas de succees ou le numero du test qui a echoue.
  */
 int mathematician_run_tests() {
-    return cmocka_run_group_tests_name("Test of the module Mathematician", tests, NULL, NULL);
+    return cmocka_run_group_tests_name("Test of the module mathematician", tests, NULL, NULL);
 }
 
 static void test_distanceCalculWithPosition(void** state) {
