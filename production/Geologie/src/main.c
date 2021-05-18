@@ -1,16 +1,9 @@
-// C Program for the above approach
-#include <unistd.h>
-#include <stdio.h>
-#include "tools.h"
-#include "ReceptionistLOG/receptionistLOG.h"
-#include "Receivers/receivers.h"
+#include "ManagerLOG/managerLOG.h"
 
 int main()
 {
-    ReceptionistLOG_new();
-    //Receivers_start(NULL); commente car pas de tests pour l'instant
-    ReceptionistLOG_start();
-    //Receivers_stop(NULL);
+    MangerLOG_startGeologie();
 
+    ManagerLOG_stopGeologie();
     return 0;
 }

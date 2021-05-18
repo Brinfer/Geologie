@@ -1,0 +1,74 @@
+/**
+ * @file managerLOG.h
+ *
+ * @brief TODO
+ *
+ * @version 1.0
+ * @date 17 mai 2021
+ * @author GAUTIER Pierre-Louis
+ * @copyright BSD 2-clauses
+ *
+ */
+
+#ifndef MANGER_LOG_
+#define MANGER_LOG_
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//                                              Define
+//
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * @def LED_NAME
+ *
+ * @brief Correspond au chemin vers le fichier de la LED.
+ *
+ * @warning Depend de la carte.
+ */
+#define LED_NAME "/dev/gpiochip0"
+
+/**
+ * @def LED_GPIO_LINE
+ *
+ * @brief Correspond au numero de la ligne de la LED.
+ *
+ * @warning Depend de la carte.
+ */
+#define LED_GPIO_LINE (14)
+
+/**
+ * @def LED_LABEL
+ *
+ * @brief Correspond au label de la LED.
+ */
+#define LED_LABEL "LED_Geologie"
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//                                              Variable et structure extern
+//
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//                                              Fonctions publiques
+//
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * @fn extern void MangerLOG_startGeologie(void)
+ *
+ * @brief Demande le demarrage de Geologie.
+ */
+extern void MangerLOG_startGeologie(void);
+
+/**
+ * @fn extern void ManagerLOG_stopGeologie(void)
+ * 
+ * @brief Demande l'arret de Geologie.
+ */
+extern void ManagerLOG_stopGeologie(void);
+
+#endif /* MANGER_LOG_ */

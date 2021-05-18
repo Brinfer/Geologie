@@ -10,9 +10,6 @@
  *
  */
 
-typedef char Data;                         //TODO changer nom structure
-
-
 /**
  * @fn int ReceptionistLOG_new()
  * @brief fonction qui crer le socket
@@ -27,20 +24,3 @@ extern int ReceptionistLOG_new(void);
  *
  */
 extern int ReceptionistLOG_start(void);
-
-/**
- * @fn extern int ReceptionistLOG_readMsg()
- * @brief fonction qui sera appelee de l'exterieur et modifiera dataToModify
- *
- * @param dataToModify prend l'adresse du tableau à modifier
- */
-extern int ReceptionistLOG_readMsg();
-
-/**
- * @fn extern int ReceptionistLOG_sendMsg()
- * @brief fonctionqui sera appelee de l'exterieur et qui enverra la donnee dataToSend
- *
- * @param dataToSend donnee a envoyer (tableau)
- * @param taille taille du tableau a envoyer
- */
-extern int ReceptionistLOG_sendMsg(const Data* dataToSend, int taille);
