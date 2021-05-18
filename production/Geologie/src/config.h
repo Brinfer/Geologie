@@ -21,10 +21,10 @@
 #define COMMAND_SIZE (1)
 
 
-#define NUMBER_OF_BEACONS
+#define NB_BEACONS (3)
 #define SIZE_BEACON_ID (3)
-#define NB_CALIBRATION_POSITION (3)
-
+#define NB_CALIBRATION_POSITIONS (10)
+#define ATT_COEFF_1_METER (6)
 /**
  * @typedef Commande
  *
@@ -61,7 +61,7 @@ typedef float Power;
 
 typedef float AttenuationCoefficient;
 
-typedef float BeaconCoefficients[NUMBER_OF_BEACONS];
+typedef float BeaconCoefficients[NB_BEACONS];
 
 /**
  * @struct type
@@ -73,7 +73,7 @@ typedef struct {
     Power power;
     AttenuationCoefficient attenuationCoefficient;
     unsigned char nbCoefficientAttenuations;
-    AttenuationCoefficient attenuationCoefficientsArray[NB_CALIBRATION_POSITION];
+    AttenuationCoefficient attenuationCoefficientsArray[NB_CALIBRATION_POSITIONS];
 } BeaconData;
 
 #endif // CONFIG_
