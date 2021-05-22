@@ -86,7 +86,7 @@ update: clean prod test
 
 help:
 	@echo -e "\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Projet ProSE A1 ST <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n"
-	@echo -e "Régles disponible:\n"
+	@echo -e "Régles disponibles:\n"
 
 	@echo -e "\t#################################################### Compilation ####################################################\n"
 	@echo -e "\tprod\t\t\t Compile et génére l'éxécutable de Géologie dans le  dossier \033[34mbin\033[0m"
