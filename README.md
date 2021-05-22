@@ -24,6 +24,12 @@ git config core.hooksPath .githooks
 
 Et ce afin que tout le monde utilise les même [git hook](https://www.atlassian.com/git/tutorials/git-hooks).
 
+Pour la suite, dans le dossier [Geologie](#architecture-du-projet) entrer la commande :
+
+```bash
+make help
+```
+
 ### Logiciel nécessaire
 
 Afin de pouvoir developer, certains logiciels sont nécessaire. Référer vous à la documentation de votre distribution (ou OS) pour savoir comment les installer.
@@ -53,6 +59,8 @@ La structure du projet doit donc être (en se plaçant les dossiers au dessus de
 └── se2022-a1.c
    ├── explorations
    ├── production
+   |  ├── Geobalise
+   |  └── Geologie
    ├── template
    └── README.md
 ```
