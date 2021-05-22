@@ -128,7 +128,5 @@ static void test_distanceCalculWithPosition(void** state) {
     float result;
     result = distanceCalculWithPosition(&param->positionTested[0], &param->positionTested[1]);
     assert_float_equal(result, param->expectedResult, EPSILON);
-    
+
 }
-
-

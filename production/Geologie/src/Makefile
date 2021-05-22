@@ -5,10 +5,7 @@
 #################################################################################
 
 # Packages.
-PACKAGES = Geographer \
-	ManagerLOG \
-	UI \
-	ReceptionistLOG\
+PACKAGES = Geographer ManagerLOG UI Mathematician ReceptionistLOG
 
 SRC  = $(wildcard */*.c)
 OBJ = $(SRC:.c=.o)
@@ -31,10 +28,10 @@ CCFLAGS += -I.
 #																				#
 #################################################################################
 
-all: build
+all: prod
 
 # Compilation
-build:
+prod:
 	@for p in $(PACKAGES); do (cd $$p && $(MAKE) $@); done
 	$(MAKE) $(EXEC)
 
@@ -42,10 +39,11 @@ $(EXEC): $(OBJ) $(MAIN)
 	$(CC) $(CCFLAGS) $(OBJ) $(MAIN) -MF $(DEP) -o $(EXEC) $(LDFLAGS)
 
 # Nettoyage
-.PHONY: clean
-
 clean:
 	@for p in $(PACKAGES); do (cd $$p && $(MAKE) $@); done
 	@rm -f $(DEP) $(OBJ)
 
 -include $(DEP)
+
+
+.PHONY: clean

@@ -130,7 +130,7 @@ static void Receivers_getAllRSSIs(){
 		//return 0;
 	}
 
-	// Set BLE events report mask.
+	// Set BLE events coverage mask.
 
 	le_set_event_mask_cp event_mask_cp;
 	memset(&event_mask_cp, 0, sizeof(le_set_event_mask_cp));
