@@ -71,7 +71,7 @@ CCFLAGS += -I.
 GCDA = $(MAIN:.c=.gcda)
 GCNO = $(MAIN:.c=.gcno)
 
-GCOVR_DIR = ../$(REPORT_DIR)/
+GCOVR_DIR = ../$(COVERAGE_DIR)/
 
 #################################################################################
 #																				#
@@ -79,29 +79,31 @@ GCOVR_DIR = ../$(REPORT_DIR)/
 #																				#
 #################################################################################
 
-all: build
+all: test
 
 # Compilation
-build:
+test:
 	@for p in $(PACKAGES); do (cd $$p && $(MAKE) $@); done
 	$(MAKE) $(EXEC)
 
 $(EXEC): $(OBJ) $(MAIN)
 	$(CC) $(CCFLAGS) $(LDWRAP) $(realpath $(OBJ)) $(MAIN) -MF $(DEP) -o $(EXEC) $(LDFLAGS)
 
-# Nettoyage
-.PHONY: clean
+# Generation du rapport de couverture
+coverage:
+	$(GCOVR) -r .. --html --html-details -o $(GCOVR_DIR)/index.html
 
-clean: test_report_clean
+# Nettoyage
+clean: coverage_clean
 	@for p in $(PACKAGES); do (cd $$p && $(MAKE) $@); done
 	@rm -f $(DEP) $(GCDA) $(GCNO)
 
-# Generation du rapport de couverture
-test_report:
-	$(GCOVR) -r .. --html --html-details -o $(GCOVR_DIR)/index.html
-
 # Nettoyage du rapport de couverture
-test_report_clean:
+coverage_clean:
 	@rm -f $(GCOVR_DIR)/*.html
 
 -include $(DEP)
+
+
+.PHONY: clean
+.PHONY: test

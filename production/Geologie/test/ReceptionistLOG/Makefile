@@ -21,18 +21,19 @@ CCFLAGS += -I.. -I../../$(SRC_DIR)
 #																				#
 #################################################################################
 
-all: build
+all: test
 
 # Compilation
-build: $(OBJ)
+test: $(OBJ)
 
 .c.o:
 	$(CC) -c $(CCFLAGS) $< -o $@
 
-# Nettoyage
-.PHONY: clean
-
 clean:
-	@rm -f $(OBJ) $(DEP)
+	@rm -f $(OBJ) $(DEP) $(GCDA) $(GCNO)
 
 -include $(DEP)
+
+# Nettoyage
+.PHONY: clean
+.PHONY: test
