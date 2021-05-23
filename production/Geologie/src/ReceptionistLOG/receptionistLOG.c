@@ -6,8 +6,8 @@
  * @version 1.0.1
  * @date 5 mai 2021
  * @author BRIENT Nathan
- * @copyright BSD 2-clauses
- *
+ * @copyright Geo-Boot
+ * @license BSD 2-clauses
  */
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -96,7 +96,7 @@ static int createSocketLOG(void) {
     int returnValue = EXIT_FAILURE;
 
     if (socketListen < 0) {
-        PRINT("%sError socket%s\n", "\033[41m", "\033[0m");
+        LOG("%sError socket%s\n", "\033[41m", "\033[0m");
     } else {
         returnValue = EXIT_SUCCESS;
     }
@@ -123,17 +123,17 @@ static void configureServerAdressLOG(void) {
  */
 
 static int startServerLOG(void) {
-    PRINT("%s\n", "dans startServerLOG");
+    LOG("%s\n", "dans startServerLOG");
     int returnValue = EXIT_FAILURE;
 
-    PRINT("%sThe server is serving on port %d at the address %s%s\n",
+    LOG("%sThe server is serving on port %d at the address %s%s\n",
         "\033[32m", PORT_SERVER, IP_SERVER, "\033[0m");
-    PRINT("%sTo shutdown the server press enter%s\n\n", "\033[36m", "\033[0m");
+    LOG("%sTo shutdown the server press enter%s\n\n", "\033[36m", "\033[0m");
 
     bind(socketListen, (struct sockaddr*) &serverAddress, sizeof(serverAddress));   // On attache le socket a l'adresse indiquee
 
     if (listen(socketListen, 1) < 0) {                                    // on met le socket en ecoute et on accepte que 1 connexion
-        PRINT("%sError while listenning the port%s\n", "\033[41m", "\033[0m");
+        LOG("%sError while listenning the port%s\n", "\033[41m", "\033[0m");
     } else {
         returnValue = EXIT_SUCCESS;
     }
@@ -149,7 +149,7 @@ static int startServerLOG(void) {
  */
 
 static void* receiveFromClient(void* _) {
-    PRINT("%s\n", "dans receiveFromClient");
+    LOG("%s\n", "dans receiveFromClient");
 
     int returnValue = EXIT_FAILURE;
     fd_set env;
@@ -171,21 +171,21 @@ static void* receiveFromClient(void* _) {
 
 
         if (select(FD_SETSIZE, &env, NULL, NULL, NULL) == -1) {
-            PRINT("%sError with %sselect()%s\n", "\033[41m", "\033[21m", "\033[0m");
+            LOG("%sError with %sselect()%s\n", "\033[41m", "\033[21m", "\033[0m");
             break; //keepGoing
         }
-        if (FD_ISSET(socketListen, &env)) {                     //si on detecte une connexion 
-            PRINT("%s\n", "Le socket d'ecoute a été réveillé");
+        if (FD_ISSET(socketListen, &env)) {                     //si on detecte une connexion
+            LOG("%s\n", "Le socket d'ecoute a été réveillé");
             returnValue = connectToClient();
             if (returnValue != EXIT_SUCCESS) {
                 break; //keepGoing
             }
         } else if (FD_ISSET(STDIN_FILENO, &env)) {
-            PRINT("\n%sAsk for exit%s\n", "\033[41m", "\033[0m");
+            LOG("\n%sAsk for exit%s\n", "\033[41m", "\033[0m");
             returnValue = EXIT_SUCCESS;
             break; //keepGoing
         } else if (FD_ISSET(socketClientValue, &env)) {    //si qqchose ecrit dessus
-            PRINT("%s\n", "Ecriture detectee");
+            LOG("%s\n", "Ecriture detectee");
 
             pthread_mutex_lock(&mutexSocket);
             int socketClientValue = socketClient;
@@ -195,18 +195,18 @@ static void* receiveFromClient(void* _) {
                     static Data previousData[] = { 0 };
                     Data noData[60] = { 0 };
                     //Data headerData[6]={0}; //en cours d'ecriture, pour lire une partie de la trame et ainsi identifier sa nature, taille ...
-                    //returnValue = readHeaderMsg(headerData);                    
+                    //returnValue = readHeaderMsg(headerData);
                     Data data[60] = { 0 };             //remise a zero de data
                     returnValue = readMsg(data);
                     sendMsg(data, sizeof(data));
                     if (strncmp(data, stopData, 4) == 0) {        //compare si message est stop (4 premiers caracteres, si oui on arrete
-                        //PRINT("%s\n", "il va falloir arreter");
+                        //LOG("%s\n", "il va falloir arreter");
                         disconnectToClient();
                     }
 
                     if (strncmp(data, noData,10) == 0) { //si deux fois le meme message sans rien, cela veut dire qu'on est deconnecte
                         socketClient = NO_CLIENT_SOCKET_VALUE;
-                        PRINT("%s%sOn a recu 2 messages identiques : client surement deconnecte%s\n\n", "\033[43m", "\033[30m", "\033[0m");
+                        LOG("%s%sOn a recu 2 messages identiques : client surement deconnecte%s\n\n", "\033[43m", "\033[30m", "\033[0m");
 
                         //disconnectToClient();
                     }
@@ -232,7 +232,7 @@ static void* receiveFromClient(void* _) {
     if (socketClientValue != NO_CLIENT_SOCKET_VALUE) {
         returnValue += disconnectToClient();
     }
-    PRINT("%s \n", " on exit le thread d'ecoute");
+    LOG("%s \n", " on exit le thread d'ecoute");
     pthread_exit(&returnValue);
 }
 
@@ -244,7 +244,7 @@ static void* receiveFromClient(void* _) {
 
 static int connectToClient(void) {
     signal(SIGINT, intHandler);
-    PRINT("%s\n", "dans connectToClient");
+    LOG("%s\n", "dans connectToClient");
 
     int returnValue = EXIT_FAILURE;
 
@@ -252,14 +252,14 @@ static int connectToClient(void) {
     int socketClientValue = socketClient;
     pthread_mutex_unlock(&mutexSocket);
     if (socketClientValue != NO_CLIENT_SOCKET_VALUE) {
-        PRINT("%sError when connecting the client, no socket client%s\n", "\033[41m", "\033[0m");
+        LOG("%sError when connecting the client, no socket client%s\n", "\033[41m", "\033[0m");
     } else {
         int socketValue = accept(socketListen, NULL, 0);
 
         if (socketValue < 0) {
-            PRINT("%sError when connecting the client, not accepted%s\n", "\033[41m", "\033[0m");
+            LOG("%sError when connecting the client, not accepted%s\n", "\033[41m", "\033[0m");
         } else {
-            PRINT("%sConnection of a client%s\n", "\033[42m", "\033[0m");
+            LOG("%sConnection of a client%s\n", "\033[42m", "\033[0m");
             returnValue = EXIT_SUCCESS;
             pthread_mutex_lock(&mutexSocket);
             socketClient = socketValue; //in case of the Macro value is not -1
@@ -281,7 +281,7 @@ static int connectToClient(void) {
  * @param data chaine qui prendra les donnees reçues
  */
 static int readMsg(Data* data) {
-    PRINT("%s\n", "dans readMsg");
+    LOG("%s\n", "dans readMsg");
 
     int returnValue = EXIT_SUCCESS;
 
@@ -290,8 +290,8 @@ static int readMsg(Data* data) {
     pthread_mutex_lock(&mutexSocket);
     read(socketClient, data, 60); //peut etre changer 60 par sizeof(data)
     pthread_mutex_unlock(&mutexSocket);
-    PRINT("la taille de data est %i \n", quantityToRead);
-    PRINT("on recoit : %s\n", data);
+    LOG("la taille de data est %i \n", quantityToRead);
+    LOG("on recoit : %s\n", data);
 
     return returnValue;
 }
@@ -303,7 +303,7 @@ static int readMsg(Data* data) {
  * @param headerData chaine qui prendra les donnees du header de la trame
  */
 static int readHeaderMsg(Data* headerData) {
-    PRINT("%s\n", "dans readHeaderMsg");
+    LOG("%s\n", "dans readHeaderMsg");
 
     int returnValue = EXIT_SUCCESS;
 
@@ -312,9 +312,9 @@ static int readHeaderMsg(Data* headerData) {
     pthread_mutex_lock(&mutexSocket);
     read(socketClient, headerData, sizeof(headerData));
     pthread_mutex_unlock(&mutexSocket);
-    PRINT("la taille du header est: %i\n", (int) sizeof(headerData));
+    LOG("la taille du header est: %i\n", (int) sizeof(headerData));
 
-    PRINT("on recoit le header: %s\n", headerData);
+    LOG("on recoit le header: %s\n", headerData);
 
     return returnValue;
 }
@@ -325,7 +325,7 @@ static int readHeaderMsg(Data* headerData) {
  *
  */
 static int disconnectToClient() {
-    PRINT("%s\n", "dans disconnectClient");
+    LOG("%s\n", "dans disconnectClient");
     Data deconnexionData[] = "deconnexion"; //on envoie l'information comme quoi on va se deconnecter
     sendMsg(deconnexionData, sizeof(deconnexionData));
 
@@ -336,7 +336,7 @@ static int disconnectToClient() {
     if (returnValue < 0) {
         returnValue = EXIT_FAILURE;
     } else {
-        PRINT("%s%sClient is disconnect%s\n\n", "\033[43m", "\033[30m", "\033[0m");
+        LOG("%s%sClient is disconnect%s\n\n", "\033[43m", "\033[30m", "\033[0m");
         pthread_mutex_lock(&mutexSocket);
         socketClient = NO_CLIENT_SOCKET_VALUE;
         pthread_mutex_unlock(&mutexSocket);
@@ -364,14 +364,14 @@ static void* sendToClientSocket(void* data) {            //tant que le prog fonc
     Data dataToSend[sizeof(data)] = { 0 };
 
     strcpy(dataToSend, data);
-    PRINT("on va envoyer en boucle %s \n", dataToSend);
+    LOG("on va envoyer en boucle %s \n", dataToSend);
     while (keepGoing) {
         pthread_mutex_lock(&mutexSocket);         // protege acces a tableau en lecture
         int socketClientValue = socketClient;
         pthread_mutex_unlock(&mutexSocket);
 
         if (socketClientValue != NO_CLIENT_SOCKET_VALUE) {  // si pas client on envoie pas message
-            returnValue = sendMsg(dataToSend, sizeof(dataToSend));                       // on envoie un message au client 
+            returnValue = sendMsg(dataToSend, sizeof(dataToSend));                       // on envoie un message au client
             if (returnValue != EXIT_SUCCESS) {
                 break; //keepGoing
             }
@@ -414,7 +414,7 @@ static int sendMsg(const Data* dataToSend, const int taille) { //dataToSend etan
 
 
 extern int ReceptionistLOG_new(void) {                                                                // configuration socket
-    PRINT("%s \n", "dans ReceptionistLOG_new");
+    LOG("%s \n", "dans ReceptionistLOG_new");
 
     int returnValue = EXIT_FAILURE;
 
@@ -427,7 +427,7 @@ extern int ReceptionistLOG_new(void) {                                          
 
 
 extern int ReceptionistLOG_start(void) {
-    PRINT("%s \n", "dans ReceptionistLOG_start");
+    LOG("%s \n", "dans ReceptionistLOG_start");
     int returnValue = EXIT_FAILURE;
     signal(SIGINT, intHandler);                                                             // Si pb avec ctr c
 
@@ -469,7 +469,7 @@ extern int ReceptionistLOG_sendMsg(Data dataToSend[], int taille) {
 
     int returnValue = EXIT_FAILURE;
     void* returnValueThread;
-    //PRINT("dans receptionistLOG_sendMsg data :%s \n", dataToSend);
+    //LOG("dans receptionistLOG_sendMsg data :%s \n", dataToSend);
     returnValueThread = malloc(sizeof(int));
 
     returnValue = pthread_create(&socketThreadWrite, NULL, &sendToClientSocket, dataToSend);

@@ -6,8 +6,8 @@
  * @version 1.0
  * @date 17 mai 2021
  * @author GAUTIER Pierre-Louis
- * @copyright BSD 2-clauses
- *
+ * @copyright Geo-Boot
+ * @license BSD 2-clauses
  */
 
 #ifndef MANGER_LOG_
@@ -66,7 +66,7 @@ extern void MangerLOG_startGeologie(void);
 
 /**
  * @fn extern void ManagerLOG_stopGeologie(void)
- * 
+ *
  * @brief Demande l'arret de Geologie.
  */
 extern void ManagerLOG_stopGeologie(void);

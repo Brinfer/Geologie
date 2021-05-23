@@ -8,15 +8,15 @@
  * #STOP_ON_ERROR
  * #TRACE
  * #ARRAY_SIZE
- * #PRINT
+ * #LOG
  * #DEBUG_FILE_PATH
  * #bool_e
  *
  * @version 1.0
  * @date 5 mai 2021
  * @author GAUTIER Pierre-louis
- * @copyright BSD 2-clauses
- *
+ * @copyright Geo-Boot
+ * @license BSD 2-clauses
  */
 
 #ifndef DEBUG_TOOLS_
@@ -28,7 +28,7 @@
 #define DEBUG_FILE_PATH "./debug.txt"
 
 /**
- * @def PRINT
+ * @def LOG
  *
  * @brief Affiche un message.
  *
@@ -43,14 +43,14 @@
  * @param
  */
 #ifndef NDEBUG
-#define PRINT(fmt, ...)                                         \
+#define LOG(fmt, ...)                                         \
     do                                                          \
     {                                                           \
         fprintf(stderr, fmt, ##__VA_ARGS__);                    \
         fflush(stderr);                                         \
     } while (0)
 #else
-#define PRINT(fmt, ...)                                         \
+#define LOG(fmt, ...)                                         \
     do                                                          \
     {                                                           \
         FILE *stream = fopen(DEBUG_FILE_PATH, "a");             \
@@ -81,7 +81,7 @@
     {                                                             \
         if (error_condition)                                      \
         {                                                         \
-            PRINT("*** Error (%s) at %s:%d\nExiting\n",           \
+            LOG("*** Error (%s) at %s:%d\nExiting\n",           \
                     #error_condition, __FILE__, __LINE__);        \
             perror("");                                           \
             _exit(1);                                             \
@@ -106,7 +106,7 @@
  */
 #ifndef NDEBUG
 #define TRACE(fmt, ...)                                            \
-    PRINT("%s:%d:%s(): " fmt, __FILE__, __LINE__,                  \
+    LOG("%s:%d:%s(): " fmt, __FILE__, __LINE__,                  \
                 __func__, ##__VA_ARGS__)
 #else
 #define TRACE(fmt, ...)

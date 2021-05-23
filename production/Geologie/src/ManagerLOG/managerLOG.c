@@ -4,7 +4,8 @@
  * @version 1.0
  * @date 5 mai 2021
  * @author GAUTIER Pierre-Louis
- * @copyright BSD 2-clauses
+ * @copyright Geo-Boot
+ * @license BSD 2-clauses
  *
  */
 
@@ -133,7 +134,7 @@ static int ledNew(void) {
     /*  Open device */
     deviceFile = open(LED_NAME, 0);
     if (deviceFile < 0) {
-        PRINT("%sFailed to open %s%s\n", "\033[41m\033[37m", LED_NAME, "\033[0m");
+        LOG("%sFailed to open %s%s\n", "\033[41m\033[37m", LED_NAME, "\033[0m");
 
     } else {
         /* request GPIO line */
@@ -145,12 +146,12 @@ static int ledNew(void) {
 
         returnValue = ioctl(deviceFile, GPIO_GET_LINEHANDLE_IOCTL, &request);
         if (returnValue < 0) {
-            PRINT("%sFailed to issue GET LINEHANDLE IOCTL%s\n", "\033[41m\033[37m", "\033[0m");
+            LOG("%sFailed to issue GET LINEHANDLE IOCTL%s\n", "\033[41m\033[37m", "\033[0m");
         }
 
         returnValue = close(deviceFile);
         if (returnValue < 0) {
-            PRINT("%sFailed to close GPIO character device file%s\n", "\033[41m\033[37m", "\033[0m");
+            LOG("%sFailed to close GPIO character device file%s\n", "\033[41m\033[37m", "\033[0m");
         }
     }
 
@@ -162,7 +163,7 @@ static int ledFree(void) {
 
     returnValue = close(request.fd);
     if (returnValue < 0) {
-        PRINT("%sFailed to close GPIO LINEHANDLE device file%s\n", "\033[41m\033[37m", "\033[0m");
+        LOG("%sFailed to close GPIO LINEHANDLE device file%s\n", "\033[41m\033[37m", "\033[0m");
     }
     return returnValue;
 }
@@ -173,7 +174,7 @@ static int ledON(void) {
     data.values[0] = ON;
     returnValue = ioctl(request.fd, GPIOHANDLE_SET_LINE_VALUES_IOCTL, &data);
     if (returnValue < 0) {
-        PRINT("%sFailed to turn ON the led%s\n", "\033[41m\033[37m", "\033[0m");
+        LOG("%sFailed to turn ON the led%s\n", "\033[41m\033[37m", "\033[0m");
     }
     return returnValue;
 }
@@ -184,7 +185,7 @@ static int ledOFF(void) {
     data.values[0] = OFF;
     returnValue = ioctl(request.fd, GPIOHANDLE_SET_LINE_VALUES_IOCTL, &data);
     if (returnValue < 0) {
-        PRINT("%sFailed to turn Off the led %s\n", "\033[41m\033[37m", "\033[0m");
+        LOG("%sFailed to turn Off the led %s\n", "\033[41m\033[37m", "\033[0m");
     }
     return returnValue;
 }
