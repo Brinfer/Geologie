@@ -15,7 +15,7 @@ cd path/vers/le/dossier/du/projet
 
 ## Copyright
 
-Voir `LICENCE.md`.
+Voir [`LICENCE.md`](file://./LICENCE.md).
 
 ## Description Générale
 
