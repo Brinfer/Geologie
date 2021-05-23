@@ -100,7 +100,7 @@ help:
 	@echo -e "\tcheck_clean\t\t Supprime les fichiers généré par la commande \033[33mcheck\033[0m"
 	@echo -e "\tcoverage_clean\t\t Supprime les fichiers généré par la commande \033[33mcoverage\033[0m"
 	@echo -e "\tdoc_clean\t\t Supprime les fichiers généré par la commande \033[33mdoc\033[0m"
-	@echo -e "\tclean_all\t\t Exécute les commandes \033[33mclean\033[0m, \033[33mcheck_clean\033[0m, \033[33mcoverage_clean\033[0m et \033[33mdoc_clean\033[0m"
+	@echo -e "\tclean_all\t\t Exécute les commandes (dans l'ordre) \033[33mclean\033[0m, \033[33mcheck_clean\033[0m, \033[33mcoverage_clean\033[0m et \033[33mdoc_clean\033[0m"
 
 	@echo -e "\n\t##################################################### Exécution #####################################################\n"
 	@echo -e "\trun\t\t\t Lance l'éxécutable généré par la commande \033[33mprod\033[0m"
@@ -115,3 +115,4 @@ help:
 .PHONY: clean
 .PHONY: test
 .PHONY: check
+.PHONY: doc

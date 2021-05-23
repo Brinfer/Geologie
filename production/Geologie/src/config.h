@@ -6,8 +6,8 @@
  * @version 1.0
  * @date 5 mai 2021
  * @author GAUTIER Pierre-Louis
- * @copyright BSD 2-clauses
- *
+ * @copyright Geo-Boot
+ * @license BSD 2-clauses
  */
 
 #ifndef CONFIG_
