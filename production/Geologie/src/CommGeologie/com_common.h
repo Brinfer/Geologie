@@ -10,7 +10,7 @@
  * @license BSD 2-clauses
  */
 
-#ifdef COM_COMMON_
+#ifndef COM_COMMON_
 #define COM_COMMON_
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -36,5 +36,15 @@ typedef struct {
 typedef enum {
     /* TODO */
 } Commande;
+
+/**
+ * @typedef enum ConnexionState
+ *
+ * @brief Enumeration contenant l'etat de la connexion entre Geologie et Geomobile.
+ */
+typedef enum {
+    DISCONNECTED=0,
+    CONNECTED
+}ConnectionState;
 
 #endif // COM_COMM_

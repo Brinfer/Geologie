@@ -69,4 +69,11 @@ typedef struct {
     AttenuationCoefficient attenuationCoefficientsArray[NB_CALIBRATION_POSITIONS];
 } BeaconData;
 
+/**
+ * @struct type
+ * @brief creation d'une structure qui va prendre les differentes donnees d'une balise
+ */
+typedef unsigned long Date;
+
+
 #endif // COMMON_
