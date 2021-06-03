@@ -40,7 +40,7 @@
 /**
  * @fn extern int ProxyGUI_new()
  * @brief Instancie et initialise l'objet ProxyGUI
- * *
+ *
  * @return retourne 1 s'il y a une erreur dans l'execution de la méthode
  *
 */
