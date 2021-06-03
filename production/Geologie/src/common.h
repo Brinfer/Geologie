@@ -96,5 +96,10 @@ typedef struct {
     ProcessorLoad processorLoad;
 }ProcessorAndMemoryLoad;
 
+/**
+ * @struct CalibrationPositionId
+ * @brief Id d'une balise
+ */
+typedef int CalibrationPositionId;
 
 #endif // COMMON_
