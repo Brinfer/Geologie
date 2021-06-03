@@ -71,9 +71,30 @@ typedef struct {
 
 /**
  * @struct type
- * @brief creation d'une structure qui va prendre les differentes donnees d'une balise
+ * @brief structure qui va prendre les differentes donnees d'une balise
  */
 typedef unsigned long Date;
+
+/**
+ * @struct MemoryLoad
+ * @brief Charge memoire
+ */
+typedef int MemoryLoad;
+
+/**
+ * @struct ProcessorLoad
+ * @brief Charge processeur
+ */
+typedef int ProcessorLoad;
+
+/**
+ * @struct ProcessorAndMemoryLoad
+ * @brief Charge processeur et memoire
+ */
+typedef struct { 
+    MemoryLoad memoryLoad;
+    ProcessorLoad processorLoad;
+}ProcessorAndMemoryLoad;
 
 
 #endif // COMMON_
