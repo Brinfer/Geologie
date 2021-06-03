@@ -35,6 +35,7 @@ typedef struct {
  */
 typedef enum {
     /* TODO */
+    TODO = 0,
 } Commande;
 
 /**
@@ -43,8 +44,8 @@ typedef enum {
  * @brief Enumeration contenant l'etat de la connexion entre Geologie et Geomobile.
  */
 typedef enum {
-    DISCONNECTED=0,
+    DISCONNECTED = 0,
     CONNECTED
-}ConnectionState;
+} ConnectionState;
 
 #endif // COM_COMM_
