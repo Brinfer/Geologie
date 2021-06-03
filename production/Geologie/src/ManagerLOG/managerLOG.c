@@ -26,10 +26,8 @@
 #include <linux/gpio.h>
 
 #include "../tools.h"
-#include "../config.h"
+#include "../common.h"
 
-// TODO suppress
-#include "ReceptionistLOG/receptionistLOG.h"
 #include "Receivers/receivers.h"
 
 
@@ -107,9 +105,6 @@ extern void MangerLOG_startGeologie(void) {
     ledNew();
     ledON();
 
-    // TODO Use Geographer
-    ReceptionistLOG_new();
-    ReceptionistLOG_start();
     // Receivers_start(NULL);
 }
 

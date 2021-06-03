@@ -40,7 +40,7 @@
 typedef struct {
     int X;
     int Y;
-}Position;
+} Position;
 
 /**
  * @typedef type Power
@@ -54,7 +54,25 @@ typedef float Power;
  */
 typedef float AttenuationCoefficient;
 
+/**
+ * @brief  TODO
+ *
+ */
 typedef float BeaconCoefficients[NB_BEACONS];
+
+typedef float ProcessorAndMemoryLoad[2];
+
+/**
+ * @brief  TODO
+ *
+ */
+typedef int CalibrationPositionId;
+
+/**
+ * @struct type
+ * @brief creation d'une structure qui va prendre les differentes donnees d'une balise
+ */
+typedef unsigned long Date;
 
 /**
  * @struct type
@@ -69,11 +87,14 @@ typedef struct {
     AttenuationCoefficient attenuationCoefficientsArray[NB_CALIBRATION_POSITIONS];
 } BeaconData;
 
-/**
- * @struct type
- * @brief creation d'une structure qui va prendre les differentes donnees d'une balise
- */
-typedef unsigned long Date;
+typedef struct
+{
+    /* data */
+} CalibrationData;
 
+typedef struct
+{
+    /* data */
+} CalibrationPosition;
 
 #endif // COMMON_
