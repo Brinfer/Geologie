@@ -1,7 +1,7 @@
 /**
- * @file config.h
+ * @file common.h
  *
- * @brief Fichier de configuration du projet.
+ * @brief Fichier de commonuration du projet.
  *
  * @version 1.0
  * @date 5 mai 2021
@@ -10,8 +10,8 @@
  * @license BSD 2-clauses
  */
 
-#ifndef CONFIG_
-#define CONFIG_
+#ifndef COMMON_
+#define COMMON_
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -69,4 +69,4 @@ typedef struct {
     AttenuationCoefficient attenuationCoefficientsArray[NB_CALIBRATION_POSITIONS];
 } BeaconData;
 
-#endif // CONFIG_
+#endif // COMMON_
