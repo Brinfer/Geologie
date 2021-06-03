@@ -469,9 +469,10 @@ extern int Geographer_signalEndUpdateAttenuation() {
 }
 
 
-extern int Geographer_signalEndAverageCalcul(CalibrationData calibrationData[]) {
+extern int Geographer_signalEndAverageCalcul(CalibrationData calibrationData[]) { //comment 
     int returnError = EXIT_FAILURE;
     printf("Geographer_signalEndAverageCalcul\n");
+
     MqMsg msg = { .event = E_SIGNAL_END_AVERAGE_CALCUL };
     if (mq_send(descripteur, (char*) &msg, sizeof(msg), 0) == 0) {
         int returnError = EXIT_SUCCESS;
