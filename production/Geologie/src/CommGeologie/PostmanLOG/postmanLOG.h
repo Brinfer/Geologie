@@ -19,6 +19,10 @@
 #ifndef POSTMAN_LOG_
 #define POSTMAN_LOG_
 
+#include <stdint.h>
+
+#include "../com_common.h"
+
 /**
  * @brief Initialise le sockect.
  *
@@ -43,7 +47,7 @@ extern int PostmanLOG_start(void);
  * @param size La taille de la trame a envoyer.
  * @return int 0 en cas de succes, une autre valeur sinon.
  */
-extern int PostmanLOG_sendMsg(const unsigned char* trame, short size);
+extern int PostmanLOG_sendMsg(Trame trame, uint8_t size);
 
 /**
  * @brief Lie les message sur le socket.
@@ -51,7 +55,7 @@ extern int PostmanLOG_sendMsg(const unsigned char* trame, short size);
  * @param destTrame La trame ou ecrire le message lue.
  * @return int 0 en cas de succes, une autre valeur sinon.
  */
-extern int PostmanLOG_readMsg(unsigned char* destTrame);
+extern int PostmanLOG_readMsg(Trame destTrame);
 
 /**
  * @brief Fermeture du socket.

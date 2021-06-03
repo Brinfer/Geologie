@@ -13,32 +13,34 @@
 #ifndef LED_
 #define LED_
 
+#include <stdint.h>
+
 /**
  * @brief Initialise la led.
  *
- * @return int 0 en cas de succes, une autre valeur sinon.
+ * @return int8_t 0 en cas de succes, une autre valeur sinon.
  */
-extern int Led_new(void);
+extern int8_t Led_new(void);
 
 /**
  * @brief Libere la led.
  *
- * @return int 0 en cas de succes, une autre valeur sinon.
+ * @return int8_t 0 en cas de succes, une autre valeur sinon.
  */
-extern int Led_free(void);
+extern int8_t Led_free(void);
 
 /**
  * @brief Allume la led.
  *
- * @return int 0 en cas de succes, une autre valeur sinon.
+ * @return int8_t 0 en cas de succes, une autre valeur sinon.
  */
-extern int Led_ledOn(void);
+extern int8_t Led_ledOn(void);
 
 /**
  * @brief Etiend la led.
  *
- * @return int 0 en cas de succes, une autre valeur sinon.
+ * @return int8_t 0 en cas de succes, une autre valeur sinon.
  */
-extern int Led_ledOff(void);
+extern int8_t Led_ledOff(void);
 
 #endif // LED_
