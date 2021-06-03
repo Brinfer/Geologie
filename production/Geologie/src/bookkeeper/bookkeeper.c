@@ -33,7 +33,7 @@
 static float getCurrentProcessorLoad(void);
 
 /**
- * @fn static float getCurrentProcessorLoad(void)
+ * @fn static  float getCurrentProcessorLoad(void)
  * @brief Calcule la charge mémoire.
  *
  * @return float entre 1 et 100.
