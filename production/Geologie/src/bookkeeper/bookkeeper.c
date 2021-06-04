@@ -46,14 +46,14 @@ static float getCurrentMemoryLoad(void);
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-extern void ask4StartBookkeeper(void){
+extern void askStartBookkeeper(void){
 
 }
 
-extern void ask4StopBookkeeper(void){
+extern void askStopBookkeeper(void){
     
 }
 
-extern void ask4CurrentProcessorAndMemoryLoad(void){
+extern void askCurrentProcessorAndMemoryLoad(void){
     
 }
