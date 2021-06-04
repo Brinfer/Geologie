@@ -89,7 +89,7 @@ extern void Receivers_stop(Receivers_t * this){
 
 }
 
-extern BeaconsData ask4AllBeaconsData(){
+extern BeaconsData askAllBeaconsData(){
     //setBeaconsData(BeaconsData)
 }
 

@@ -82,12 +82,6 @@ typedef short NbCoefficient;
 typedef int CalibrationPositionId;
 
 /**
- * @brief  TODO
- * 
- */
-typedef unsigned long Date;
-
-/**
  * @struct type
  * @brief creation d'une structure qui va prendre les differentes donnees d'une balise
  */

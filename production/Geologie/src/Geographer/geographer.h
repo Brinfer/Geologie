@@ -68,7 +68,7 @@ extern int Geographer_new();
 extern int Geographer_free();
 
 /**
- * @fn extern int ask4SignalStartGeographer()
+ * @fn extern int askSignalStartGeographer()
  * @brief Demande le démarrage de geographer
  *
  * Demande à geographer de démarrer, démarre le thread
@@ -76,10 +76,10 @@ extern int Geographer_free();
  * @return retourne 1 s'il y a une erreur dans l'execution de la méthode
  *
 */
-extern int Geographer_ask4SignalStartGeographer();
+extern int Geographer_askSignalStartGeographer();
 
 /**
- * @fn extern int ask4SignalSStopGeographer()
+ * @fn extern int askSignalSStopGeographer()
  * @brief Demande l'arret de geographer
  *
  * Demande à geographer de s'arreter, arrete le thread ferme la boite aux lettres
@@ -87,10 +87,10 @@ extern int Geographer_ask4SignalStartGeographer();
  * @return retourne 1 s'il y a une erreur dans l'execution de la méthode
  *
 */
-extern int Geographer_ask4SignalStopGeographer();
+extern int Geographer_askSignalStopGeographer();
 
 /**
- * @fn extern int ask4CalibrationPositions()
+ * @fn extern int askCalibrationPositions()
  * @brief Demande les positions de calibrage
  *
  * Demande à geographer les positions de calibrage qui les enverra a GUI
@@ -100,7 +100,7 @@ extern int Geographer_ask4SignalStopGeographer();
  * @return retourne 1 s'il y a une erreur dans l'execution de la méthode
  *
 */
-extern int Geographer_ask4CalibrationPositions();
+extern int Geographer_askCalibrationPositions();
 
 /**
  * @fn extern int Geographer_validatePosition(CalibrationPositionId calibrationPositionId)

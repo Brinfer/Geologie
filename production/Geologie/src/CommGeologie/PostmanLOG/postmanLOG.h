@@ -19,16 +19,28 @@
 #ifndef POSTMAN_LOG_
 #define POSTMAN_LOG_
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//                                              Include
+//
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #include <stdint.h>
 
 #include "../com_common.h"
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//                                              Fonctions publiques
+//
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 /**
  * @brief Initialise le sockect.
  *
- * @return int 0 en cas de succes, une autre valeur sinon.
+ * @return int8_t 0 en cas de succes, une autre valeur sinon.
  */
-extern int PostmanLOG_new(void);
+extern int8_t PostmanLOG_new(void);
 
 /**
  * @brief Ouvre le socket.
@@ -36,39 +48,39 @@ extern int PostmanLOG_new(void);
  * Reste en attente de connexion si aucune n'est etablie, et permet
  * de lire par la suite des messages.
  *
- * @return int 0 en cas de succes, une autre valeur sinon.
+ * @return int8_t 0 en cas de succes, une autre valeur sinon.
  */
-extern int PostmanLOG_start(void);
+extern int8_t PostmanLOG_start(void);
 
 /**
  * @brief Envoie un message.
  *
  * @param trame La trame a envoyer.
  * @param size La taille de la trame a envoyer.
- * @return int 0 en cas de succes, une autre valeur sinon.
+ * @return int8_t 0 en cas de succes, une autre valeur sinon.
  */
-extern int PostmanLOG_sendMsg(Trame trame, uint8_t size);
+extern int8_t PostmanLOG_sendMsg(Trame trame, uint8_t size);
 
 /**
  * @brief Lie les message sur le socket.
  *
  * @param destTrame La trame ou ecrire le message lue.
- * @return int 0 en cas de succes, une autre valeur sinon.
+ * @return int8_t 0 en cas de succes, une autre valeur sinon.
  */
-extern int PostmanLOG_readMsg(Trame destTrame);
+extern int8_t PostmanLOG_readMsg(Trame destTrame);
 
 /**
  * @brief Fermeture du socket.
  *
- * @return int 0 en cas de succes, une autre valeur sinon.
+ * @return int8_t 0 en cas de succes, une autre valeur sinon.
  */
-extern int PostmanLOG_stop(void);
+extern int8_t PostmanLOG_stop(void);
 
 /**
  * @brief Ferme le socket.
  *
- * @return int 0 en cas de succes, une autre valeur sinon.
+ * @return int8_t 0 en cas de succes, une autre valeur sinon.
  */
-extern int PostmanLOG_free(void);
+extern int8_t PostmanLOG_free(void);
 
 #endif // POSTMAN_LOG_
