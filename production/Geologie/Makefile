@@ -111,6 +111,13 @@ help:
 	@echo -e "\tall\t\t\t Exécute les commandes (dans l'ordre) \033[33mprod\033[0m et \033[33mtest\033[0m"
 	@echo -e "\thelp\t\t\t Affiche cet écran"
 
+	@echo -e "\n\n\tPour compiler en utilisant le compilateur pour la carte STM32MP1 entrer la commande:"
+	@echo -e "\n\t\t\033[32msource ../../../SDK/environment-setup-cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi\033[0m\n"
+	@echo -e "\tPenser à nettoyer les anciens fichiers compilés avant de recompiler (voir la commande \033[33mclean\033[0m)."
+
+	@echo -e "\n\n\tPour evpyer le fichier compiler à la carte STM32MP1 entrer la commande:"
+	@echo -e "\n\t\t\033[32mscp bin/geologie.out root@<Ip>:/home/root/geologie.out\033[0m\n"
+
 	@echo -e "\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Projet ProSE A1 ST <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n"
 .PHONY: clean
 .PHONY: test

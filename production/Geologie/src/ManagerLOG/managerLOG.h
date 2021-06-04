@@ -23,18 +23,6 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * @brief Creer tout les objets necessaire au logiciel.
- *
- */
-extern void ManagerLOG_new(void);
-
-/**
- * @brief Detruit tout les objets du logiciel
- *
- */
-extern void ManagerLOG_free(void);
-
-/**
  * @brief Demande le demarrage le logiciel.
  *
  */

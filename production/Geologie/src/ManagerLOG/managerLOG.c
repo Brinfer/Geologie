@@ -24,11 +24,11 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "tools.h"
-#include "UI/ui.h"
-#include "Geographer/geographer.h"
-#include "CommGeologie/PostmanLOG/postmanLOG.h"
-#include "CommGeologie/DispatcherLOG/dispatcherLOG.h"
+#include "../tools.h"
+#include "../UI/ui.h"
+#include "../Geographer/geographer.h"
+#include "../CommGeologie/PostmanLOG/postmanLOG.h"
+#include "../CommGeologie/DispatcherLOG/dispatcherLOG.h"
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -36,7 +36,9 @@
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-extern void ManagerLOG_new(void) {
+extern void ManagerLOG_startGEOLOGIE(void) {
+    /* New */
+
     TRACE("%sInitialization of GEOLOGIE%s%s", "\033[47m\033[30m", "\033[0m", "\n");
 
     int8_t returnError = EXIT_FAILURE;
@@ -44,65 +46,63 @@ extern void ManagerLOG_new(void) {
     returnError = UI_new();
     STOP_ON_ERROR(returnError < 0);
 
-    returnError = PostmanLOG_new();
-    STOP_ON_ERROR(returnError < 0);
+    // returnError = PostmanLOG_new();
+    // STOP_ON_ERROR(returnError < 0);
 
     returnError = Geographer_new();
     STOP_ON_ERROR(returnError < 0);
 
-    returnError = DispatcherLOG_new();
-    STOP_ON_ERROR(returnError < 0);
-}
+    // returnError = DispatcherLOG_new();
+    // STOP_ON_ERROR(returnError < 0);
 
-extern void ManagerLOG_startGEOLOGIE(void) {
+    /* Start */
+
     TRACE("%sStart of GEOLOGIE%s%s", "\033[47m\033[30m", "\033[0m", "\n");
 
-    int8_t returnError = EXIT_FAILURE;
-
-    returnError = PostmanLOG_start();
-    STOP_ON_ERROR(returnError < 0);
+    // returnError = PostmanLOG_start();
+    // STOP_ON_ERROR(returnError < 0);
 
     returnError = Geographer_askSignalStartGeographer();
     STOP_ON_ERROR(returnError < 0);
 
-    returnError = DispatcherLOG_new();
-    STOP_ON_ERROR(returnError < 0);
+    // returnError = DispatcherLOG_start();
+    // STOP_ON_ERROR(returnError < 0);
 
     returnError = UI_askSignalBeginningGEOLOGIE();
     STOP_ON_ERROR(returnError < 0);
 }
 
 extern void ManagerLOG_stopGEOLOGIE(void) {
+    /* Stop */
+
     TRACE("%sStop of GEOLOGIE%s%s", "\033[47m\033[30m", "\033[0m", "\n");
 
     int8_t returnError = EXIT_FAILURE;
 
-    returnError = DispatcherLOG_stop();
-    STOP_ON_ERROR(returnError < 0);
+    // returnError = DispatcherLOG_stop();
+    // STOP_ON_ERROR(returnError < 0);
 
     returnError = Geographer_askSignalStopGeographer();
     STOP_ON_ERROR(returnError < 0);
 
-    returnError = PostmanLOG_stop();
-    STOP_ON_ERROR(returnError < 0);
+    // returnError = PostmanLOG_stop();
+    // STOP_ON_ERROR(returnError < 0);
 
     returnError = UI_askSignalEndingGEOLOGIE();
     STOP_ON_ERROR(returnError < 0);
-}
 
-extern void ManagerLOG_free(void) {
+    /* Free */
+
     TRACE("%sDestruction of GEOLOGIE%s%s", "\033[47m\033[30m", "\033[0m", "\n");
 
-    int8_t returnError = EXIT_FAILURE;
-
-    returnError = DispatcherLOG_free();
-    STOP_ON_ERROR(returnError < 0);
+    // returnError = DispatcherLOG_free();
+    // STOP_ON_ERROR(returnError < 0);
 
     returnError = Geographer_free();
     STOP_ON_ERROR(returnError < 0);
 
-    returnError = PostmanLOG_free();
-    STOP_ON_ERROR(returnError < 0);
+    // returnError = PostmanLOG_free();
+    // STOP_ON_ERROR(returnError < 0);
 
     returnError = UI_free();
     STOP_ON_ERROR(returnError < 0);
