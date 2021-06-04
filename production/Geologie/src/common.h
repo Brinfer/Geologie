@@ -32,14 +32,20 @@
 #define SIZE_BEACON_ID (3)
 #define NB_CALIBRATION_POSITIONS (10)
 #define ATT_COEFF_1_METER (6)
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//                                              include
+//
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include <stdint.h>
 /**
  * @struct type
  * @brief structure qui va prendre les coordonnees d'un point (X et Y seront des entiers et seront en cm)
  */
 typedef struct {
-    int X;
-    int Y;
+    uint32_t X;
+    uint32_t Y;
 }Position;
 
 /**
