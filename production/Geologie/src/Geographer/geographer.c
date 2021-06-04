@@ -5,17 +5,17 @@
  * @date 03/06/21
  * @author Nathan BRIENT
  * @copyright BSD 2-clauses
- * 
+ *
  */
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//                                              Define 
+//                                              Define
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//                                              Include 
+//                                              Include
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #include "geographer.h"
@@ -27,14 +27,14 @@
 //                                              Variable et structure privee
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/** 
-* @brief Tableau d'entier 
-* creation d'un tableau constant d'entier 
+/**
+* @brief Tableau d'entier
+* creation d'un tableau constant d'entier
 */
 
-/** 
- * 
- * @brief On documente ce qui est privé 
+/**
+ *
+ * @brief On documente ce qui est privé
  * (et uniquement ce qui
  * est privé) dans le fichier .c puisque le reste (public)
  * est documenté dans le fichier .h.
@@ -69,7 +69,7 @@
  * @fn static uneFonctionPourLExemple(void)
  * @brief une fonction exemple
  * fonction exemple qui va montrer plusieurs cas à faire ou ne pas faire
- */ 
+ */
 
   /**
   * @brief Exemple de commentaire
@@ -99,21 +99,21 @@ extern int Geographer_free(){
 }
 
 
-extern int Geographer_ask4SignalStartGeographer(){
+extern int Geographer_askSignalStartGeographer(){
     int returnError=EXIT_FAILURE;
 
     return returnError;
 }
 
 
-extern int Geographer_ask4SignalStopGeographer(){
+extern int Geographer_askSignalStopGeographer(){
     int returnError=EXIT_FAILURE;
 
     return returnError;
 }
 
 
-extern int Geographer_ask4CalibrationPositions(){
+extern int Geographer_askCalibrationPositions(){
     int returnError=EXIT_FAILURE;
 
     return returnError;
@@ -161,8 +161,3 @@ extern int Geographer_dateAndSendData(BeaconData beaconsData[], Position current
 
     return returnError;
 }
-
-
-
-
-

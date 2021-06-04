@@ -93,7 +93,7 @@ help:
 	@echo -e "\ttest\t\t\t Compile et génére l'éxécutable de des tests de Géologie"
 	@echo -e "\tcheck\t\t\t Exécute une analyse statique sur le code source et export le résultat dans le dossier \033[34mreport\033[0m"
 	@echo -e "\tcoverage\t\t Génére un rapport de couverture des tests dans le dossier \033[34mcoverage\033[0m"
-	@echo -e "\tdoc\t\t\t Génére la documentation du code source dans le  dossier \033[34mdoc\033[0m"
+	@echo -e "\tdoc\t\t\t Génére la documentation du code source dans le dossier \033[34mdoc\033[0m"
 
 	@echo -e "\n\t##################################################### Nettoyage #####################################################\n"
 	@echo -e "\tclean\t\t\t Supprime les fichiers généré par les commandes \033[33mprod\033[0m et \033[33mtest\033[0m"
