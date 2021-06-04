@@ -128,10 +128,10 @@ typedef struct {
 
 typedef struct {
     Event_GEOGRAPHER event; //evenement interne
-    Position currentPosition;
+    Position * currentPosition;
     BeaconData* beaconsData;
     uint8_t beaconsDataSize;
-    ProcessorAndMemoryLoad* currentProcessorAndmemoryLoad;
+    ProcessorAndMemoryLoad * currentProcessorAndMemoryLoad;
     CalibrationPositionId calibrationPositionId;
     CalibrationData * calibrationData;
     uint8_t nbCalibration;
@@ -140,7 +140,6 @@ typedef struct {
 
 static State_GEOGRAPHER myState;
 static pthread_t myThread;
-
 
 
 /**
@@ -299,15 +298,15 @@ static void* run() {
         mqReceive(&msg); //Opération privée pour lire dans la BAL de AdminUI
         if (stateMachine[myState][msg.event].destinationState == S_FORGET) // aucun état de destination, on ne fait rien
         {
-            //TRACE("MAE, perte evenement %s  \n", Event_getName(msg.event));
+            TRACE("MAE, perte evenement %s  \n", Event_Geographer_getName(msg.event));
         } else /* on tire la transition */
         {
-            //TRACE("MAE, traitement evenement %s \n",  Event_getName(msg.event));
+            TRACE("MAE, traitement evenement %s \n",  Event_Geographer_getName(msg.event));
             act = stateMachine[myState][msg.event].action;
-            //TRACE("MAE, traitement action %s \n", Action_getName(act));
+            TRACE("MAE, traitement action %s \n", Action_Geographer_getName(act));
             performAction(act, &msg);
             myState = stateMachine[myState][msg.event].destinationState;
-            //TRACE("MAE, va dans etat %s \n", State_getName(myState));
+            TRACE("MAE, va dans etat %s \n", State_Geographer_getName(myState));
         }
     }
     return 0;
@@ -324,8 +323,8 @@ static void performAction(Action_GEOGRAPHER anAction, MqMsg* msg) {
 
     case A_CONNECTION_ESTABLISHED:
         connectionState = CONNECTED;
-        ProxyLoggerMOB_setExperimentalPositions(&experimentalPositions, EXP_POSITION_NUMBER);
-        ProxyLoggerMOB_setExperimentalTrajects(&experimentalTrajects, EXP_TRAJECT_NUMBER);
+        ProxyLoggerMOB_setExperimentalPositions(experimentalPositions, EXP_POSITION_NUMBER);
+        ProxyLoggerMOB_setExperimentalTrajects(experimentalTrajects, EXP_TRAJECT_NUMBER);
         break;
 
     case A_CONNECTION_DOWN:
@@ -335,8 +334,8 @@ static void performAction(Action_GEOGRAPHER anAction, MqMsg* msg) {
     case A_SET_ALL_DATA:
         currentDate = getCurrentDate();
         ProxyLoggerMOB_setAllBeaconsData(msg->beaconsData, msg->beaconsDataSize, currentDate);
-        ProxyLoggerMOB_setCurrentPosition(&msg->currentPosition, currentDate);
-        ProxyLoggerMOB_setProcessorAndMemoryLoad(msg->currentProcessorAndmemoryLoad, currentDate);
+        ProxyLoggerMOB_setCurrentPosition(msg->currentPosition, currentDate);
+        ProxyLoggerMOB_setProcessorAndMemoryLoad(msg->currentProcessorAndMemoryLoad, currentDate);
         break;
 
     case A_SET_CALIBRATION_POSITIONS:
@@ -349,8 +348,8 @@ static void performAction(Action_GEOGRAPHER anAction, MqMsg* msg) {
         break;
 
     case A_END_CALIBRATION_POSITION:
-        CalibrationData
-            ProxyLoggerMOB_setCalibrationData(calibrationData);
+        
+        ProxyLoggerMOB_setCalibrationData(msg->calibrationData);
         break;
 
     case A_END_CALIBRATION: //TODO
@@ -439,7 +438,7 @@ extern uint8_t Geographer_askSignalStartGeographer() {
 
 extern uint8_t Geographer_askSignalStopGeographer() {
     uint8_t returnError = EXIT_FAILURE;
-    returnError = Scanner_askSopScanner();
+    returnError = Scanner_askStopScanner();
 
     if (returnError == EXIT_SUCCESS) {
         ProxyLoggerMOB_stop();
@@ -531,7 +530,7 @@ extern uint8_t Geographer_signalConnectionDown() {
 
 
 
-extern uint8_t Geographer_dateAndSendData(BeaconData* beaconsData, uint8_t beaconsDataSize, Position* currentPosition, ProcessorAndMemoryLoad* currentProcessorAndMemoryLoad) {
+extern uint8_t Geographer_dateAndSendData(BeaconData* beaconsData, uint8_t beaconsDataSize, Position* currentPosition, ProcessorAndMemoryLoad currentProcessorAndMemoryLoad) {
     uint8_t returnError = EXIT_FAILURE;
     printf("Geographer_dateAndSendData\n");
     if (connectionState == CONNECTED) {
@@ -541,7 +540,7 @@ extern uint8_t Geographer_dateAndSendData(BeaconData* beaconsData, uint8_t beaco
             .beaconsData = &(*beaconsData),
             .beaconsDataSize=beaconsDataSize,
             .currentPosition=currentPosition,
-            .currentProcessorAndmemoryLoad=currentProcessorAndMemoryLoad,
+            .currentProcessorAndMemoryLoad=currentProcessorAndMemoryLoad,
         };
         
 

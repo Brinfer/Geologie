@@ -75,11 +75,6 @@ typedef float ProcessorAndMemoryLoad[2];
  */
 typedef short NbCoefficient;
 
-/**
- * @brief  TODO
- *
- */
-typedef int CalibrationPositionId;
 
 /**
  * @brief  TODO
@@ -87,11 +82,6 @@ typedef int CalibrationPositionId;
  */
 typedef unsigned long Date;
 
-/**
- * @struct type
- * @brief creation d'une structure qui va prendre les differentes donnees d'une balise
- */
-typedef unsigned long Date;
 
 /**
  * @struct type
@@ -116,38 +106,16 @@ typedef struct
     /* data */
 } CalibrationPosition;
 
-/**
- * @struct type
- * @brief structure qui va prendre les differentes donnees d'une balise
- */
-typedef unsigned long Date;
 
-/**
- * @struct MemoryLoad
- * @brief Charge memoire
- */
-typedef int MemoryLoad;
 
-/**
- * @struct ProcessorLoad
- * @brief Charge processeur
- */
-typedef int ProcessorLoad;
 
-/**
- * @struct ProcessorAndMemoryLoad
- * @brief Charge processeur et memoire
- */
-typedef struct { 
-    MemoryLoad memoryLoad;
-    ProcessorLoad processorLoad;
-}ProcessorAndMemoryLoad;
 
 /**
  * @struct CalibrationPositionId
  * @brief Id d'une balise
  */
 typedef int CalibrationPositionId;
+
 /** * @brief  TODO
  *
  */
@@ -161,5 +129,10 @@ typedef struct
 {
     /* data */
 } ExperimentalPosition;
+
+typedef struct
+{
+    /* data */
+} BeaconSignal;
 
 #endif // COMMON_
