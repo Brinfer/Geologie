@@ -32,7 +32,8 @@
 #define RAW_DATA_UUID_VALUE_INDEX
 
 typedef struct {
-    char name[8];
+    char name[3];
+    int uuid;
     int8_t rssi;
     //Position position;
 } BeaconsSignal;
