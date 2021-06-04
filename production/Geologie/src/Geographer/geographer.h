@@ -38,6 +38,8 @@
 #include "../CommGeologie/ProxyGUI/proxyGUI.h"
 #include "../CommGeologie/com_common.h"
 #include "../common.h"
+#include "../tools.h"
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //                                              Variable et structure extern
@@ -182,6 +184,6 @@ extern uint8_t Geographer_signalConnectionDown();
  * @return retourne 1 s'il y a une erreur dans l'execution de la méthode
  *
 */
-extern uint8_t Geographer_dateAndSendData(BeaconData * beaconsData, uint8_t beaconsDataSize, Position * currentPosition, ProcessorAndMemoryLoad * currentProcessorAndMemoryLoad);
+extern uint8_t Geographer_dateAndSendData(BeaconData * beaconsData, uint8_t beaconsDataSize, Position * currentPosition, ProcessorAndMemoryLoad currentProcessorAndMemoryLoad);
 
 #endif /* GEOGRAPHER_H */

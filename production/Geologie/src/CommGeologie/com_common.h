@@ -56,9 +56,6 @@ typedef enum {
  * @brief  TODO
  *
  */
-typedef struct
-{
-    /* data */
-} Header;
+
 
 #endif // COM_COMM_
