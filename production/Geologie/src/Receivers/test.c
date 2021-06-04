@@ -11,6 +11,7 @@
 
 #include "receivers.h"
 #include "translator.h"
+#include "../translatorBeacon/translatorBeacon.h"
 
 #define UUID_FIRST_BYTE 21
 #define UUID_LAST_BYTE 22
@@ -20,7 +21,9 @@
 #define LOCAL_NAME_FIRST_BYTE 5
 #define LOCAL_NAME_LAST_BYTE 18
 
-BeaconsData beaconsData;
+#define BEACONS_UUID 0x1A18
+
+BeaconsSignal beaconsData;
 
 struct hci_request ble_hci_request(uint16_t ocf, int clen, void * status, void * cparam)
 {
@@ -73,8 +76,23 @@ void getNameAndRSSI(le_advertising_info * info){
 	printf("RSSI : %d\n\n", beaconsData.rssi);
 }
 
+static int convertBytesToInt(const unsigned char* src) {
+
+    int returnVal;
+
+    unsigned char tempArray[8];
+
+    memcpy(tempArray, src, 8);
+
+    returnVal = *(int*) tempArray;
+
+    returnVal = ntohl(returnVal);
+
+    return returnVal;
+
+}
+
 void checkUUID(le_advertising_info * info){
-	RawData* rd;
 	int uuid[2] = {0};
 	int i;
 	for(i = UUID_FIRST_BYTE; i < UUID_LAST_BYTE+1; i++){
@@ -88,9 +106,9 @@ void checkUUID(le_advertising_info * info){
 		}		
 	}
 	if(uuid[0] == 26 && uuid[1]==24){
-		getNameAndRSSI(info);
+		translate(info);
+		//getNameAndRSSI(info);
 	}
-	//Translator_convertByteToRawData(info->data, rd);
 }
 
 int main()

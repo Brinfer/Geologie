@@ -116,7 +116,7 @@ extern int TranslatorBeacon_free();
 
 */
 
-extern BeaconsSignal TranslatorBeacon_translateChannelToBeaconsSignal(const unsigned char* channel);
+extern BeaconsSignal TranslatorBeacon_translateChannelToBeaconsSignal(le_advertising_info * info);
 
 
 #endif /* TRANSLATORBEACON_H */
