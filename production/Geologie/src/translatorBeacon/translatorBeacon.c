@@ -134,19 +134,39 @@ static float convertBytesToFloat(const unsigned char* src);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-extern BeaconsSignal TranslatorBeacon_translateChannelToBeaconsSignal(const unsigned char* channel){
+extern BeaconsSignal TranslatorBeacon_translateChannelToBeaconsSignal(le_advertising_info * info){
 
-    /* NAME */
+    BeaconsSignal bs;
 
-    BeaconsSignal * dest;
-    const unsigned char* uuid;
-    
-    memcpy(dest->name, channel + 5, 3);
+    char posX[5];
+	char posY[5];
 
-    /* UUID */
+	memcpy(bs.name, info->data + 5, 2); //Mettre des define pour les index
 
-    memcpy(uuid, channel + 11, 2);
-    dest->uuid = convertBytesToInt(uuid);
+	printf("Name : %c%c\n", bs.name[0], bs.name[1]);
+
+	memcpy(bs.uuid, info->data + 21, 2);
+
+	printf("\nUUID : %d\n", bs.uuid[0]);
+
+	memcpy(posX, info->data + 8, 5); //parfois des Pbs au niveau du X
+
+	sscanf(posX, "%d", &(bs.position.X));
+
+	printf("\nX : %d\n", bs.position.X);
+
+	memcpy(posY, info->data + 14, 5);	
+
+	sscanf(posY, "%d", &(bs.position.Y));
+
+	printf("\nY : %d\n", bs.position.Y);
+
+	bs.rssi = (int8_t) info->data[info->length];
+
+	printf("\nRSSI : %d\n", bs.rssi);
+
+    return bs;
+
 
 }
 
@@ -210,4 +230,11 @@ static float convertBytesToFloat(const unsigned char* src) {
 
     return returnVal;
 
+}
+
+int main(){
+    const unsigned char * data;
+    data = "0201060F09623178333030303079343030303003031A1803190003";
+    printf("%s\n", data);
+    TranslatorBeacon_translateChannelToBeaconsSignal(data);
 }
