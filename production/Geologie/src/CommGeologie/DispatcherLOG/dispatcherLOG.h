@@ -60,7 +60,7 @@ extern int DispatcherLOG_new();
 extern int DispatcherLOG_free();
 
 /**
- * @fn extern int ask4SignalStartDispatcherLOG()
+ * @fn extern int askSignalStartDispatcherLOG()
  * @brief Demande le démarrage de dispatcherLOG
  *
  * Demande à dispatcherLOG de démarrer, démarre le thread
@@ -71,7 +71,7 @@ extern int DispatcherLOG_free();
 extern int DispatcherLOG_start();
 
 /**
- * @fn extern int ask4SignalSStopDispatcherLOG()
+ * @fn extern int askSignalSStopDispatcherLOG()
  * @brief Demande l'arret de dispatcherLOG
  *
  * Demande à dispatcherLOG de s'arreter, arrete le thread ferme la boite aux lettres

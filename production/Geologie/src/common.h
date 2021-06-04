@@ -148,9 +148,10 @@ typedef struct {
  * @brief Id d'une balise
  */
 typedef int CalibrationPositionId;
- * @brief  TODO
+/** * @brief  TODO
  *
  */
+
 typedef struct
 {
     /* data */

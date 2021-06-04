@@ -20,7 +20,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #include "../PostmanLOG/postmanLOG.h"
-#include "../TranslatorLOG/translator.h"
+#include "../TranslatorLOG/translatorLOG.h"
 
 #include "../com_common.h"
 #include "../../common.h"
@@ -56,7 +56,7 @@ extern int ProxyGUI_new();
 extern int ProxyGUI_free();
 
 /**
- * @fn extern int ask4SignalStartProxyGUI()
+ * @fn extern int askSignalStartProxyGUI()
  * @brief Demande le démarrage de proxyGUI
  *
  * Demande à proxyGUI de démarrer, démarre le thread
@@ -67,7 +67,7 @@ extern int ProxyGUI_free();
 extern int ProxyGUI_start();
 
 /**
- * @fn extern int ask4SignalSStopProxyGUI()
+ * @fn extern int askSignalSStopProxyGUI()
  * @brief Demande l'arret de proxyGUI
  *
  * Demande à proxyGUI de s'arreter, arrete le thread ferme la boite aux lettres
