@@ -20,18 +20,21 @@
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#define NB_BEACONS (3) // TODO move
 
-#define SIZE_BEACON_DATA (19 * 8)
-#define SIZE_POSITION_DATA (8 * 8)
-
-#define COMMAND_POSITION_START (0)
-#define COMMAND_SIZE (1)
-
-
-#define NB_BEACONS (3)
+/**
+ * @brief  TODO
+ *
+ */
 #define SIZE_BEACON_ID (3)
-#define NB_CALIBRATION_POSITIONS (10)
-#define ATT_COEFF_1_METER (6)
+
+#define NB_CALIBRATION_POSITIONS (10) // TODO move
+
+/**
+ * @brief  TODO
+ *
+ */
+#define ATT_COEFF_1_METER (6) // TODO move
 
 /**
  * @struct type
@@ -40,7 +43,7 @@
 typedef struct {
     int X;
     int Y;
-}Position;
+} Position;
 
 /**
  * @typedef type Power
@@ -54,7 +57,41 @@ typedef float Power;
  */
 typedef float AttenuationCoefficient;
 
+/**
+ * @brief  TODO
+ *
+ */
 typedef float BeaconCoefficients[NB_BEACONS];
+
+/**
+ * @brief  TODO
+ *
+ */
+typedef float ProcessorAndMemoryLoad[2];
+
+/**
+ * @brief  TODO
+ *
+ */
+typedef short NbCoefficient;
+
+/**
+ * @brief  TODO
+ *
+ */
+typedef int CalibrationPositionId;
+
+/**
+ * @brief  TODO
+ * 
+ */
+typedef unsigned long Date;
+
+/**
+ * @struct type
+ * @brief creation d'une structure qui va prendre les differentes donnees d'une balise
+ */
+typedef unsigned long Date;
 
 /**
  * @struct type
@@ -68,6 +105,16 @@ typedef struct {
     unsigned char nbCoefficientAttenuations;
     AttenuationCoefficient attenuationCoefficientsArray[NB_CALIBRATION_POSITIONS];
 } BeaconData;
+
+typedef struct
+{
+    /* data */
+} CalibrationData;
+
+typedef struct
+{
+    /* data */
+} CalibrationPosition;
 
 /**
  * @struct type
@@ -101,5 +148,17 @@ typedef struct {
  * @brief Id d'une balise
  */
 typedef int CalibrationPositionId;
+ * @brief  TODO
+ *
+ */
+typedef struct
+{
+    /* data */
+} ExperimentalTraject;
+
+typedef struct
+{
+    /* data */
+} ExperimentalPosition;
 
 #endif // COMMON_

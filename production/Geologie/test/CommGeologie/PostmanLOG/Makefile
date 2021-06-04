@@ -4,23 +4,16 @@
 #																				#
 #################################################################################
 
-# Packages.
-PACKAGES = Geographer ManagerLOG UI Mathematician Scanner CommGeologie Led
-
-SRC  = $(wildcard */*.c)
+SRC = $(wildcard *.c)
 OBJ = $(SRC:.c=.o)
+DEP = $(SRC:.c=.d)
 
-# Point d'entre du programme
-MAIN = main.c
+# Gcov informations
+GCDA = $(SRC:.c=.gcda)
+GCNO = $(SRC:.c=.gcno)
 
-# Gestion automatique des dpendances
-DEP = $(MAIN:.c=.d)
-
-# Executable à gnrer.
-EXEC = ../$(PROD)
-
-# Inclusion depuis le niveau du package
-CCFLAGS += -I.
+# Inclusion depuis le niveau du package.
+CCFLAGS += -I.. -I../../$(SRC_DIR)
 
 #################################################################################
 #																				#
@@ -28,22 +21,19 @@ CCFLAGS += -I.
 #																				#
 #################################################################################
 
-all: prod
+all: test
 
 # Compilation
-prod:
-	@for p in $(PACKAGES); do (cd $$p && $(MAKE) $@); done
-	$(MAKE) $(EXEC)
+test: $(OBJ)
 
-$(EXEC): $(OBJ) $(MAIN)
-	$(CC) $(CCFLAGS) $(OBJ) $(MAIN) -MF $(DEP) -o $(EXEC) $(LDFLAGS)
+.c.o:
+	$(CC) -c $(CCFLAGS) $< -o $@
 
-# Nettoyage
 clean:
-	@for p in $(PACKAGES); do (cd $$p && $(MAKE) $@); done
-	@rm -f $(DEP) $(OBJ)
+	@rm -f $(OBJ) $(DEP) $(GCDA) $(GCNO)
 
 -include $(DEP)
 
-
+# Nettoyage
 .PHONY: clean
+.PHONY: test

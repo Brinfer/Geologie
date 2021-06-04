@@ -5,11 +5,7 @@
 #################################################################################
 
 # Packages.
-PACKAGES = Geographer \
-	ManagerLOG \
-	UI \
-	Mathematician \
-	ReceptionistLOG
+PACKAGES = Geographer ManagerLOG UI Mathematician Scanner CommGeologie Led
 
 #################################################################################
 #																				#
