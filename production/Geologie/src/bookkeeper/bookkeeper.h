@@ -42,23 +42,23 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * @fn extern void ask4StartBookkeeper(void)
+ * @fn extern void askStartBookkeeper(void)
  * @brief Demande le demarrage de bookkeeper.
  */
-extern void ask4StartBookkeeper(void);
+extern void askStartBookkeeper(void);
 
 /**
- * @fn extern void ask4StopBookkeeper(void)
+ * @fn extern void askStopBookkeeper(void)
  * 
  * @brief Demande l'arret de Bookkeeper.
  */
-extern void ask4StopBookkeeper(void);
+extern void askStopBookkeeper(void);
 
 /**
- * @fn extern void ask4CurrentProcessorAndMemoryLoad(void);
+ * @fn extern void askCurrentProcessorAndMemoryLoad(void);
  * 
  * @brief Demande les charges mémoire et processeur actuelles.
  */
-extern void ask4CurrentProcessorAndMemoryLoad(void);
+extern void askCurrentProcessorAndMemoryLoad(void);
 
 #endif /* BOOKKEEPER */
