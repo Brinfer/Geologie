@@ -1,8 +1,8 @@
 /**
  * @file proxyGUI.h
- * 
+ *
  * @brief  Proxy pour utilser les methodes de GUI cote Geologie
- * 
+ *
  * @version 2.0
  * @date 03-06-2021
  * @author Nathan BRIENT
@@ -11,16 +11,16 @@
  */
 
 #ifndef PROXYGUI_H
-#define PROXYGUI_H 
+#define PROXYGUI_H
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//                                              Include 
+//                                              Include
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #include "../PostmanLOG/postmanLOG.h"
-#include "../TranslatorLOG/translatorLOG.h"
+#include "../TranslatorLOG/translator.h"
 
 #include "../com_common.h"
 #include "../../common.h"
@@ -40,9 +40,9 @@
 /**
  * @fn extern int ProxyGUI_new()
  * @brief Instancie et initialise l'objet ProxyGUI
- * *
+ *
  * @return retourne 1 s'il y a une erreur dans l'execution de la méthode
- * 
+ *
 */
 extern int ProxyGUI_new();
 
@@ -51,7 +51,7 @@ extern int ProxyGUI_new();
  * @brief Libere et supprime l'objet ProxyGUI
  * *
  * @return retourne 1 s'il y a une erreur dans l'execution de la méthode
- * 
+ *
 */
 extern int ProxyGUI_free();
 
@@ -62,7 +62,7 @@ extern int ProxyGUI_free();
  * Demande à proxyGUI de démarrer, démarre le thread
  *
  * @return retourne 1 s'il y a une erreur dans l'execution de la méthode
- * 
+ *
 */
 extern int ProxyGUI_start();
 
@@ -73,7 +73,7 @@ extern int ProxyGUI_start();
  * Demande à proxyGUI de s'arreter, arrete le thread ferme la boite aux lettres
  *
  * @return retourne 1 s'il y a une erreur dans l'execution de la méthode
- * 
+ *
 */
 extern int ProxyGUI_stop();
 
@@ -83,28 +83,28 @@ extern int ProxyGUI_stop();
  *
  *
  * @return retourne 1 s'il y a une erreur dans l'execution de la méthode
- * 
+ *
 */
 extern int ProxyGUI_setCalibrationPositions(CalibrationPosition calibrationPositions[]);
 
 /**
  * @fn extern int ProxyGUI_signalEndCalibrationPosition();
  * @brief Signale la fin de la calibration pour la position
- * 
+ *
  *
  * @return retourne 1 s'il y a une erreur dans l'execution de la méthode
- * 
+ *
 */
 extern int ProxyGUI_signalEndCalibrationPosition();
 
 /**
  * @fn extern int ProxyGUI_signalEndCalibration();
  * @brief Signale la fin de la calibration
- * 
+ *
  *
  * @return retourne 1 s'il y a une erreur dans l'execution de la méthode
- * 
+ *
 */
 extern int ProxyGUI_signalEndCalibration();
 
-#endif PROXYGUI_H
+#endif // PROXYGUI_H

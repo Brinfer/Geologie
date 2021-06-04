@@ -4,23 +4,12 @@
 #																				#
 #################################################################################
 
-# Packages.
-PACKAGES = Geographer ManagerLOG UI Mathematician Scanner CommGeologie Led
-
-SRC  = $(wildcard */*.c)
+SRC = $(wildcard *.c)
 OBJ = $(SRC:.c=.o)
+DEP = $(SRC:.c=.d)
 
-# Point d'entre du programme
-MAIN = main.c
-
-# Gestion automatique des dpendances
-DEP = $(MAIN:.c=.d)
-
-# Executable à gnrer.
-EXEC = ../$(PROD)
-
-# Inclusion depuis le niveau du package
-CCFLAGS += -I.
+# Inclusion depuis le niveau du package.
+CCFLAGS += -I..
 
 #################################################################################
 #																				#
@@ -31,19 +20,15 @@ CCFLAGS += -I.
 all: prod
 
 # Compilation
-prod:
-	@for p in $(PACKAGES); do (cd $$p && $(MAKE) $@); done
-	$(MAKE) $(EXEC)
+prod: $(OBJ)
 
-$(EXEC): $(OBJ) $(MAIN)
-	$(CC) $(CCFLAGS) $(OBJ) $(MAIN) -MF $(DEP) -o $(EXEC) $(LDFLAGS)
+.c.o:
+	$(CC) -c $(CCFLAGS) $< -o $@
 
 # Nettoyage
+.PHONY: clean
+
 clean:
-	@for p in $(PACKAGES); do (cd $$p && $(MAKE) $@); done
-	@rm -f $(DEP) $(OBJ)
+	@rm -f $(OBJ) $(DEP)
 
 -include $(DEP)
-
-
-.PHONY: clean

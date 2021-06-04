@@ -13,11 +13,15 @@
 #ifndef COM_COMMON_
 #define COM_COMMON_
 
+#include <stdint.h>
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //                                              Define
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+typedef uint8_t Trame[];
 
 /**
  * @struct Header
@@ -35,6 +39,7 @@ typedef struct {
  */
 typedef enum {
     /* TODO */
+    TODO = 0,
 } Commande;
 
 /**
@@ -43,8 +48,17 @@ typedef enum {
  * @brief Enumeration contenant l'etat de la connexion entre Geologie et Geomobile.
  */
 typedef enum {
-    DISCONNECTED=0,
+    DISCONNECTED = 0,
     CONNECTED
-}ConnectionState;
+} ConnectionState;
+
+/**
+ * @brief  TODO
+ *
+ */
+typedef struct
+{
+    /* data */
+} Header;
 
 #endif // COM_COMM_
