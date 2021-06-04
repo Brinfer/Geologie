@@ -60,9 +60,9 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "../Receiver/receiver.h"
+#include "../Receivers/receivers.h"
 
-#include "../common.h"
+//#include "../common.h"
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -116,7 +116,7 @@ extern int TranslatorBeacon_free();
 
 */
 
-extern BeaconsSignal TranslatorBeacon_translateChannelToBeaconsSignal(BleChannel);
+extern BeaconsSignal TranslatorBeacon_translateChannelToBeaconsSignal(const unsigned char* channel);
 
 
 #endif /* TRANSLATORBEACON_H */
