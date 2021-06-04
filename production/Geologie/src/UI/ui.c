@@ -69,7 +69,6 @@ extern int8_t UI_askSignalBeginningGEOLOGIE(void) {
     return returnError;
 }
 
-
 extern int8_t UI_askSignalEndingGEOLOGIE(void) {
     int8_t returnError = EXIT_FAILURE;
 
