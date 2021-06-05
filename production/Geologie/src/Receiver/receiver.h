@@ -37,14 +37,7 @@ typedef struct {
     //Position position;
 } BeaconsSignal;
 
-typedef struct {
-    unsigned char* flags_length;
-    unsigned char* name_length;
-    unsigned char* uuid_length;
-    unsigned char* flags_value;
-    unsigned char* name_value;
-    unsigned char* uuid_value;
-} BeaconsChannel;
+typedef le_advertising_info BeaconsChannel;
 
 typedef struct {
     unsigned char* flags_length;
