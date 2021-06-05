@@ -1,7 +1,7 @@
 /**
  * @file proxyGUI.h
  *
- * @brief  Proxy pour utilser les methodes de GUI cote Geologie
+ * @brief  Proxy pour utilser les methodes de GUI cote GEOLOGIE
  *
  * @version 2.0
  * @date 03-06-2021

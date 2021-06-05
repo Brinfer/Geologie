@@ -5,13 +5,6 @@
  *
  * Definie plusieurs macro:
  *
- * #STOP_ON_ERROR
- * #TRACE
- * #ARRAY_SIZE
- * #LOG
- * #DEBUG_FILE_PATH
- * #bool_e
- *
  * @version 1.0
  * @date 5 mai 2021
  * @author GAUTIER Pierre-louis
@@ -132,14 +125,5 @@
             arrayDest[indexStart + i] = arraySource[i];                     \
         }                                                                   \
     } while(0)
-
-/**
- * @enum bool_e
- * @brief Enumeration pour remplacer le type bool d'autre langage.
- */
-typedef enum {
-    False, /**< Valeur false */
-    True,   /**< Valuer true */
-} bool_e;
 
 #endif /* DEBUG_TOOLS_ */
