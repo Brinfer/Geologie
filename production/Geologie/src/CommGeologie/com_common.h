@@ -22,7 +22,12 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * @brief Tableau de uint_t composant un message envoye entre GEOMOBILE et GEOLOGIE.
+ * @brief Le nombre d'octet composant le header d'une trame.
+ */
+#define SIZE_HEADER (3)
+
+/**
+ * @brief Tableau de uint8_t composant un message envoye entre GEOMOBILE et GEOLOGIE.
  */
 typedef uint8_t Trame[];
 

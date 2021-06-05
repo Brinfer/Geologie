@@ -31,17 +31,35 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
+ * @brief Donne la taille de la trame necessaire pour envoyer le message de la commande en fonction du
+ * nombre d'element qui la compose si celle-ci est de taille variable.
+ *
+ * Dans le cas ou la commande n'est pas de taille variable, l'argument @a nbElements est ignore.
+ *
+ * @a nbElements peut correspondre au nombre de #BeaconData a envoyer pour le message #SEND_ALL_BEACONS_DATA, ou
+ * au nombre de position de calibration du message #REP_CALIBRATION_POSITIONS.
+ *
+ * @param cmd La commande dont on veut connaitre la taille de la trame.
+ * @param nbElements Le nombre d'element composant le message.
+ * @return uint16_t La taille que la trame doit avoir pour pouvoir envoyer le message.
+ *
+ * @todo Faire pour la commande SEND_EXPERIMENTAL_TRAJECTS
+ */
+extern uint16_t TranslatorLog_getTrameSize(Commande cmd, uint8_t nbElements);
+
+
+/**
  * @brief Traduit la trame en un #Header.
  *
- * Traduit le header de @a trame et place cette traduction dans @a p.
+ * Traduit le header de @a trame et place cette traduction dans @a dest.
  *
  * @param trame La trame qui contient le header.
  * @param dest La structure #Header qui contiendra la traduction
- * @return int16_t -1 en cas d'erreur, la taille de la trame sinon.
  *
- *  @warning dest doit etre un pointeur initialise.
+ * @warning @a dest doit etre de la bonne taille.
+ * @see #SIZE_HEADER
  */
-extern int16_t TranslatorLog_translateTrameToHeader(const Trame *trame, Header dest);
+extern void TranslatorLog_translateTrameToHeader(const Trame trame, Header* dest);
 
 /**
  * @brief Traduit les positions experimentales a envoyer en une trame.
@@ -51,11 +69,11 @@ extern int16_t TranslatorLog_translateTrameToHeader(const Trame *trame, Header d
  * @param nbPositions Le nombre de position experimentale a envoyer.
  * @param experimentalPosition Les positions experimentales a envoyer.
  * @param dest La trame de destination de la traduction.
- * @return int16_t -1 en cas d'erreur, la taille de la trame sinon.
  *
- * @warning dest doit etre un pointeur initialise.
+ * @warning @a dest doit etre de la bonne taille.
+ * @see #TranslatorLog_getTrameSize
  */
-extern int16_t TranslatorLog_translate4SendExperimentalPosition(uint8_t nbPositions, const ExperimentalPosition* experimentalPosition, Trame dest);
+extern void TranslatorLog_translate4SendExperimentalPosition(uint8_t nbPositions, const ExperimentalPosition* experimentalPosition, Trame dest);
 
 /**
  * @brief Traduit les donnees balise en une trame.
@@ -66,11 +84,11 @@ extern int16_t TranslatorLog_translate4SendExperimentalPosition(uint8_t nbPositi
  * @param beaconsData Le donnees balise a traduire.
  * @param currentDate La date a laquelle les donnees on ete relevee.
  * @param dest La trame de destination de la traduction.
- * @return int16_t -1 en cas d'erreur, la taille de la trame sinon.
  *
- * @warning dest doit etre un pointeur initialise.
+ * @warning @a dest doit etre de la bonne taille.
+ * @see #TranslatorLog_getTrameSize
  */
-extern int16_t TranslatorLog_translate4SendAllBeaconsData(uint8_t nbBeacons, const BeaconData* beaconsData, Date currentDate, Trame dest);
+extern void TranslatorLog_translate4SendAllBeaconsData(uint8_t nbBeacons, const BeaconData* beaconsData, Date currentDate, Trame dest);
 
 /**
  * @brief Traduit la position courante en une trame.
@@ -80,11 +98,11 @@ extern int16_t TranslatorLog_translate4SendAllBeaconsData(uint8_t nbBeacons, con
  * @param currentPosition La position courante a traduire.
  * @param currentDate La date a laquelle les donnees on ete relevee.
  * @param dest La trame de destination de la traduction.
- * @return int16_t -1 en cas d'erreur, la taille de trame sinon.
  *
- * @warning dest doit etre un pointeur initialise.
+ * @warning @a dest doit etre de la bonne taille.
+ * @see #TranslatorLog_getTrameSize
  */
-extern int16_t TranslatorLog_translate4SendCurrentPosition(const Position* currentPosition, Date currentDate, Trame dest);
+extern void TranslatorLog_translate4SendCurrentPosition(const Position* currentPosition, Date currentDate, Trame dest);
 
 /**
  * @brief Traduit les donnees de calibration en une trame.
@@ -94,11 +112,11 @@ extern int16_t TranslatorLog_translate4SendCurrentPosition(const Position* curre
  * @param nbCalibrationPosition Le nombre de position de calibration a traduire.
  * @param calibrationPosition Les position de calibration a traduire.
  * @param dest La trame de destination de la traduction.
- * @return int16_t -1 en cas d'erreur, la taille de trame sinon.
  *
- * @warning dest doit etre un pointeur initialise.
+ * @warning @a dest doit etre de la bonne taille.
+ * @see #TranslatorLog_getTrameSize
  */
-extern int16_t TranslatorLog_translateRepCalibrationPosition(uint8_t nbCalibrationPosition, const CalibrationPosition* calibrationPosition, Trame dest);
+extern void TranslatorLog_translateRepCalibrationPosition(uint8_t nbCalibrationPosition, const CalibrationPosition* calibrationPosition, Trame dest);
 
 /**
  * @brief Traduit la charge processeur et memoire en une trame.
@@ -108,11 +126,11 @@ extern int16_t TranslatorLog_translateRepCalibrationPosition(uint8_t nbCalibrati
  * @param processorAndMemoryLoad La charge processeur et memoire a traduire.
  * @param currentDate La date a laquelle les donnees on ete relevee.
  * @param dest La trame de destination de la traduction.
- * @return int16_t -1 en cas d'erreur, la taille de trame sinon.
  *
- * @warning dest doit etre un pointeur initialise.
+ * @warning @a dest doit etre de la bonne taille.
+ * @see #TranslatorLog_getTrameSize
  */
-extern int16_t TranslatorLog_translateSendProcessorAndMemoryLoad(ProcessorAndMemoryLoad processorAndMemoryLoad, Date currentDate, Trame dest);
+extern void TranslatorLog_translateSendProcessorAndMemoryLoad(ProcessorAndMemoryLoad processorAndMemoryLoad, Date currentDate, Trame dest);
 
 /**
  * @brief Traduit une trame en un identifiant de position de calibration.
@@ -122,7 +140,8 @@ extern int16_t TranslatorLog_translateSendProcessorAndMemoryLoad(ProcessorAndMem
  * @param trame La trame a traduire.
  * @return CalibrationPositionId -1 en cas d'erreur, l'identifiant de la position de calibration sinon
  *
- * @warning dest doit etre un pointeur initialise.
+ * @warning @a dest doit etre de la bonne taille.
+ * @see #TranslatorLog_getTrameSize
  */
 extern CalibrationPositionId TranslatorLog_treanslate4SignalCalibrationPosition(const Trame trame);
 
@@ -134,10 +153,10 @@ extern CalibrationPositionId TranslatorLog_treanslate4SignalCalibrationPosition(
  * @param nbTraject Le nombre de trajet experimentaux.
  * @param ExperimentalTraject Les trajet experimentaux a traduire.
  * @param dest La trame de destination de la traduction.
- * @return int16_t -1 en cas d'erreur, la taille de trame sinon.
  *
- * @warning dest doit etre un pointeur initialise.
+ * @warning @a dest doit etre de la bonne taille.
+ * @see #TranslatorLog_getTrameSize
  */
-extern int16_t translate4ExperimentalTrajects(uint8_t nbTraject, const ExperimentalTraject* experimentalTrajects, Trame dest);
+extern void translate4ExperimentalTrajects(uint8_t nbTraject, const ExperimentalTraject* experimentalTrajects, Trame dest);
 
 #endif // TRANSLATOR_LOG_
