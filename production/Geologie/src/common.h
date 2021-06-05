@@ -77,11 +77,10 @@ typedef short NbCoefficient;
 
 
 /**
- * @brief  TODO
- * 
+ * @struct type
+ * @brief creation d'une structure qui va prendre les differentes donnees d'une balise
  */
 typedef unsigned long Date;
-
 
 /**
  * @struct type

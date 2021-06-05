@@ -121,6 +121,8 @@ Après l'installation il faut adapter certains paramètres (template des fichier
 
 ### Cross-compilation
 
+#### Compilation
+
 La cible du projet est une _STM32MP1_ utilisant comme OS _OpenStLinux 5.10_. Cet _OS_ utilise un compilateur spécifique __ostl-linux-gnueabi__.
 Afin de pouvoir facilement il faut changer la valeur de la variable __CC__ (on considère ici que le dossier contenant le compilateur ce trouve au-dessus de la racine du projet, voir [section Architecture du projet](#architecture-du-projet)).
 
@@ -141,4 +143,12 @@ arm-ostl-linux-gnueabi-gcc (GCC) 9.3.0
 Copyright (C) 2019 Free Software Foundation, Inc.
 This is free software; see the source for copying conditions.  There is NO
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+```
+
+#### Copie du fichier vers la cible
+
+Pour partager une copie de l'executable générer à l'aide de la commande précédente, il faut utiliser la commande suivante:
+
+```bash
+scp <fichierACopier> <utilisateurCible>@<adresseIP>:<cheminOuCopierLeFichier>
 ```

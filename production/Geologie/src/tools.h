@@ -25,7 +25,7 @@
 #include <unistd.h>
 #include <stdio.h>
 
-#define DEBUG_FILE_PATH "./debug.txt"
+#define DEBUG_FILE_PATH "./debug.log"
 
 /**
  * @def LOG
@@ -43,14 +43,14 @@
  * @param
  */
 #ifndef NDEBUG
-#define LOG(fmt, ...)                                         \
+#define LOG(fmt, ...)                                           \
     do                                                          \
     {                                                           \
         fprintf(stderr, fmt, ##__VA_ARGS__);                    \
         fflush(stderr);                                         \
     } while (0)
 #else
-#define LOG(fmt, ...)                                         \
+#define LOG(fmt, ...)                                           \
     do                                                          \
     {                                                           \
         FILE *stream = fopen(DEBUG_FILE_PATH, "a");             \
@@ -81,8 +81,9 @@
     {                                                             \
         if (error_condition)                                      \
         {                                                         \
-            LOG("*** Error (%s) at %s:%d\nExiting\n",           \
+            fprintf(stderr, "*** Error (%s) at %s:%d\nExiting\n", \
                     #error_condition, __FILE__, __LINE__);        \
+            fflush(stderr);                                       \
             perror("");                                           \
             _exit(1);                                             \
         }                                                         \
@@ -106,8 +107,11 @@
  */
 #ifndef NDEBUG
 #define TRACE(fmt, ...)                                            \
-    LOG("%s:%d:%s(): " fmt, __FILE__, __LINE__,                  \
-                __func__, ##__VA_ARGS__)
+    do                                                             \
+    {                                                              \
+        fprintf(stderr, fmt, ##__VA_ARGS__);                       \
+        fflush(stderr);                                            \
+    } while (0)
 #else
 #define TRACE(fmt, ...)
 #endif
