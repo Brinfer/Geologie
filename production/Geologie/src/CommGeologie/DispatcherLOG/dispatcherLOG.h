@@ -1,7 +1,7 @@
 /**
  * @file DispatcherLOG.h
  *
- * @brief  Classe permettant de recevoir les demandes cote Geologie et effectuer des actions en fonction de ces demandes
+ * @brief  Classe permettant de recevoir les demandes cote GEOLOGIE et effectuer des actions en fonction de ces demandes
  *
  * @version 2.0
  * @date 03-06-2021

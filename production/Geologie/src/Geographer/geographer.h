@@ -1,7 +1,7 @@
 /**
  * @file geographer.h
  *
- * @brief Ce module est en quelques sorte le chef d'orchestre de Geologie,
+ * @brief Ce module est en quelques sorte le chef d'orchestre de GEOLOGIE,
  *
  * Vous pouvez ici mettre un descriptif un peu plus long de ce que propose
  * le module (fichiers .h + .c). C'est là que vous expliquez les modalités
@@ -146,7 +146,7 @@ extern int Geographer_signalEndAverageCalcul(CalibrationData calibrationData[]);
 /**
  * @fn extern int Geographer_signalConnectionEstablished()
  *
- * @brief Signale la connexion entre Geologie et Geomobile
+ * @brief Signale la connexion entre GEOLOGIE et GEOMOBILE
  *
  * On mettra ensuite a jour la variable connectionState
  *
@@ -159,7 +159,7 @@ extern int Geographer_signalConnectionEstablished();
 /**
  * @fn extern int Geographer_signalConnectionDown()
  *
- * @brief Signale la fin de la connexion entre Geologie et Geomobile
+ * @brief Signale la fin de la connexion entre GEOLOGIE et GEOMOBILE
  *
  * On mettra ensuite a jour la variable connectionState
  *
