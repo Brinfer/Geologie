@@ -10,7 +10,7 @@
 #include <inttypes.h>
 
 #include "receivers.h"
-#include "translator.h"
+//#include "translator.h"
 
 #define UUID_FIRST_BYTE 21
 #define UUID_LAST_BYTE 22
