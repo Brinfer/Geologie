@@ -1,7 +1,7 @@
 /**
- * @file led.c
+ * @file LED.c
  *
- * @brief Pilote la led en allumant ou en l'eteignant.
+ * @brief Pilote la LED en allumant ou en l'eteignant.
  *
  * @version 2.0
  * @date 04-06-2021
@@ -60,6 +60,15 @@ static struct gpiohandle_request request;
  */
 static struct gpiohandle_data data;
 
+/**
+ * @brief Indique si la LED a pus etre correctement initialisee.
+ *
+ * Dans le cas ou celle =-ci n'a pus l'etre, le programme continue, la LED
+ * n'etant pas indispansable a son fonctionnement.
+ *
+ */
+static bool_e isFunctional = False;
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //                                              Fonctions publiques
@@ -70,10 +79,13 @@ extern int8_t Led_new(void) {
     int returnError = EXIT_FAILURE;
     int deviceFile;
 
+    isFunctional = True;
+
     /*  Open device */
     deviceFile = open(LED_NAME, 0);
     if (deviceFile < 0) {
-        LOG("Failed to open %s\n", LED_NAME);
+        LOG("Failed to open %s, the program is still running\n", LED_NAME);
+        isFunctional = False;
 
     } else {
         /* request GPIO line */
@@ -81,40 +93,53 @@ extern int8_t Led_new(void) {
         request.flags = GPIOHANDLE_REQUEST_OUTPUT;
         memcpy(request.default_values, &data, sizeof(request.default_values));
         strcpy(request.consumer_label, LED_LABEL);
-        request.lines = 1; // 1 : nombre de ligne modifie dans la requete
+        request.lines = 1; // 1 : number of lines modified in the request
 
         returnError = ioctl(deviceFile, GPIO_GET_LINEHANDLE_IOCTL, &request);
         if (returnError < 0) {
-            LOG("Failed to issue GET LINEHANDLE IOCTL%s", "\n");
+            LOG("Failed to issue GET LINEHANDLE IOCTL, the program is still running%s", "\n");
+            isFunctional = False;
         }
 
         returnError = close(deviceFile);
         if (returnError < 0) {
-            LOG("Failed to close GPIO character device file%s", "\n");
+            LOG("Failed to close GPIO character device file, the program is still running%s", "\n");
+            Led_free();
+            isFunctional = False;
         }
     }
     return returnError;
 }
 
-
 extern int8_t Led_ledOn(void) {
     int returnError = EXIT_FAILURE;
 
-    data.values[0] = ON;
-    returnError = ioctl(request.fd, GPIOHANDLE_SET_LINE_VALUES_IOCTL, &data);
-    if (returnError < 0) {
-        LOG("Failed to turn ON the led%s", "\n");
+    if (isFunctional) {
+        data.values[0] = ON;
+        returnError = ioctl(request.fd, GPIOHANDLE_SET_LINE_VALUES_IOCTL, &data);
+        if (returnError < 0) {
+            LOG("Failed to turn ON the LED%s", "\n");
+        }
+    } else {
+        LOG("Can't use the LED%s", "\n");
+        returnError = EXIT_SUCCESS;
     }
+
     return returnError;
 }
 
 extern int8_t Led_ledOff(void) {
     int returnError;
 
-    data.values[0] = OFF;
-    returnError = ioctl(request.fd, GPIOHANDLE_SET_LINE_VALUES_IOCTL, &data);
-    if (returnError < 0) {
-        LOG("Failed to turn OFF the led%s", "\n");
+    if (isFunctional) {
+        data.values[0] = OFF;
+        returnError = ioctl(request.fd, GPIOHANDLE_SET_LINE_VALUES_IOCTL, &data);
+        if (returnError < 0) {
+            LOG("Failed to turn OFF the LED%s", "\n");
+        }
+    } else {
+        LOG("Can't use the LED%s", "\n");
+        returnError = EXIT_SUCCESS;
     }
     return returnError;
 }
@@ -122,9 +147,14 @@ extern int8_t Led_ledOff(void) {
 extern int8_t Led_free(void) {
     int returnError;
 
-    returnError = close(request.fd);
-    if (returnError < 0) {
-        LOG("Failed to close GPIO LINEHANDLE device file%s", "\n");
+    if (isFunctional) {
+        returnError = close(request.fd);
+        if (returnError < 0) {
+            LOG("Failed to close GPIO LINEHANDLE device file%s", "\n");
+        }
+    } else {
+        LOG("Can't use the LED%s", "\n");
+        returnError = EXIT_SUCCESS;
     }
     return returnError;
 }

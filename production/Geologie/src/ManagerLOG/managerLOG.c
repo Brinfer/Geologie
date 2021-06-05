@@ -1,7 +1,7 @@
 /**
  * @file managerLOG.c
  *
- * @brief Permet le démarrage et l’extinction du logiciel. A aussi pour role de creer tous les objets
+ * @brief Permet le démarrage et l’extinction de GEOLOGIE. A aussi pour role de creer tous les objets
  *  et de demarrer les differentes machines à etats.
  * Cette objet permet aussi de stopper les machines a etats et de detruire tous les objets
  * instancies à l’extinction.
@@ -46,27 +46,27 @@ extern void ManagerLOG_startGEOLOGIE(void) {
     returnError = UI_new();
     STOP_ON_ERROR(returnError < 0);
 
-    // returnError = PostmanLOG_new();
-    // STOP_ON_ERROR(returnError < 0);
+    returnError = PostmanLOG_new();
+    STOP_ON_ERROR(returnError < 0);
 
     returnError = Geographer_new();
     STOP_ON_ERROR(returnError < 0);
 
-    // returnError = DispatcherLOG_new();
-    // STOP_ON_ERROR(returnError < 0);
+    returnError = DispatcherLOG_new();
+    STOP_ON_ERROR(returnError < 0);
 
     /* Start */
 
     TRACE("%sStart of GEOLOGIE%s%s", "\033[47m\033[30m", "\033[0m", "\n");
 
-    // returnError = PostmanLOG_start();
-    // STOP_ON_ERROR(returnError < 0);
+    returnError = PostmanLOG_start();
+    STOP_ON_ERROR(returnError < 0);
 
     returnError = Geographer_askSignalStartGeographer();
     STOP_ON_ERROR(returnError < 0);
 
-    // returnError = DispatcherLOG_start();
-    // STOP_ON_ERROR(returnError < 0);
+    returnError = DispatcherLOG_start();
+    STOP_ON_ERROR(returnError < 0);
 
     returnError = UI_askSignalBeginningGEOLOGIE();
     STOP_ON_ERROR(returnError < 0);
@@ -79,14 +79,14 @@ extern void ManagerLOG_stopGEOLOGIE(void) {
 
     int8_t returnError = EXIT_FAILURE;
 
-    // returnError = DispatcherLOG_stop();
-    // STOP_ON_ERROR(returnError < 0);
+    returnError = DispatcherLOG_stop();
+    STOP_ON_ERROR(returnError < 0);
 
     returnError = Geographer_askSignalStopGeographer();
     STOP_ON_ERROR(returnError < 0);
 
-    // returnError = PostmanLOG_stop();
-    // STOP_ON_ERROR(returnError < 0);
+    returnError = PostmanLOG_stop();
+    STOP_ON_ERROR(returnError < 0);
 
     returnError = UI_askSignalEndingGEOLOGIE();
     STOP_ON_ERROR(returnError < 0);
@@ -95,14 +95,14 @@ extern void ManagerLOG_stopGEOLOGIE(void) {
 
     TRACE("%sDestruction of GEOLOGIE%s%s", "\033[47m\033[30m", "\033[0m", "\n");
 
-    // returnError = DispatcherLOG_free();
-    // STOP_ON_ERROR(returnError < 0);
+    returnError = DispatcherLOG_free();
+    STOP_ON_ERROR(returnError < 0);
 
     returnError = Geographer_free();
     STOP_ON_ERROR(returnError < 0);
 
-    // returnError = PostmanLOG_free();
-    // STOP_ON_ERROR(returnError < 0);
+    returnError = PostmanLOG_free();
+    STOP_ON_ERROR(returnError < 0);
 
     returnError = UI_free();
     STOP_ON_ERROR(returnError < 0);

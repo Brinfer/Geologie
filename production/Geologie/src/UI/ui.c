@@ -1,7 +1,7 @@
 /**
  * @file ui.c
  *
- * @brief Permet de faire le lien avec l’utilisateur  en lui indiquant l’état du logiciel (démarré ou éteint).
+ * @brief Permet de faire le lien avec l’utilisateur  en lui indiquant l’état de GEOLOGIE (démarré ou éteint).
  *
  * @version 2.0
  * @date 03-06-2021
@@ -31,14 +31,14 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * @brief Affiche le bon demarrage du logiciel.
+ * @brief Affiche le bon demarrage de GEOLOGIE.
  *
  * @return int8_t -1 en cas d'erreur, 0 sinon.
  */
 static int8_t signalBeginningGEOLOGIE(void);
 
 /**
- * @brief Affiche la bonne extinction du logiciel.
+ * @brief Affiche la bonne extinction de GEOLOGIE.
  *
  * @return int8_t -1 en cas d'erreur, 0 sinon.
  */
