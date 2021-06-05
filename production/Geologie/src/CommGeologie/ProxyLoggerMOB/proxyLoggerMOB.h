@@ -1,7 +1,7 @@
 /**
  * @file proxyLoggerMOB.h
  *
- * @brief Toutes les requetes qui doivent être envoyees à LoggerMOB passent par cet objet.
+ * @brief Toutes les requetes qui doivent etre envoyees à LoggerMOB passent par cet objet.
  *
  * ProxyLoggerMOB utilise la classe TranslatorLOG pour traduire les messages avant de les envoyer, afin qu'ils
  * correspondent au protocole de communication.

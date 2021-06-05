@@ -1,7 +1,7 @@
 /**
  * @file postmanLOG.h
  *
- * @brief Gére le socket de communication.
+ * @brief Gere le socket de communication.
  *
  * Joue le role de serveur dans cette communication et ecoute le socket pour etablir une
  * connexion ou recevoir une communication.

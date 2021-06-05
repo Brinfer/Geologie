@@ -84,13 +84,11 @@ typedef short NbCoefficient;
 typedef int CalibrationPositionId;
 
 /**
- * @struct type
  * @brief creation d'une structure qui va prendre les differentes donnees d'une balise
  */
 typedef unsigned long Date;
 
 /**
- * @struct type
  * @brief structure qui va prendre les coordonnees d'un point (X et Y seront des entiers et seront en cm)
  */
 typedef struct {
@@ -99,7 +97,6 @@ typedef struct {
 } Position;
 
 /**
- * @struct type
  * @brief creation d'une structure qui va prendre les differentes donnees d'une balise
  */
 typedef struct {
