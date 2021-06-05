@@ -1,7 +1,7 @@
 /**
  * @file com_common.h
  *
- * @brief Fichier contenant les types en commun dans le module dédier à la communication de GEOLOGIE
+ * @brief Fichier contenant les types en commun dans le module dedier a la communication de GEOLOGIE
  *
  * @version 2.0
  * @date 03-06-2021
@@ -22,13 +22,11 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * @def Trame[]
  * @brief Tableau de uint_t composant un message envoye entre GEOMOBILE et GEOLOGIE.
  */
 typedef uint8_t Trame[];
 
 /**
- * @struct Header
  * @brief Composition du header des message envoye entre GEOMOBILE et GEOLOGIE.
  *
  */

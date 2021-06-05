@@ -41,7 +41,7 @@
  * @fn extern int ProxyGUI_new()
  * @brief Instancie et initialise l'objet ProxyGUI
  *
- * @return retourne 1 s'il y a une erreur dans l'execution de la méthode
+ * @return retourne 1 s'il y a une erreur dans l'execution de la methode
  *
 */
 extern int ProxyGUI_new();
@@ -50,18 +50,18 @@ extern int ProxyGUI_new();
  * @fn extern int ProxyGUI_free()
  * @brief Libere et supprime l'objet ProxyGUI
  * *
- * @return retourne 1 s'il y a une erreur dans l'execution de la méthode
+ * @return retourne 1 s'il y a une erreur dans l'execution de la methode
  *
 */
 extern int ProxyGUI_free();
 
 /**
  * @fn extern int askSignalStartProxyGUI()
- * @brief Demande le démarrage de proxyGUI
+ * @brief Demande le demarrage de proxyGUI
  *
- * Demande à proxyGUI de démarrer, démarre le thread
+ * Demande a proxyGUI de demarrer, demarre le thread
  *
- * @return retourne 1 s'il y a une erreur dans l'execution de la méthode
+ * @return retourne 1 s'il y a une erreur dans l'execution de la methode
  *
 */
 extern int ProxyGUI_start();
@@ -70,9 +70,9 @@ extern int ProxyGUI_start();
  * @fn extern int askSignalSStopProxyGUI()
  * @brief Demande l'arret de proxyGUI
  *
- * Demande à proxyGUI de s'arreter, arrete le thread ferme la boite aux lettres
+ * Demande a proxyGUI de s'arreter, arrete le thread ferme la boite aux lettres
  *
- * @return retourne 1 s'il y a une erreur dans l'execution de la méthode
+ * @return retourne 1 s'il y a une erreur dans l'execution de la methode
  *
 */
 extern int ProxyGUI_stop();
@@ -82,7 +82,7 @@ extern int ProxyGUI_stop();
  * @brief Envoie les position de calibration
  *
  *
- * @return retourne 1 s'il y a une erreur dans l'execution de la méthode
+ * @return retourne 1 s'il y a une erreur dans l'execution de la methode
  *
 */
 extern int ProxyGUI_setCalibrationPositions(CalibrationPosition calibrationPositions[]);
@@ -92,7 +92,7 @@ extern int ProxyGUI_setCalibrationPositions(CalibrationPosition calibrationPosit
  * @brief Signale la fin de la calibration pour la position
  *
  *
- * @return retourne 1 s'il y a une erreur dans l'execution de la méthode
+ * @return retourne 1 s'il y a une erreur dans l'execution de la methode
  *
 */
 extern int ProxyGUI_signalEndCalibrationPosition();
@@ -102,7 +102,7 @@ extern int ProxyGUI_signalEndCalibrationPosition();
  * @brief Signale la fin de la calibration
  *
  *
- * @return retourne 1 s'il y a une erreur dans l'execution de la méthode
+ * @return retourne 1 s'il y a une erreur dans l'execution de la methode
  *
 */
 extern int ProxyGUI_signalEndCalibration();

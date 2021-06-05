@@ -38,15 +38,11 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * @def ON
- *
  * @brief Indique que l'etat de la LED est: allumee.
  */
 #define ON (0)
 
 /**
- * @def OFF
- *
  * @brief Indique que l'etat de la LED est: eteinte.
  */
 #define OFF (1)
@@ -77,7 +73,7 @@ static bool isFunctional = false;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 extern int8_t Led_new(void) {
-    int returnError = EXIT_FAILURE;
+    int returnError = EXIT_SUCCESS;
     int deviceFile;
 
     isFunctional = true;
@@ -113,7 +109,7 @@ extern int8_t Led_new(void) {
 }
 
 extern int8_t Led_ledOn(void) {
-    int returnError = EXIT_FAILURE;
+    int returnError = EXIT_SUCCESS;
 
     if (isFunctional) {
         data.values[0] = ON;

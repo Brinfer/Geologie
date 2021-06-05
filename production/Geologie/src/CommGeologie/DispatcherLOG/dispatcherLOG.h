@@ -47,7 +47,7 @@
 /**
  * @brief Instancie et initialise l'objet DispatcherLOG
  * *
- * @return retourne 1 s'il y a une erreur dans l'execution de la méthode
+ * @return retourne 1 s'il y a une erreur dans l'execution de la methode
  *
 */
 extern int8_t DispatcherLOG_new();
@@ -55,17 +55,17 @@ extern int8_t DispatcherLOG_new();
 /**
  * @brief Libere et supprime l'objet DispatcherLOG
  * *
- * @return retourne 1 s'il y a une erreur dans l'execution de la méthode
+ * @return retourne 1 s'il y a une erreur dans l'execution de la methode
  *
 */
 extern int8_t DispatcherLOG_free();
 
 /**
- * @brief Demande le démarrage de dispatcherLOG
+ * @brief Demande le demarrage de dispatcherLOG
  *
- * Demande à dispatcherLOG de démarrer, démarre le thread
+ * Demande a dispatcherLOG de demarrer, demarre le thread
  *
- * @return retourne 1 s'il y a une erreur dans l'execution de la méthode
+ * @return retourne 1 s'il y a une erreur dans l'execution de la methode
  *
 */
 extern int8_t DispatcherLOG_start();
@@ -73,9 +73,9 @@ extern int8_t DispatcherLOG_start();
 /**
  * @brief Demande l'arret de dispatcherLOG
  *
- * Demande à dispatcherLOG de s'arreter, arrete le thread ferme la boite aux lettres
+ * Demande a dispatcherLOG de s'arreter, arrete le thread ferme la boite aux lettres
  *
- * @return retourne 1 s'il y a une erreur dans l'execution de la méthode
+ * @return retourne 1 s'il y a une erreur dans l'execution de la methode
  *
 */
 extern int8_t DispatcherLOG_stop();

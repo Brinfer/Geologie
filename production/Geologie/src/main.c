@@ -80,6 +80,7 @@ static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
  * @return int 0
  */
 int main() {
+    TRACE("%s", "\033[2J\033[;H");
     setUp();
 
     ManagerLOG_startGEOLOGIE();
@@ -100,7 +101,7 @@ int main() {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 static void setUp(void) {
-    int8_t returnError = EXIT_FAILURE;
+    int8_t returnError = EXIT_SUCCESS;
     sig_t returnErrorSignal = NULL;
 
     returnErrorSignal = signal(SIGINT, intHandler);
@@ -114,7 +115,7 @@ static void setUp(void) {
 }
 
 static void tearDown(void) {
-    int8_t returnError = EXIT_FAILURE;
+    int8_t returnError = EXIT_SUCCESS;
     sig_t returnErrorSignal = NULL;
 
     returnErrorSignal = signal(SIGINT, intHandler);
@@ -130,7 +131,7 @@ static void tearDown(void) {
 static void intHandler(int _) {
     LOG("Press CTRL+C%s", "\n");
 
-    int8_t returnError = EXIT_FAILURE;
+    int8_t returnError = EXIT_SUCCESS;
 
     returnError = pthread_cond_signal(&cond);
     assert(returnError >= 0);

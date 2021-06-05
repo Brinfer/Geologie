@@ -4,8 +4,8 @@
  * @brief Ce module est en quelques sorte le chef d'orchestre de GEOLOGIE,
  *
  * Vous pouvez ici mettre un descriptif un peu plus long de ce que propose
- * le module (fichiers .h + .c). C'est là que vous expliquez les modalités
- * générales d'utilisation (préconditions, contexte d'utilisation, avertissements,
+ * le module (fichiers .h + .c). C'est la que vous expliquez les modalites
+ * generales d'utilisation (preconditions, contexte d'utilisation, avertissements,
  * ...).
  *
  * @version 2.0
@@ -53,7 +53,7 @@
  * @fn extern int Geographer_new()
  * @brief Instancie et initialise l'objet Geographer
  * *
- * @return retourne 1 s'il y a une erreur dans l'execution de la méthode
+ * @return retourne 1 s'il y a une erreur dans l'execution de la methode
  *
 */
 extern int Geographer_new();
@@ -62,18 +62,18 @@ extern int Geographer_new();
  * @fn extern int Geographer_free()
  * @brief Libere et supprime l'objet Geographer
  * *
- * @return retourne 1 s'il y a une erreur dans l'execution de la méthode
+ * @return retourne 1 s'il y a une erreur dans l'execution de la methode
  *
 */
 extern int Geographer_free();
 
 /**
  * @fn extern int askSignalStartGeographer()
- * @brief Demande le démarrage de geographer
+ * @brief Demande le demarrage de geographer
  *
- * Demande à geographer de démarrer, démarre le thread
+ * Demande a geographer de demarrer, demarre le thread
  *
- * @return retourne 1 s'il y a une erreur dans l'execution de la méthode
+ * @return retourne 1 s'il y a une erreur dans l'execution de la methode
  *
 */
 extern int Geographer_askSignalStartGeographer();
@@ -82,9 +82,9 @@ extern int Geographer_askSignalStartGeographer();
  * @fn extern int askSignalSStopGeographer()
  * @brief Demande l'arret de geographer
  *
- * Demande à geographer de s'arreter, arrete le thread ferme la boite aux lettres
+ * Demande a geographer de s'arreter, arrete le thread ferme la boite aux lettres
  *
- * @return retourne 1 s'il y a une erreur dans l'execution de la méthode
+ * @return retourne 1 s'il y a une erreur dans l'execution de la methode
  *
 */
 extern int Geographer_askSignalStopGeographer();
@@ -93,11 +93,11 @@ extern int Geographer_askSignalStopGeographer();
  * @fn extern int askCalibrationPositions()
  * @brief Demande les positions de calibrage
  *
- * Demande à geographer les positions de calibrage qui les enverra a GUI
+ * Demande a geographer les positions de calibrage qui les enverra a GUI
  *
  * Cette methode sera appellee par GUI
  *
- * @return retourne 1 s'il y a une erreur dans l'execution de la méthode
+ * @return retourne 1 s'il y a une erreur dans l'execution de la methode
  *
 */
 extern int Geographer_askCalibrationPositions();
@@ -105,12 +105,12 @@ extern int Geographer_askCalibrationPositions();
 /**
  * @fn extern int Geographer_validatePosition(CalibrationPositionId calibrationPositionId)
  *
- * @brief Valide la demande de calibration à la position ayant calibrationPositionId comme Id
+ * @brief Valide la demande de calibration a la position ayant calibrationPositionId comme Id
  *
  *
  * Cette methode sera appellee par GUI
  *
- * @return retourne 1 s'il y a une erreur dans l'execution de la méthode
+ * @return retourne 1 s'il y a une erreur dans l'execution de la methode
  *
 */
 extern int Geographer_validatePosition(CalibrationPositionId calibrationPositionId);
@@ -123,7 +123,7 @@ extern int Geographer_validatePosition(CalibrationPositionId calibrationPosition
  *
  * Cette methode sera appellee par Scanner
  *
- * @return retourne 1 s'il y a une erreur dans l'execution de la méthode
+ * @return retourne 1 s'il y a une erreur dans l'execution de la methode
  *
 */
 extern int Geographer_signalEndUpdateAttenuation();
@@ -138,7 +138,7 @@ extern int Geographer_signalEndUpdateAttenuation();
  * Cette methode sera appellee par Scanner
  *
  * @param calibrationData tableau contenat les donnees de calibrage pour chaque balise
- * @return retourne 1 s'il y a une erreur dans l'execution de la méthode
+ * @return retourne 1 s'il y a une erreur dans l'execution de la methode
  *
 */
 extern int Geographer_signalEndAverageCalcul(CalibrationData calibrationData[]);
@@ -151,7 +151,7 @@ extern int Geographer_signalEndAverageCalcul(CalibrationData calibrationData[]);
  * On mettra ensuite a jour la variable connectionState
  *
  *
- * @return retourne 1 s'il y a une erreur dans l'execution de la méthode
+ * @return retourne 1 s'il y a une erreur dans l'execution de la methode
  *
 */
 extern int Geographer_signalConnectionEstablished();
@@ -164,7 +164,7 @@ extern int Geographer_signalConnectionEstablished();
  * On mettra ensuite a jour la variable connectionState
  *
  *
- * @return retourne 1 s'il y a une erreur dans l'execution de la méthode
+ * @return retourne 1 s'il y a une erreur dans l'execution de la methode
  *
 */
 extern int Geographer_signalConnectionDown();
@@ -174,12 +174,12 @@ extern int Geographer_signalConnectionDown();
  *
  * @brief Reçoit les donnee actuelle, les dates et les renvoie
  *
- * Cette méthode intervient dans la mise à jour automatique des donnees
+ * Cette methode intervient dans la mise a jour automatique des donnees
  *
  * @param beaconsData[] tableau contenant les donnees des balises
  * @param currentPosition position actuelle de la carte mere
  * @param currentProcessorAndMemoryLoad charge processeur et memoire actuelle
- * @return retourne 1 s'il y a une erreur dans l'execution de la méthode
+ * @return retourne 1 s'il y a une erreur dans l'execution de la methode
  *
 */
 extern int Geographer_dateAndSendData(BeaconData beaconsData[], Position currentPosition, ProcessorAndMemoryLoad currentProcessorAndMemoryLoad);

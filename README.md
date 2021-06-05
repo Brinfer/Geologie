@@ -19,11 +19,11 @@ Voir [`LICENCE.md`](file://./LICENCE.md).
 
 ## Description Générale
 
-ST aimerait compléter son prototype de robot autonome avec un mécanisme robuste de indoor-positioning. Une étude de positionnement basée sur la technologie Wifi a démontré que cette technologie était trop imprécise et instable pour répondre à la demande. Cette année, ST cherche à implémenter et à qualifier une solution basée sur l’utilisation de Balises bluetooth afin qu’elle soit dans un second temps intégrée dans sa solution de robot autonome.
+ST aimerait compléter son prototype de robot autonome avec un mécanisme robuste de indoor-positioning. Une étude de positionnement basée sur la technologie Wifi a démontré que cette technologie était trop imprécise et instable pour répondre à la demande. Cette année, ST cherche à implémenter et à qualifier une solution basée sur l’utilisation de Balises bluetooth afin qu’elle soit dans un second temps intégrée dans sa solution de robot autonome.
 
-Notre projet est de créer une application permettant de tester la fiabilité de la technologie bluetooth. Elle n’est en aucun cas une technologie de positionnement.
+Notre projet est de créer une application permettant de tester la fiabilité de la technologie bluetooth. Elle n’est en aucun cas une technologie de positionnement.
 
-Pour pallier l’incapacité du robot à se situer dans un espace fermé, en récupérant sa position dans son environnement pour être en mesure d’interagir avec le robot en prenant compte de sa localisation.
+Pour pallier l’incapacité du robot à se situer dans un espace fermé, en récupérant sa position dans son environnement pour être en mesure d’interagir avec le robot en prenant compte de sa localisation.
 
 ## Installation
 
