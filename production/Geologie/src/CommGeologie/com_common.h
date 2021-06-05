@@ -52,10 +52,4 @@ typedef enum {
     CONNECTED
 } ConnectionState;
 
-/**
- * @brief  TODO
- *
- */
-
-
 #endif // COM_COMM_
