@@ -1,7 +1,7 @@
 /**
  * @file managerLOG.h
  *
- * @brief Permet le démarrage et l’extinction du logiciel. A aussi pour role de creer tous les objets
+ * @brief Permet le démarrage et l’extinction de GEOLOGIE. A aussi pour role de creer tous les objets
  *  et de demarrer les differentes machines à etats.
  * Cette objet permet aussi de stopper les machines a etats et de detruire tous les objets
  * instancies à l’extinction.
@@ -23,13 +23,13 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * @brief Demande le demarrage le logiciel.
+ * @brief Demande le demarrage de GEOLOGIE.
  *
  */
 extern void ManagerLOG_startGEOLOGIE(void);
 
 /**
- * @brief Demande l'arret le logiciel.
+ * @brief Demande l'arret de GEOLOGIE.
  *
  */
 extern void ManagerLOG_stopGEOLOGIE(void);

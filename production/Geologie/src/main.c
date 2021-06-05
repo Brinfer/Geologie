@@ -1,7 +1,7 @@
 /**
  * @file main.c
  *
- * @brief Fichier main du logiciel
+ * @brief Fichier main du de GEOLOGIE
  *
  * @version 2.0
  * @date 03-06-2021
@@ -32,17 +32,23 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * @brief Fonction permettant de gérer le CTRL+C.
+ * @brief Gere le CTRL+C.
  *
- * @param _ Le numero du signal, ici ignore.
+ * @param _ Le numero du signal, ici est ignore.
  */
 static void intHandler(int _);
 
 /**
- * @brief Met en place l'environnement pour le logiciel.
+ * @brief Met en place l'environnement de GEOLOGIE.
  *
  */
 static void setUp(void);
+
+/**
+ * @brief Demantele l'environnement de GEOLOGIE.
+ *
+ */
+static void tearDown(void);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -50,7 +56,16 @@ static void setUp(void);
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/**
+ * @brief La variable condition que le main thread devra attendre pour reprendre son execution.
+ *
+ */
 static pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
+
+/**
+ * @brief Le mutex associe a la variable condition.
+ *
+ */
 static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -59,17 +74,8 @@ static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-static void intHandler(int _) {
-    LOG("Press CTRL+C%s", "\n");
-
-    int8_t returnError = EXIT_FAILURE;
-
-    returnError = pthread_cond_signal(&cond);
-    assert(returnError >= 0);
-}
-
 /**
- * @brief Fonction main du logiciel
+ * @brief Fonction main de GEOLOGIE
  *
  * @return int 0
  */
@@ -81,6 +87,8 @@ int main() {
     pthread_cond_wait(&cond, &mutex);
 
     ManagerLOG_stopGEOLOGIE();
+
+    tearDown();
 
     return 0;
 }
@@ -96,11 +104,34 @@ static void setUp(void) {
     sig_t returnErrorSignal = NULL;
 
     returnErrorSignal = signal(SIGINT, intHandler);
-    // assert(returnErrorSignal == SIG_ERR);
+    assert(returnErrorSignal != SIG_ERR);
 
     returnError = pthread_mutex_init(&mutex, NULL);
     assert(returnError >= 0);
 
     returnError = pthread_cond_init(&cond, NULL);
+    assert(returnError >= 0);
+}
+
+static void tearDown(void) {
+    int8_t returnError = EXIT_FAILURE;
+    sig_t returnErrorSignal = NULL;
+
+    returnErrorSignal = signal(SIGINT, intHandler);
+    assert(returnErrorSignal != SIG_ERR);
+
+    returnError = pthread_mutex_destroy(&mutex);
+    assert(returnError >= 0);
+
+    returnError = pthread_cond_destroy(&cond);
+    assert(returnError >= 0);
+}
+
+static void intHandler(int _) {
+    LOG("Press CTRL+C%s", "\n");
+
+    int8_t returnError = EXIT_FAILURE;
+
+    returnError = pthread_cond_signal(&cond);
     assert(returnError >= 0);
 }
