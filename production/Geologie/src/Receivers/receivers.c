@@ -6,8 +6,8 @@
  * @version 1.0.1
  * @date 5 mai 2021
  * @author LECENNE Gabriel
- * @copyright BSD 2-clauses
- *
+ * @copyright Geo-Boot
+ * @license BSD 2-clauses
  */
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -89,7 +89,7 @@ extern void Receivers_stop(Receivers_t * this){
 
 }
 
-extern BeaconsData ask4AllBeaconsData(){
+extern BeaconsData askAllBeaconsData(){
     //setBeaconsData(BeaconsData)
 }
 
@@ -130,7 +130,7 @@ static void Receivers_getAllRSSIs(){
 		//return 0;
 	}
 
-	// Set BLE events report mask.
+	// Set BLE events coverage mask.
 
 	le_set_event_mask_cp event_mask_cp;
 	memset(&event_mask_cp, 0, sizeof(le_set_event_mask_cp));
@@ -173,7 +173,7 @@ static void Receivers_getAllRSSIs(){
 		//return 0;
 	}
 
-	PRINT("Scanning....\n");
+	LOG("Scanning....\n");
 
 	uint8_t buf[HCI_MAX_EVENT_SIZE];
 	evt_le_meta_event * meta_event;
@@ -194,8 +194,8 @@ static void Receivers_getAllRSSIs(){
 					int nom;
 					nom = hci_read_remote_name(device, &(info->bdaddr), sizeof(name), name, 0);
 					ba2str(&(info->bdaddr), addr);
-					//PRINT("Test GetName :%d", nom);
-					PRINT("%s - %s - RSSI %d\n", name, addr, (int8_t)info->data[info->length]);
+					//LOG("Test GetName :%d", nom);
+					LOG("%s - %s - RSSI %d\n", name, addr, (int8_t)info->data[info->length]);
 					offset = info->data + info->length + 2;
 				}
 			}

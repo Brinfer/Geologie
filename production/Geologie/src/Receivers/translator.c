@@ -10,9 +10,9 @@
 
  * @author GAUTIER Pierre-Louis
 
- * @copyright BSD 2-clauses
+ * @copyright Geo-Boot
 
- *
+ * @license BSD 2-clauses
 
  */
 
@@ -137,7 +137,7 @@ static float convertBytesToFloat(const unsigned char* src);
 extern void Translator_convertByteToRawData(const unsigned char* src, RawData* dest) {
 
     /* FLAGS */
-    printf("Le str Flag %d\n", (char)src[1]);
+    printf("Le str Flag %d\n", (char) src[1]);
     //memcpy(dest->flags_length, src, 1);
     //memcpy(dest->flags_value, src + 2, 1);
 
@@ -210,7 +210,7 @@ static float convertBytesToFloat(const unsigned char* src) {
 
     temp = ntohl(temp);
 
-    returnVal = *(float *) &temp;
+    returnVal = *(float*) &temp;
 
     return returnVal;
 

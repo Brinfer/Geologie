@@ -36,8 +36,6 @@
 
 #define EPSILON (0.0001)
 /**
- * @struct ParametersTestCalculDistancePosition
- *
  * @brief Structure des donnees passees en parametre des fonction de test pour la conversion des Position
  * en tableau d'octet.
  */
@@ -128,7 +126,5 @@ static void test_distanceCalculWithPosition(void** state) {
     float result;
     result = distanceCalculWithPosition(&param->positionTested[0], &param->positionTested[1]);
     assert_float_equal(result, param->expectedResult, EPSILON);
-    
+
 }
-
-

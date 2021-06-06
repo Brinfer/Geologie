@@ -4,8 +4,8 @@
  * @version 1.0.1
  * @date 9/05/2021
  * @author Nathan BRIENT
- * @copyright BSD 2-clauses
- *
+ * @copyright Geo-Boot
+ * @license BSD 2-clauses
  */
 
 #include "mathematician.h"
@@ -45,7 +45,7 @@ static float distanceCalculWithPosition(const Position* p1, const Position* p2) 
  */
 static float distanceCalculWithPower(const Power* power, const AttenuationCoefficient* attenuationCoefficient) {
     float distance = 0;
-    float A = 0; ///correspond a ce qui est dans la puissance 
+    float A = 0; ///correspond a ce qui est dans la puissance
     A = ((*power) - ATT_COEFF_1_METER) / (-10 * (*attenuationCoefficient));
     distance = pow(10, A);
     return distance;

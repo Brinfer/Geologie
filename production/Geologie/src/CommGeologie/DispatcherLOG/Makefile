@@ -17,18 +17,18 @@ CCFLAGS += -I..
 #																				#
 #################################################################################
 
-all: build
+all: prod
 
 # Compilation
-build: $(OBJ)
+prod: $(OBJ)
 
 .c.o:
 	$(CC) -c $(CCFLAGS) $< -o $@
-
-# Nettoyage
-.PHONY: clean
 
 clean:
 	@rm -f $(OBJ) $(DEP)
 
 -include $(DEP)
+
+# Nettoyage
+.PHONY: clean
