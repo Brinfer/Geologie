@@ -30,8 +30,8 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 
-#include "tools.h"
-#include "dispatcherLOG.h"
+#include "../../tools.h"
+#include "DispatcherLOG/dispatcherLOG.h"
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -249,7 +249,7 @@ static int8_t sendMessage(Trame trame, uint8_t size) {
         quantityWritten = send(myClientSocket, trame + quantityWritten, quantityToWrite, SEND_FLAGS);
 
         if (quantityWritten < 0) {
-            LOG("Error when sending the message", "\n");
+            LOG("Error when sending the message%s", "\n");
             break; // quantityToWrite
         } else {
             quantityToWrite -= quantityWritten;

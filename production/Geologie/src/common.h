@@ -94,7 +94,7 @@ typedef struct {
  * @brief creation d'une structure qui va prendre les differentes donnees d'une balise
  */
 typedef struct {
-    char ID[SIZE_BEACON_ID];
+    uint8_t ID[SIZE_BEACON_ID];
     Position position;
     Power power;
     AttenuationCoefficient attenuationCoefficient;
