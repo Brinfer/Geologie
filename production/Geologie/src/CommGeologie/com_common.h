@@ -20,9 +20,10 @@
 //                                              Define
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 /**
  * @brief Le nombre d'octet composant le header d'une trame.
+ *
+ * @addtogroup sizeTrame
  */
 #define SIZE_HEADER (3)
 
