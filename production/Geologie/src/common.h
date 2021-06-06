@@ -67,7 +67,10 @@ typedef float BeaconCoefficients[NB_BEACONS];
  * @brief  TODO
  *
  */
-typedef float ProcessorAndMemoryLoad[2];
+typedef struct{
+    float memoryLoad;
+    float processorLoad;
+}ProcessorAndMemoryLoad;
 
 /**
  * @brief  TODO
