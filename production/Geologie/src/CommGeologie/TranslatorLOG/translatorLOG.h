@@ -36,7 +36,7 @@
  *
  * Dans le cas ou la commande n'est pas de taille variable, l'argument @a nbElements est ignore.
  *
- * @a nbElements peut correspondre au nombre de #BeaconData a envoyer pour le message #SEND_ALL_BEACONS_DATA, ou
+ * @a nbElements peut correspondre au pare exemple nombre de #BeaconData a envoyer pour le message #SEND_ALL_BEACONS_DATA, ou
  * au nombre de position de calibration du message #REP_CALIBRATION_POSITIONS.
  *
  * @param cmd La commande dont on veut connaitre la taille de la trame.
@@ -62,7 +62,7 @@ extern uint16_t TranslatorLog_getTrameSize(Commande cmd, uint8_t nbElements);
 extern void TranslatorLog_translateTrameToHeader(const Trame trame, Header* dest);
 
 /**
- * @brief Traduit les positions experimentales a envoyer en une trame.
+ * @brief Traduit les positions experimentales a envoyer en une trame. Compose aussi le header.
  *
  * Traduit le tableau @a experimentalPosition en une #Trame et place la traduction dans @a dest.
  *
@@ -73,10 +73,10 @@ extern void TranslatorLog_translateTrameToHeader(const Trame trame, Header* dest
  * @warning @a dest doit etre de la bonne taille.
  * @see #TranslatorLog_getTrameSize
  */
-extern void TranslatorLog_translateForSendExperimentalPosition(uint8_t nbPosinbExperimentalPositionstions, const ExperimentalPosition* experimentalPositions, Trame dest);
+extern void TranslatorLog_translateForSendExperimentalPositions(uint8_t nbPosinbExperimentalPositionstions, const ExperimentalPosition* experimentalPositions, Trame dest);
 
 /**
- * @brief Traduit les donnees balise en une trame.
+ * @brief Traduit les donnees balise en une trame. Compose aussi le header.
  *
  * Traduit le tableau @a beaconsData en une #Trame et place la traduction dans @a dest.
  *
@@ -91,7 +91,7 @@ extern void TranslatorLog_translateForSendExperimentalPosition(uint8_t nbPosinbE
 extern void TranslatorLog_translateForSendAllBeaconsData(uint8_t nbBeacons, const BeaconData* beaconsData, Date currentDate, Trame dest);
 
 /**
- * @brief Traduit la position courante en une trame.
+ * @brief Traduit la position courante en une trame. Compose aussi le header.
  *
  * Traduit @a currentPosition en une #Trame et place la traduction dans @a dest.
  *
@@ -105,7 +105,7 @@ extern void TranslatorLog_translateForSendAllBeaconsData(uint8_t nbBeacons, cons
 extern void TranslatorLog_translateForSendCurrentPosition(const Position* currentPosition, Date currentDate, Trame dest);
 
 /**
- * @brief Traduit les donnees de calibration en une trame.
+ * @brief Traduit les donnees de calibration en une trame. Compose aussi le header.
  *
  * Traduit @a calibrationPosition en une #Trame et place la traduction dans @a dest.
  *
@@ -119,7 +119,7 @@ extern void TranslatorLog_translateForSendCurrentPosition(const Position* curren
 extern void TranslatorLog_translateForRepCalibrationPosition(uint8_t nbCalibrationPositions, const CalibrationPosition* calibrationPositions, Trame dest);
 
 /**
- * @brief Traduit la charge processeur et memoire en une trame.
+ * @brief Traduit la charge processeur et memoire en une trame. Compose aussi le header.
  *
  * Traduit @a processorAndMemoryLoad en une #Trame et place la traduction dans @a dest.
  *
@@ -140,13 +140,13 @@ extern void TranslatorLog_translateForSendMemoryAndProcessorLoad(const Processor
  * @param trame La trame a traduire.
  * @return CalibrationPositionId -1 en cas d'erreur, l'identifiant de la position de calibration sinon
  *
- * @warning @a trame ne doit pas contenir le #Header.
+ * @warning @a trame doit contenir le #Header.
  * @see #TranslatorLog_getTrameSize
  */
 extern CalibrationPositionId TranslatorLog_translateForSignalCalibrationPosition(const Trame trame);
 
 /**
- * @brief Traduit les trajets d'experimentation en une trame.
+ * @brief Traduit les trajets d'experimentation en une trame. Compose aussi le header.
  *
  * Traduit @a experimentalTrajects en une #Trame et place la traduction dans @a dest.
  *
