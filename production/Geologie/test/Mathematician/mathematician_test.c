@@ -36,8 +36,6 @@
 
 #define EPSILON (0.0001)
 /**
- * @struct ParametersTestCalculDistancePosition
- *
  * @brief Structure des donnees passees en parametre des fonction de test pour la conversion des Position
  * en tableau d'octet.
  */

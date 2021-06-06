@@ -1,11 +1,11 @@
 /**
  * @file postmanLOG.h
  *
- * @brief Gére le socket de communication.
+ * @brief Gere le socket de communication.
  *
- * Joue le rôle de serveur dans cette communication et ecoute  le socket pour etablir une
+ * Joue le role de serveur dans cette communication et ecoute le socket pour etablir une
  * connexion ou recevoir une communication.
- * PostmanLOG ne sait pas décrypter les messages qu’il envoie ou qu’il reçoit.
+ * PostmanLOG ne sait pas decrypter les messages qu’il envoie ou qu’il reçoit.
  * Il s’occupe uniquement de donner les messages qu’il reçoit a DispatcherLOG ainsi que
  * d’envoyer les messages fournis par ProxyGUI et ProxyLoggerMOB.
  *
@@ -38,7 +38,7 @@
 /**
  * @brief Initialise le sockect.
  *
- * @return int8_t 0 en cas de succes, une autre valeur sinon.
+ * @return int8_t -1 en cas d'erreur, 0 sinon.
  */
 extern int8_t PostmanLOG_new(void);
 
@@ -48,7 +48,7 @@ extern int8_t PostmanLOG_new(void);
  * Reste en attente de connexion si aucune n'est etablie, et permet
  * de lire par la suite des messages.
  *
- * @return int8_t 0 en cas de succes, une autre valeur sinon.
+ * @return int8_t -1 en cas d'erreur, 0 sinon.
  */
 extern int8_t PostmanLOG_start(void);
 
@@ -62,24 +62,27 @@ extern int8_t PostmanLOG_start(void);
 extern int8_t PostmanLOG_sendMsg(Trame trame, uint8_t size);
 
 /**
- * @brief Lie les message sur le socket.
+ * @brief Lie sur le socket le nombre d'octet indique.
  *
  * @param destTrame La trame ou ecrire le message lue.
- * @return int8_t 0 en cas de succes, une autre valeur sinon.
+ * @param nbToRead Le nombre d'octet a lire.
+ * @return int8_t -1 en cas d'erreur, 0 sinon.
+ *
+ * @warning Fonction bloquante.
  */
-extern int8_t PostmanLOG_readMsg(Trame destTrame);
+extern int8_t PostmanLOG_readMsg(Trame destTrame, uint8_t nbToRead);
 
 /**
  * @brief Fermeture du socket.
  *
- * @return int8_t 0 en cas de succes, une autre valeur sinon.
+ * @return int8_t -1 en cas d'erreur, 0 sinon.
  */
 extern int8_t PostmanLOG_stop(void);
 
 /**
  * @brief Ferme le socket.
  *
- * @return int8_t 0 en cas de succes, une autre valeur sinon.
+ * @return int8_t -1 en cas d'erreur, 0 sinon.
  */
 extern int8_t PostmanLOG_free(void);
 

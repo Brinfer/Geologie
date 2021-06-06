@@ -1,7 +1,7 @@
 /**
  * @file proxyLoggerMOB.h
  *
- * @brief Toutes les requetes qui doivent être envoyees à LoggerMOB passent par cet objet.
+ * @brief Toutes les requetes qui doivent etre envoyees à LoggerMOB passent par cet objet.
  *
  * ProxyLoggerMOB utilise la classe TranslatorLOG pour traduire les messages avant de les envoyer, afin qu'ils
  * correspondent au protocole de communication.
@@ -83,7 +83,7 @@ extern int ProxyLoggerMOB_setExperimentalPositions(const ExperimentalPosition* e
  * @param calibrationData Les donnees de calibration a envoyer.
  * @return int 0 en cas de succes, une autre valeur sinon.
  */
-extern int ProxyLoggerMOB_setCalibrationData(const CalibrationData* calibrationData);
+extern int ProxyLoggerMOB_setcalibration(const CalibrationData* calibrationData);
 
 /**
  * @brief Envoie les donnees des balises a LoggerMOB.
@@ -111,6 +111,6 @@ extern int ProxyLoggerMOB_setCurrentPosition(const Position* currentPosition, Da
  * @param currentDate La date a laquelle la charge memoire et processuer ont ete relevees.
  * @return int 0 en cas de succes, une autre valeur sinon.
  */
-extern int ProxyLoggerMOB_setProcessorAndMemoryLoad(const ProcessorAndMemoryLoad * processorAndMemoryLoad, Date currentDate);
+extern int ProxyLoggerMOB_setProcessorAndMemoryLoad(const ProcessorAndMemoryLoad* processorAndMemoryLoad, Date currentDate);
 
 #endif // PROXY_LOGGER_MOB_

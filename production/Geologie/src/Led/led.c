@@ -27,6 +27,7 @@
 #include <unistd.h>
 #include <linux/gpio.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 #include "../tools.h"
 
@@ -37,15 +38,11 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * @def ON
- *
  * @brief Indique que l'etat de la LED est: allumee.
  */
 #define ON (0)
 
 /**
- * @def OFF
- *
  * @brief Indique que l'etat de la LED est: eteinte.
  */
 #define OFF (1)
@@ -67,7 +64,7 @@ static struct gpiohandle_data data;
  * n'etant pas indispansable a son fonctionnement.
  *
  */
-static bool_e isFunctional = False;
+static bool isFunctional = false;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -76,16 +73,16 @@ static bool_e isFunctional = False;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 extern int8_t Led_new(void) {
-    int returnError = EXIT_FAILURE;
+    int returnError = EXIT_SUCCESS;
     int deviceFile;
 
-    isFunctional = True;
+    isFunctional = true;
 
     /*  Open device */
     deviceFile = open(LED_NAME, 0);
     if (deviceFile < 0) {
         LOG("Failed to open %s, the program is still running\n", LED_NAME);
-        isFunctional = False;
+        isFunctional = false;
 
     } else {
         /* request GPIO line */
@@ -98,21 +95,21 @@ extern int8_t Led_new(void) {
         returnError = ioctl(deviceFile, GPIO_GET_LINEHANDLE_IOCTL, &request);
         if (returnError < 0) {
             LOG("Failed to issue GET LINEHANDLE IOCTL, the program is still running%s", "\n");
-            isFunctional = False;
+            isFunctional = false;
         }
 
         returnError = close(deviceFile);
         if (returnError < 0) {
             LOG("Failed to close GPIO character device file, the program is still running%s", "\n");
             Led_free();
-            isFunctional = False;
+            isFunctional = false;
         }
     }
     return returnError;
 }
 
 extern int8_t Led_ledOn(void) {
-    int returnError = EXIT_FAILURE;
+    int returnError = EXIT_SUCCESS;
 
     if (isFunctional) {
         data.values[0] = ON;

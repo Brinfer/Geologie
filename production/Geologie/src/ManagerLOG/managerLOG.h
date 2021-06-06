@@ -1,7 +1,7 @@
 /**
  * @file managerLOG.h
  *
- * @brief Permet le démarrage et l’extinction de GEOLOGIE. A aussi pour role de creer tous les objets
+ * @brief Permet le demarrage et l’extinction de GEOLOGIE. A aussi pour role de creer tous les objets
  *  et de demarrer les differentes machines à etats.
  * Cette objet permet aussi de stopper les machines a etats et de detruire tous les objets
  * instancies à l’extinction.

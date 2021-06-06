@@ -1,7 +1,7 @@
 /**
  * @file ui.c
  *
- * @brief Permet de faire le lien avec l’utilisateur  en lui indiquant l’état de GEOLOGIE (démarré ou éteint).
+ * @brief Permet de faire le lien avec l’utilisateur  en lui indiquant l’etat de GEOLOGIE (demarre ou eteint).
  *
  * @version 2.0
  * @date 03-06-2021
@@ -52,7 +52,7 @@ static int8_t signalEndingGEOLOGIE(void);
 
 
 extern int8_t UI_new(void) {
-    int8_t returnError = EXIT_FAILURE;
+    int8_t returnError = EXIT_SUCCESS;
 
     returnError = Led_new();
     STOP_ON_ERROR(returnError < 0);
@@ -61,7 +61,7 @@ extern int8_t UI_new(void) {
 }
 
 extern int8_t UI_askSignalBeginningGEOLOGIE(void) {
-    int8_t returnError = EXIT_FAILURE;
+    int8_t returnError = EXIT_SUCCESS;
 
     returnError = signalBeginningGEOLOGIE();
     STOP_ON_ERROR(returnError < 0);
@@ -70,7 +70,7 @@ extern int8_t UI_askSignalBeginningGEOLOGIE(void) {
 }
 
 extern int8_t UI_askSignalEndingGEOLOGIE(void) {
-    int8_t returnError = EXIT_FAILURE;
+    int8_t returnError = EXIT_SUCCESS;
 
     returnError = signalEndingGEOLOGIE();
     STOP_ON_ERROR(returnError < 0);
@@ -79,7 +79,7 @@ extern int8_t UI_askSignalEndingGEOLOGIE(void) {
 }
 
 extern int8_t UI_free(void) {
-    int8_t returnError = EXIT_FAILURE;
+    int8_t returnError = EXIT_SUCCESS;
 
     returnError = Led_free();
     STOP_ON_ERROR(returnError < 0);
@@ -94,7 +94,7 @@ extern int8_t UI_free(void) {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 static int8_t signalBeginningGEOLOGIE(void) {
-    int8_t returnError = EXIT_FAILURE;
+    int8_t returnError = EXIT_SUCCESS;
 
     returnError = Led_ledOn();
     STOP_ON_ERROR(returnError < 0);
@@ -103,7 +103,7 @@ static int8_t signalBeginningGEOLOGIE(void) {
 }
 
 static int8_t signalEndingGEOLOGIE(void) {
-    int8_t returnError = EXIT_FAILURE;
+    int8_t returnError = EXIT_SUCCESS;
 
     returnError = Led_ledOff();
     STOP_ON_ERROR(returnError < 0);

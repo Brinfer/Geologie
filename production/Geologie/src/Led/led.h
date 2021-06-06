@@ -28,8 +28,6 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * @def LED_NAME
- *
  * @brief Correspond au chemin vers le fichier de la LED.
  *
  * @warning Depend de la carte.
@@ -37,8 +35,6 @@
 #define LED_NAME "/dev/gpiochip0"
 
 /**
- * @def LED_GPIO_LINE
- *
  * @brief Correspond au numero de la ligne de la LED.
  *
  * @warning Depend de la carte.
@@ -46,8 +42,6 @@
 #define LED_GPIO_LINE (14)
 
 /**
- * @def LED_LABEL
- *
  * @brief Correspond au label de la LED.
  */
 #define LED_LABEL "LED_Geologie"
