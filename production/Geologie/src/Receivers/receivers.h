@@ -32,7 +32,7 @@
 #define RAW_DATA_UUID_VALUE_INDEX
 
 /* \struct Receivers_t
- * \brief  Structure de receivers définie dans receivers.c
+ * \brief  Structure de receivers definie dans receivers.c
  */
 typedef struct {
 
