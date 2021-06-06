@@ -6,8 +6,8 @@
  * @version 1.0.1
  * @date 5 mai 2021
  * @author LECENNE Gabriel
- * @copyright BSD 2-clauses
- *
+ * @copyright Geo-Boot
+ * @license BSD 2-clauses
  */
 
 //#include <stdlib.h>
@@ -32,7 +32,7 @@
 #define RAW_DATA_UUID_VALUE_INDEX
 
 /* \struct Receivers_t
- * \brief  Structure de receivers définie dans receivers.c
+ * \brief  Structure de receivers definie dans receivers.c
  */
 typedef struct {
 

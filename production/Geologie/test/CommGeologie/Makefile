@@ -8,12 +8,11 @@ SRC = $(wildcard *.c)
 OBJ = $(SRC:.c=.o)
 DEP = $(SRC:.c=.d)
 
-# Gcov informations
-GCDA = $(SRC:.c=.gcda)
-GCNO = $(SRC:.c=.gcno)
-
 # Inclusion depuis le niveau du package.
-CCFLAGS += -I.. -I../../$(SRC_DIR)
+CCFLAGS += -I..
+
+# Packages
+PACKAGES = PostmanLOG DispatcherLOG ProxyGUI ProxyLoggerMOB TranslatorLOG
 
 #################################################################################
 #																				#
@@ -21,10 +20,11 @@ CCFLAGS += -I.. -I../../$(SRC_DIR)
 #																				#
 #################################################################################
 
-all: build
+all: prod
 
 # Compilation
-build: $(OBJ)
+prod: $(OBJ)
+	@for p in $(PACKAGES); do (cd $$p && $(MAKE) $@); done
 
 .c.o:
 	$(CC) -c $(CCFLAGS) $< -o $@
@@ -33,6 +33,7 @@ build: $(OBJ)
 .PHONY: clean
 
 clean:
+	@for p in $(PACKAGES); do (cd $$p && $(MAKE) $@); done
 	@rm -f $(OBJ) $(DEP)
 
 -include $(DEP)

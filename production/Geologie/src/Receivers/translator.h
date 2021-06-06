@@ -16,9 +16,9 @@
 
  * @author GAUTIER Pierre-Louis
 
- * @copyright BSD 2-clauses
+ * @copyright Geo-Boot
 
- *
+ * @license BSD 2-clauses
 
  */
 

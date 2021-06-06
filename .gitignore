@@ -24,6 +24,7 @@
 **/doc
 **/template
 **/coverage
+**/check
 
 # Fichiers binaires genere
 **/*.out

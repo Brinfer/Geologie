@@ -5,18 +5,11 @@
  *
  * Definie plusieurs macro:
  *
- * #STOP_ON_ERROR
- * #TRACE
- * #ARRAY_SIZE
- * #PRINT
- * #DEBUG_FILE_PATH
- * #bool_e
- *
  * @version 1.0
  * @date 5 mai 2021
  * @author GAUTIER Pierre-louis
- * @copyright BSD 2-clauses
- *
+ * @copyright Geo-Boot
+ * @license BSD 2-clauses
  */
 
 #ifndef DEBUG_TOOLS_
@@ -25,15 +18,15 @@
 #include <unistd.h>
 #include <stdio.h>
 
-#define DEBUG_FILE_PATH "./debug.txt"
+#define DEBUG_FILE_PATH "./debug.log"
 
 /**
- * @def PRINT
+ * @def LOG
  *
  * @brief Affiche un message.
  *
  * Cette macro peut etre utilisee comme la fonction printf,
- * le premier argument est la chaîne de caractere et les arguments
+ * le premier argument est la chaene de caractere et les arguments
  * suivants peuvent etre specifies en fonction du format choisi.
  *
  * Le flux peut etre redirige vers un fichier si la macro NDEBUG
@@ -43,16 +36,14 @@
  * @param
  */
 #ifndef NDEBUG
-#define PRINT(fmt, ...)                                         \
-    do                                                          \
-    {                                                           \
+#define LOG(fmt, ...)                                           \
+    do {                                                        \
         fprintf(stderr, fmt, ##__VA_ARGS__);                    \
         fflush(stderr);                                         \
     } while (0)
 #else
-#define PRINT(fmt, ...)                                         \
-    do                                                          \
-    {                                                           \
+#define LOG(fmt, ...)                                           \
+    do {                                                        \
         FILE *stream = fopen(DEBUG_FILE_PATH, "a");             \
         fprintf(stream, fmt, ##__VA_ARGS__);                    \
         fclose(stream);                                         \
@@ -77,12 +68,11 @@
  */
 #ifndef NDEBUG
 #define STOP_ON_ERROR(error_condition)                            \
-    do                                                            \
-    {                                                             \
-        if (error_condition)                                      \
-        {                                                         \
-            PRINT("*** Error (%s) at %s:%d\nExiting\n",           \
+    do {                                                          \
+        if (error_condition) {                                    \
+            fprintf(stderr, "*** Error (%s) at %s:%d\nExiting\n", \
                     #error_condition, __FILE__, __LINE__);        \
+            fflush(stderr);                                       \
             perror("");                                           \
             _exit(1);                                             \
         }                                                         \
@@ -97,7 +87,7 @@
  * @brief Affiche un message de debug.
  *
  * Cette macro peut etre utilisee comme la fonction printf,
- * le premier argument est la chaîne de caracteres, les arguments
+ * le premier argument est la chaene de caracteres, les arguments
  * suivants peuvent etre specifies en fonction du format choisi.
  *
  * L'affichage peut etre desactivee en definissant la macro NDEBUG.
@@ -106,15 +96,15 @@
  */
 #ifndef NDEBUG
 #define TRACE(fmt, ...)                                            \
-    PRINT("%s:%d:%s(): " fmt, __FILE__, __LINE__,                  \
-                __func__, ##__VA_ARGS__)
+    do {                                                           \
+        fprintf (stderr, "%s:%d:%s(): " fmt, __FILE__, __LINE__,   \
+			__func__, ##__VA_ARGS__);                              \
+    } while (0)
 #else
 #define TRACE(fmt, ...)
 #endif
 
 /**
- * @def ARRAY_COUNT
- *
  * @brief Donne la taille d'un tableau sans tenir compte de la taille de chaque element.
  *
  * @param array Le tableau.
@@ -128,14 +118,5 @@
             arrayDest[indexStart + i] = arraySource[i];                     \
         }                                                                   \
     } while(0)
-
-/**
- * @enum bool_e
- * @brief Enumeration pour remplacer le type bool d'autre langage.
- */
-typedef enum {
-    False, /**< Valeur false */
-    True,   /**< Valuer true */
-} bool_e;
 
 #endif /* DEBUG_TOOLS_ */
