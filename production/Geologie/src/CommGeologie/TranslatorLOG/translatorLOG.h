@@ -66,14 +66,14 @@ extern void TranslatorLog_translateTrameToHeader(const Trame trame, Header* dest
  *
  * Traduit le tableau @a experimentalPosition en une #Trame et place la traduction dans @a dest.
  *
- * @param nbPositions Le nombre de position experimentale a envoyer.
+ * @param nbExperimentalPositions Le nombre de position experimentale a envoyer.
  * @param experimentalPosition Les positions experimentales a envoyer.
  * @param dest La trame de destination de la traduction.
  *
  * @warning @a dest doit etre de la bonne taille.
  * @see #TranslatorLog_getTrameSize
  */
-extern void TranslatorLog_translate4SendExperimentalPosition(uint8_t nbPositions, const ExperimentalPosition* experimentalPosition, Trame dest);
+extern void TranslatorLog_translateForSendExperimentalPosition(uint8_t nbPosinbExperimentalPositionstions, const ExperimentalPosition* experimentalPositions, Trame dest);
 
 /**
  * @brief Traduit les donnees balise en une trame.
@@ -88,7 +88,7 @@ extern void TranslatorLog_translate4SendExperimentalPosition(uint8_t nbPositions
  * @warning @a dest doit etre de la bonne taille.
  * @see #TranslatorLog_getTrameSize
  */
-extern void TranslatorLog_translate4SendAllBeaconsData(uint8_t nbBeacons, const BeaconData* beaconsData, Date currentDate, Trame dest);
+extern void TranslatorLog_translateForSendAllBeaconsData(uint8_t nbBeacons, const BeaconData* beaconsData, Date currentDate, Trame dest);
 
 /**
  * @brief Traduit la position courante en une trame.
@@ -102,21 +102,21 @@ extern void TranslatorLog_translate4SendAllBeaconsData(uint8_t nbBeacons, const 
  * @warning @a dest doit etre de la bonne taille.
  * @see #TranslatorLog_getTrameSize
  */
-extern void TranslatorLog_translate4SendCurrentPosition(const Position* currentPosition, Date currentDate, Trame dest);
+extern void TranslatorLog_translateForSendCurrentPosition(const Position* currentPosition, Date currentDate, Trame dest);
 
 /**
  * @brief Traduit les donnees de calibration en une trame.
  *
  * Traduit @a calibrationPosition en une #Trame et place la traduction dans @a dest.
  *
- * @param nbCalibrationPosition Le nombre de position de calibration a traduire.
+ * @param nbCalibrationPositions Le nombre de position de calibration a traduire.
  * @param calibrationPosition Les position de calibration a traduire.
  * @param dest La trame de destination de la traduction.
  *
  * @warning @a dest doit etre de la bonne taille.
  * @see #TranslatorLog_getTrameSize
  */
-extern void TranslatorLog_translateRepCalibrationPosition(uint8_t nbCalibrationPosition, const CalibrationPosition* calibrationPosition, Trame dest);
+extern void TranslatorLog_translateForRepCalibrationPosition(uint8_t nbCalibrationPositions, const CalibrationPosition* calibrationPositions, Trame dest);
 
 /**
  * @brief Traduit la charge processeur et memoire en une trame.
@@ -130,7 +130,7 @@ extern void TranslatorLog_translateRepCalibrationPosition(uint8_t nbCalibrationP
  * @warning @a dest doit etre de la bonne taille.
  * @see #TranslatorLog_getTrameSize
  */
-extern void TranslatorLog_translateSendProcessorAndMemoryLoad(ProcessorAndMemoryLoad processorAndMemoryLoad, Date currentDate, Trame dest);
+extern void TranslatorLog_translateForSendMemoryAndProcessorLoad(const ProcessorAndMemoryLoad* processorAndMemoryLoad, Date currentDate, Trame dest);
 
 /**
  * @brief Traduit une trame en un identifiant de position de calibration.
@@ -140,10 +140,10 @@ extern void TranslatorLog_translateSendProcessorAndMemoryLoad(ProcessorAndMemory
  * @param trame La trame a traduire.
  * @return CalibrationPositionId -1 en cas d'erreur, l'identifiant de la position de calibration sinon
  *
- * @warning @a dest doit etre de la bonne taille.
+ * @warning @a trame ne doit pas contenir le #Header.
  * @see #TranslatorLog_getTrameSize
  */
-extern CalibrationPositionId TranslatorLog_treanslate4SignalCalibrationPosition(const Trame trame);
+extern CalibrationPositionId TranslatorLog_translateForSignalCalibrationPosition(const Trame trame);
 
 /**
  * @brief Traduit les trajets d'experimentation en une trame.
@@ -157,6 +157,6 @@ extern CalibrationPositionId TranslatorLog_treanslate4SignalCalibrationPosition(
  * @warning @a dest doit etre de la bonne taille.
  * @see #TranslatorLog_getTrameSize
  */
-extern void translate4ExperimentalTrajects(uint8_t nbTraject, const ExperimentalTraject* experimentalTrajects, Trame dest);
+extern void translateForExperimentalTrajects(uint8_t nbTraject, const ExperimentalTraject* experimentalTrajects, Trame dest);
 
 #endif // TRANSLATOR_LOG_

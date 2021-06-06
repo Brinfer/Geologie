@@ -69,12 +69,6 @@ typedef float BeaconCoefficients[NB_BEACONS];
  * @brief  TODO
  *
  */
-typedef float ProcessorAndMemoryLoad[2];
-
-/**
- * @brief  TODO
- *
- */
 typedef short NbCoefficient;
 
 /**
@@ -86,14 +80,14 @@ typedef int CalibrationPositionId;
 /**
  * @brief creation d'une structure qui va prendre les differentes donnees d'une balise
  */
-typedef unsigned long Date;
+typedef uint64_t Date;
 
 /**
  * @brief structure qui va prendre les coordonnees d'un point (X et Y seront des entiers et seront en cm)
  */
 typedef struct {
-    int X;
-    int Y;
+    uint32_t X;
+    uint32_t Y;
 } Position;
 
 /**
@@ -130,5 +124,14 @@ typedef struct {
     ExperimentalPositionId id;
     Position position;
 } ExperimentalPosition;
+
+/**
+ * @brief  TODO
+ *
+ */
+typedef struct {
+    float memoryLoad;
+    float processorLoad;
+} ProcessorAndMemoryLoad;
 
 #endif // COMMON_
