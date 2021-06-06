@@ -83,7 +83,7 @@ extern int ProxyLoggerMOB_setExperimentalPositions(const ExperimentalPosition* e
  * @param calibrationData Les donnees de calibration a envoyer.
  * @return int 0 en cas de succes, une autre valeur sinon.
  */
-extern int ProxyLoggerMOB_setcalibration(const CalibrationData* calibrationData);
+extern int ProxyLoggerMOB_setCalibrationData(const CalibrationData* calibrationData);
 
 /**
  * @brief Envoie les donnees des balises a LoggerMOB.
