@@ -11,7 +11,6 @@
 
 #ifndef COMMON_
 #define COMMON_
-
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //                                              Include
@@ -19,6 +18,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <stdint.h>
+
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -42,10 +42,18 @@
  */
 #define ATT_COEFF_1_METER (6) // TODO move
 
-
 typedef uint8_t ExperimentalPositionId;
 
 typedef uint8_t ExperimentalTrajectId;
+
+/**
+ * @struct type
+ * @brief structure qui va prendre les coordonnees d'un point (X et Y seront des entiers et seront en cm)
+ */
+typedef struct {
+    int X;
+    int Y;
+} Position;
 
 /**
  * @typedef type Power
@@ -58,12 +66,17 @@ typedef float Power;
  * @brief type representant un coefficient d'attenuation
  */
 typedef float AttenuationCoefficient;
-
 /**
+ * @struct Header
  * @brief  TODO
  *
  */
+ /**
+  *  @brief  TODO
+ *
+ */
 typedef float BeaconCoefficients[NB_BEACONS];
+
 
 /**
  * @brief  TODO
@@ -71,28 +84,22 @@ typedef float BeaconCoefficients[NB_BEACONS];
  */
 typedef short NbCoefficient;
 
+
 /**
- * @brief  TODO
- *
+ * @struct type
+ * @brief creation d'une structure qui va prendre les differentes donnees d'une balise
+ */
+typedef unsigned long Date;
+
+/**
+ * @struct type
+ * @brief creation d'une structure qui va prendre les differentes donnees d'une balise
+ */
+/**
+ * @struct CalibrationPositionId
+ * @brief Id d'une balise
  */
 typedef int CalibrationPositionId;
-
-/**
- * @brief creation d'une structure qui va prendre les differentes donnees d'une balise
- */
-typedef uint64_t Date;
-
-/**
- * @brief structure qui va prendre les coordonnees d'un point (X et Y seront des entiers et seront en cm)
- */
-typedef struct {
-    uint32_t X;
-    uint32_t Y;
-} Position;
-
-/**
- * @brief creation d'une structure qui va prendre les differentes donnees d'une balise
- */
 typedef struct {
     char ID[SIZE_BEACON_ID];
     Position position;
@@ -111,10 +118,15 @@ typedef struct {
     Position position;
 } CalibrationPosition;
 
-/**
- * @brief  TODO
+
+
+
+
+
+/** * @brief  TODO
  *
  */
+
 typedef struct {
     ExperimentalTrajectId id;
     Position* traject;
@@ -133,5 +145,9 @@ typedef struct {
     float memoryLoad;
     float processorLoad;
 } ProcessorAndMemoryLoad;
+
+typedef struct {
+    /* data */
+} BeaconSignal;
 
 #endif // COMMON_

@@ -32,6 +32,7 @@ export CCFLAGS += -D_REENTRANT					# define a macro
 export LDFLAGS += -lm							# Include math library
 export LDFLAGS += -pthread -lpthread			# Include pthread library
 export LDFLAGS += -lbluetooth					# Include bluetooth library
+export LDFLAGS += -lrt					        # Include mqueue library
 
 all : prod test
 
@@ -47,7 +48,7 @@ test:
 check:
 	[ -d $(CHECK_DIR) ] || mkdir -p $(CHECK_DIR)
 	cppcheck --enable=all --xml --xml-version=2 ./ 2>$(CHECK_DIR)/report.xml
-	cppcheck-htmlreport --source-dir=./ --file=$(CHECK_DIR)/report.xml --report-dir=$(CHECK_DIR) --title=GEOLOGIE
+	cppcheck-htmlreport --source-dir=./ --file=$(CHECK_DIR)/report.xml --report-dir=$(CHECK_DIR) --title=Geologie
 
 # Gestion d'un rapport de couverture de code par les tests
 coverage:
