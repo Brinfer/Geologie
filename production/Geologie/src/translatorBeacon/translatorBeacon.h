@@ -60,8 +60,7 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "../Receivers/receivers.h"
-
+#include "../Receiver/receiver.h"
 //#include "../common.h"
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -116,7 +115,7 @@ extern int TranslatorBeacon_free();
 
 */
 
-extern BeaconsSignal TranslatorBeacon_translateChannelToBeaconsSignal(le_advertising_info * info);
+extern BeaconsSignal TranslatorBeacon_translateChannelToBeaconsSignal(BeaconsChannel * beaconsChannel);
 
 
 #endif /* TRANSLATORBEACON_H */
