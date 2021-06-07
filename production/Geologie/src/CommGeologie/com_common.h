@@ -57,11 +57,10 @@ typedef enum {
 
     REP_CALIBRATION_POSITIONS = 0x07,       /**< GEOLOGIE envoie a GEOMOBILE les positions de calibrage. */
 
-    SIGNAL_CALIBRATION_START = 0x08,        /**< GEOMOBILE signale a GEOLOGIE une nouvelle session de calibrage. */
-    SIGNAL_CALIBRATION_POSITION = 0x09,     /**< GEOMOBILE signale a GEOLOGIE qu’il est bien place a l’emplacement de calibrage. */
-    SIGNAL_CALIRATION_END = 0x0A,           /**< GEOLOGIE signale a GEOMOBILE la fin du calibrage. */
-    SIGNAL_CALIBRATION_END_POSITION = 0x0B,  /**< GEOLOGIE signale a GEOMOBILE la fin du calibrage a la position actuelle */
-
+    SIGNAL_CALIBRATION_POSITION = 0x08,     /**< GEOMOBILE signale a GEOLOGIE qu’il est bien place a l’emplacement de calibrage. */
+    SIGNAL_CALIRATION_END = 0x09,           /**< GEOLOGIE signale a GEOMOBILE la fin du calibrage. */
+    SIGNAL_CALIBRATION_END_POSITION = 0x0A, /**< GEOLOGIE signale a GEOMOBILE la fin du calibrage a la position actuelle */
+    SIGNAL_END_CALIBRATION_POSITION =0x0B,
     NB_COMMANDE = 11,                       /**< Le nombre de commande */
 } Commande;
 

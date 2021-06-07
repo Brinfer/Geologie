@@ -32,6 +32,7 @@ export CCFLAGS += -D_REENTRANT					# define a macro
 export LDFLAGS += -lm							# Include math library
 export LDFLAGS += -pthread -lpthread			# Include pthread library
 export LDFLAGS += -lbluetooth					# Include bluetooth library
+export LDFLAGS += -lrt					
 
 all : prod test
 

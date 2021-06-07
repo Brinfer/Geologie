@@ -98,10 +98,7 @@ static void performAction(Trame* trame, Header* header) {
     case REP_CALIBRATION_POSITIONS:
         /* code */
         break;
-    case SIGNAL_CALIBRATION_START:
-        /* code */
-        break;
-    case SIGNAL_CALIBRATION_POSITION:
+    case SIGNAL_CALIBRATION_POSITION:;
         /* code */
         CalibrationPositionId calibrationPositionId= TranslatorLog_translateForSignalCalibrationPosition(trame);
         Geographer_validatePosition(calibrationPositionId);
@@ -129,7 +126,7 @@ static void readHeader(Header* header) {
 
 
 static void* listen() {
-    TRACE("order\n");
+    TRACE("listen%s","\n");
     while (keepGoing) {
         Header header;
         readHeader(&header); //on lit d'abord le header et on le traduit
@@ -140,7 +137,6 @@ static void* listen() {
         performAction(trame,&header);
     }
     return 0;
-
 }
 
 
@@ -152,7 +148,6 @@ static void* listen() {
 
 
 extern int8_t DispatcherLOG_new() {
-    mqInit();
 
 
     return 0;
@@ -160,7 +155,6 @@ extern int8_t DispatcherLOG_new() {
 
 
 extern int8_t DispatcherLOG_free() {
-    mqDone();
     return 0;
 }
 
