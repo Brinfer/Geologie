@@ -5,10 +5,7 @@
 #################################################################################
 
 # Packages.
-PACKAGES = Geographer \
-	ManagerLOG \
-	Mathematician \
-	UI
+PACKAGES = Geographer ManagerLOG UI Mathematician Scanner CommGeologie Led
 
 #################################################################################
 #																				#
@@ -17,7 +14,10 @@ PACKAGES = Geographer \
 #################################################################################
 
 # Framework de test CMocka.
-export CMOCKA = ../cmocka-1.1.5_x86_64
+CMOCKA = $(realpath ../../../../cmocka-1.1.5_x86_64/)
+
+# Couverture du code
+export GCOVR = gcovr
 
 #################################################################################
 #																				#
@@ -25,12 +25,12 @@ export CMOCKA = ../cmocka-1.1.5_x86_64
 #																				#
 #################################################################################
 
-# Wrap des méthodes du Stock pour bouchonage.
+# Wrap des mthodes du Stock pour bouchonage.
 #exemple LDWRAP  = -Wl,--wrap=<symbol>
 LDWRAP =
 
 # Inclusion depuis le niveau du package.
-CCFLAGS += -I. -I$(CMOCKA)/include
+CCFLAGS += -I$(CMOCKA)/include
 
 # Liens pour les tests.
 LDFLAGS += -L$(CMOCKA)/lib
@@ -52,13 +52,13 @@ CCFLAGS += -fprofile-arcs -ftest-coverage -fprofile-abs-path
 SRC  = $(wildcard */*.c)
 OBJ = $(SRC:.c=.o)
 
-# Point d'entrée du programme
+# Point d'entre du programme
 MAIN = main_test.c
 
-# Gestion automatique des dépendances
+# Gestion automatique des dpendances
 DEP = $(MAIN:.c=.d)
 
-# Executable à générer.
+# Executable à gnrer.
 EXEC = ../$(TEST)
 
 # Inclusion depuis le niveau du package
@@ -67,7 +67,7 @@ CCFLAGS += -I.
 GCDA = $(MAIN:.c=.gcda)
 GCNO = $(MAIN:.c=.gcno)
 
-GCOVR_DIR = ../$(REPORT_DIR)/
+GCOVR_DIR = ../$(COVERAGE_DIR)/
 
 #################################################################################
 #																				#
@@ -75,29 +75,31 @@ GCOVR_DIR = ../$(REPORT_DIR)/
 #																				#
 #################################################################################
 
-all: build
+all: test
 
 # Compilation
-build:
+test:
 	@for p in $(PACKAGES); do (cd $$p && $(MAKE) $@); done
 	$(MAKE) $(EXEC)
 
 $(EXEC): $(OBJ) $(MAIN)
 	$(CC) $(CCFLAGS) $(LDWRAP) $(realpath $(OBJ)) $(MAIN) -MF $(DEP) -o $(EXEC) $(LDFLAGS)
 
-# Nettoyage
-.PHONY: clean
+# Generation du rapport de couverture
+coverage:
+	$(GCOVR) -r .. --html --html-details -o $(GCOVR_DIR)/index.html
 
-clean: test_report_clean
+# Nettoyage
+clean: coverage_clean
 	@for p in $(PACKAGES); do (cd $$p && $(MAKE) $@); done
 	@rm -f $(DEP) $(GCDA) $(GCNO)
 
-# Generation du rapport de couverture
-test_report:
-	$(GCOVR) -r .. --html --html-details -o $(GCOVR_DIR)/index.html
-
 # Nettoyage du rapport de couverture
-test_report_clean:
+coverage_clean:
 	@rm -f $(GCOVR_DIR)/*.html
 
 -include $(DEP)
+
+
+.PHONY: clean
+.PHONY: test

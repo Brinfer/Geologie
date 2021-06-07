@@ -6,214 +6,139 @@ Dans tout ce __README__ nous concéderons que le terminal est placé au niveau d
 cd path/vers/le/dossier/du/projet
 ```
 
+## Auteurs
+
+* BRIENT Nathan
+* GAUTIER Pierre-Louis
+* LECENNE Gabriel
+* MOLARD Simon
+
+## Copyright
+
+Voir [`LICENCE.md`](file://./LICENCE.md).
+
+## Description Générale
+
+ST aimerait compléter son prototype de robot autonome avec un mécanisme robuste de indoor-positioning. Une étude de positionnement basée sur la technologie Wifi a démontré que cette technologie était trop imprécise et instable pour répondre à la demande. Cette année, ST cherche à implémenter et à qualifier une solution basée sur l’utilisation de Balises bluetooth afin qu’elle soit dans un second temps intégrée dans sa solution de robot autonome.
+
+Notre projet est de créer une application permettant de tester la fiabilité de la technologie bluetooth. Elle n’est en aucun cas une technologie de positionnement.
+
+Pour pallier l’incapacité du robot à se situer dans un espace fermé, en récupérant sa position dans son environnement pour être en mesure d’interagir avec le robot en prenant compte de sa localisation.
+
 ## Installation
 
-Après le clonage du dépot, pensez à executer cette commande:
+Pour cloner le dépot, éxécuter la commande:
+
+```bash
+git clone -c http.sslVerify=false https://172.24.2.6:447/git/se2022.a1.c
+```
+
+Vos identifiants vous seront demandé.
+
+Après le clonage du dépot, executer cette commande:
 
 ```bash
 git config core.hooksPath .githooks
 ```
 
-
 Et ce afin que tout le monde utilise les même [git hook](https://www.atlassian.com/git/tutorials/git-hooks).
+
+Pour la suite, dans le dossier [Geologie](#architecture-du-projet) entrer la commande :
+
+```bash
+make help
+```
+
+### Logiciel nécessaire
+
+Afin de pouvoir developer, certains logiciels sont nécessaire. Référer vous à la documentation de votre distribution (ou OS) pour savoir comment les installer.
+
+* [CppCheck](http://cppcheck.sourceforge.net/) : outil d'analyse statique pour le C et le C++
+* [Make](https://www.gnu.org/software/make/) : outil permettant de controller la génération des éxécutables et d'autres type de génération
+* [arm-ostl-linux-gnueabi-gcc](https://wiki.st.com/stm32mpu/wiki/Getting_started/STM32MP1_boards/STM32MP157x-EV1/Develop_on_Arm%C2%AE_Cortex%C2%AE-A7/Install_the_SDK) : ensemble des paquets utilisés dans le processus de compilation d'un programme, pour [_OpenSt8Linux_](#cross-compilation)
+* [Doxygen](https://www.doxygen.nl/index.html) : outil permettant de générer la documentation des annotations dans le code source.
+* [GCC](https://gcc.gnu.org/) : ensemble de compilateur pour le C, C++, Objectif-C ...
+* [GCovr](https://gcovr.com/en/stable/) : utilitaire pour générer les rapport de couverture de code
+* [CMocka](https://cmocka.org/) : framework de test unitaire, son installation peut nécessiter  [CMake](https://cmake.org/) (dépends de votre distribution / OS), de plus, il faut installer les [__librairies statiques__](https://embeddedartistry.com/blog/2017/10/26/building-cmocka-as-a-static-library/)
+
+Il est fortement recommandé d'utiliser les dernières versions des ces logiciels
+
+### Architecture du projet
+
+Dans ce projet, le [framework CMocka](#logiciel-nécessaire) est utilisé. Celui-ci doit se trouver dans un dossier nommé `cmocka-1.1.5_x86_64`.
+La chaîne de compilation [arm-ostl-linux-gnueabi-gcc](#logiciel-nécessaire) est aussi utilisée. Celle-ci doit être dans un dossier nommé `SDK`.
+La structure du projet doit donc être (en se plaçant les dossiers au dessus de la racine du projet (`cd ..`)):
+
+```bash
+.
+├──cmocka-1.1.5_x86_64
+|  └── ...
+├── SDK
+|  └── ...
+└── se2022-a1.c
+   ├── explorations
+   ├── production
+   |  ├── Geobalise
+   |  └── Geologie
+   ├── template
+   └── README.md
+```
+
+#### exploration
+
+Ce dossier contient les codes élaborés lors d'exploration, ceux-ci peuvent être réutilisé pour le code de production.
+
+#### production
+
+Ce dossier contient le code de production, celui composant l'exécutable finale.
+
+#### template
+
+Ce dossier contient deux fichiers d'exemples et un dossier de configuration:
+
+```bash
+.
+├── code template
+│  ├── C_Header_File.xml
+│  ├── C_Source_File.xml
+│  ├── File_Comment.xml
+│  └── Formater.xml
+├── example.c
+└── example.h
+```
+
+Les fichiers _exemple.h_ et _exemple.c_ décrivent rapidement les règles de codage pour le dossiers de [production](#production).
+
+Le dossier _code template_ contient des fichiers de configuration de l'[environnement de développement](#st-cube-ide).
+
+*C_Header_File.xml_* et *C_Source_File.xml* sont des fichiers de configuration des templates des fichiers sources et headers. *Formater.xml* est le fichier de configuration du formater des fichiers.
 
 ### ST CUBE IDE
 
 Pour l'installation de l'environnement de développement référer vous à la documentation du [IDE fourni par ST](https://www.st.com/en/development-tools/stm32cubeide.html#documentation).
 
-## Règle sur le Git
+Après l'installation il faut adapter certains paramètres (template des fichiers sources et headers ainsi que celui du formateurs, voir [dossier template](#template)). Voir la page [Code Templates Preferences](https://www.eclipse.org/pdt/help/html/code_templates_preferences.htm) et [Import XML file for path and symbols programmatically](https://www.eclipse.org/forums/index.php/t/1096273/)
 
-Pour plus de détails ou d'information, il y de nombreuses ressources sur [internet](https://www.atlassian.com/fr/git/tutorials/learn-git-with-bitbucket-cloud)
+### Cross-compilation
 
-### Les branches
-
-Créer une branche signifie diverger de la ligne principale de développement et continuer à travailler sans impacter cette ligne.
-
-Il est important de ne pas faire de modification sur la branche principale: _master_. Celle-ci ne doit être modifier que au travers de _merge_ ou de _pull request_. Vous devez donc créer des _branch_.
-
-Il y a certaines règles à respecter sur le nommage des branches:
-
-* Mettre le numéro de la tâche associer à ce que vous à la branches
-* Préciser ce que vous y faites
-
-Structure: ```#<numTache>: <MessagePrecis>```
-
-#### Commandes
-
-Créer du branche:
+La cible du projet est une _STM32MP1_ utilisant comme OS _OpenStLinux 5.10_. Cet _OS_ utilise un compilateur spécifique __ostl-linux-gnueabi__.
+Afin de pouvoir facilement il faut changer la valeur de la variable __CC__ (on considère ici que le dossier contenant le compilateur ce trouve au-dessus de la racine du projet, voir [section Architecture du projet](#architecture-du-projet)).
 
 ```bash
-git branch "<nomDeLaBranche>"
+source ../SDK/environment-setup-cortexa7t2hf-neon-vfpv4-ostl-linux-gnueabi
 ```
 
-_(La branche n'existe que en locale, elle n'est toujours présente sur le dépot distant [voir la partie sur la dépot distant](#le-dépot-distant), pensez à respecter la structure des nom des [branches](#les-branches))_
-
-&nbsp;
-
-Lister les branches en locale:
+Pour tester le bon changement il faut utiliser la commande:
 
 ```bash
-git branch
+$CC --version
 ```
 
-&nbsp;
-
-Lister les branches distante:
+et doit retourner (peut varier):
 
 ```bash
-git branch -r
+arm-ostl-linux-gnueabi-gcc (GCC) 9.3.0
+Copyright (C) 2019 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 ```
-
-&nbsp;
-
-Changer de branche:
-
-```bash
-git checkout "<nomDeMaBranche>"
-```
-
-&nbsp;
-
-Fusionner une branche vers celle où je me trouve:
-
-```bash
-git merge "<nomDeLaBrancheAFusionner>"
-```
-
-_(Des conflits peuvent apparaître, c'est alors à vous de les gérer. Le mieux est alors de vous référer à la documentation de l'IDE que vous utilisez car celui-ci peut vous aidez à les visualiser. Pour plus de détails sur les conflits: [lien](https://www.atlassian.com/fr/git/tutorials/using-branches/merge-conflicts))_
-
-&nbsp;
-
-Supprimer une branches en locale:
-
-```bash
-git branch -d "<nomDeLaBranche>"
-```
-
-_(La branche n'est supprimer que en locale, elle est toujours présente sur le dépot distant, [voir la partie sur la dépot distant](#le-dépot-distant))_
-
-&nbsp;
-
-Renommer une branche en locale:
-
-```bash
-git branch -m "<nouveauNom>"
-```
-
-_(La branche n'est renommer que en locale, elle à toujours sont ancien nom sur le dépot distant, [voir la partie sur la dépot distant](#le-dépot-distant), pensez à respecter la structure des noms des [branches](#les-branches))_
-
-### Les Commits
-
-Un _commit_ permet de valider les modifications apportées. Notez que tout _commit_ ne sere pas dans le dépôt distant tant qu'il n'est pas pousser ([voir la partie sur la dépot distant](#le-dépot-distant)).
-
-Il y a certaines règles à respecter sur les messages des commits:
-
-* Mettre le numéro de la tâche associer à ce que vous faites
-* Préciser ce que vous y faites
-
-Structure: ```#<numTache>: <MessagePrecis>```
-
-#### Commandes
-
-Dans un premier temps il faut ajouter les fichiers modifiers ou ajouté à l'index, pour cela il faut utiliser la commande _add_:
-
-```bash
-git add "chemin/vers/mon/fichier"
-```
-
-_(Pour ajouter toutes les modifications du projet, un ```git add .``` suffit)_
-
-Il faut ensuite valider les changements:
-
-```bash
-git commit -m "<monMessage>"
-```
-
-_(Le commit n'existe que en locale, il n'est toujours présente sur le dépot distant [voir la partie sur la dépot distant](#le-dépot-distant), pensez à respecter la structure des nom des [commits](#les-commits))_
-
-&nbsp;
-
-Pour voir les précédents _commit_:
-
-```bash
-git log
-```
-
-_(Pour arrêter de visualiser appuyer sur la touche __q__)_
-
-&nbsp;
-
-Pour modifier le dernier _commit_ (faites le avant de pousser le commit):
-
-```bash
-git commit --amend
-```
-
-Un fichier sera ouvert et vous pourrez modifier l'ensemble des informations du commit. Pour plus de détail voir la [documentation](https://www.atlassian.com/fr/git/tutorials/rewriting-history).
-Pour juste modifier le message du commit:
-
-```bash
-git commit --amend -m "<nouveauMessage>"
-```
-
-_(Pensez à respecter la structure des [commits](#les-commits))_
-
-&nbsp;
-
-De nombreuses autres commandes existes et permettent de faire de nombreuse chose. Je vous invite à vous renseigner de vous même dessus en fonction de vos besoins.
-
-### Le dépot distant
-
-Un dépôt distant est une version du projet qui est hébergée sur un serveur. Collaborer avec d’autres personnes consiste à gérer ce dépôt distant, en poussant ou tirant des données depuis et vers ces dépôts quand vous souhaitez partager votre travail.
-
-#### Commandes
-
-Pousser vos modification locale vers le dépot distant:
-
-```bash
-git push
-```
-
-&nbsp;
-
-Tirer les modification du dépot distant:
-
-```bash
-git pull
-```
-
-&nbsp;
-
-Pousser une nouvelle branches ou une branche renommé:
-
-```bash
-git push -u "<leNomDeMaBranche>"
-```
-
-&nbsp;
-
-Supprimer une branches du dépot distant:
-
-```bash
-git push <nomDuDepot> --delete "#6666: Ma nouvelle branche / Ma branche renommé"
-```
-
-_(le ```nomDuDepot``` est généralement __origin__)_
-
-&nbsp;
-
-Sauvegarder les mots de passe:
-
-```bash
-git config --local credential.helper store
-```
-
-Il suffit de pousser ou de tirer ensuite (l'idée est d'entrer de nouveau vôtre mot de passe). Les identifiants sont lors sauvegarder et automatiquement réutilisés. __Attention__ ceux-ci sont sauvegardé dans un fichier texte sans aucun encodage, vos identifiant sont visisible en clair ce qui est un défaut de sécurité.
-
-Vous pouvez aussi sauvegardé ces identifiant de manière temporaire:
-
-```bash
-git config --local credential.helper cache --timeout <seconde>
-```
-
-Par défaut, ```seconde``` vaut 900 soit 15 minutes.

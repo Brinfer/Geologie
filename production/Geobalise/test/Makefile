@@ -94,7 +94,7 @@ clean: test_report_clean
 
 # Generation du rapport de couverture
 test_report:
-	$(GCOVR) -r .. --html --html-details -o $(GCOVR_DIR)/index.html
+	$(GCOV) -r .. --html --html-details -o $(GCOVR_DIR)/index.html
 
 # Nettoyage du rapport de couverture
 test_report_clean:
