@@ -168,7 +168,7 @@ extern CalibrationPositionId TranslatorLog_translateForSignalCalibrationPosition
  * @warning @a dest doit etre de la bonne taille.
  * @see #TranslatorLog_getTrameSize
  */
-extern void Translator_translateForSignalCalibrationEnd(const Trame* dest);
+extern void Translator_translateForSignalCalibrationEnd(Trame* dest);
 
 /**
  * @brief Compose la trame pour la commande #SIGNAL_CALIBRATION_END_POSITION. Compose aussi le header.
@@ -180,6 +180,6 @@ extern void Translator_translateForSignalCalibrationEnd(const Trame* dest);
  * @warning @a dest doit etre de la bonne taille.
  * @see #TranslatorLog_getTrameSize
  */
-extern void Translator_translateForSignalCalibrationEndPosition(const Trame* dest);
+extern void Translator_translateForSignalCalibrationEndPosition(Trame* dest);
 
 #endif // TRANSLATOR_LOG_

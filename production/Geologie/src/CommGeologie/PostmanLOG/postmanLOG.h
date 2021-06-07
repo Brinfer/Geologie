@@ -58,6 +58,8 @@ extern int8_t PostmanLOG_start(void);
  * @param trame La trame a envoyer.
  * @param size La taille de la trame a envoyer.
  * @return int8_t 0 en cas de succes, une autre valeur sinon.
+ *
+ * @warning La fonction appelante est en charge de la garantie de la validite du message (passage de pointeur).
  */
 extern int8_t PostmanLOG_sendMsg(Trame* trame, uint16_t size);
 

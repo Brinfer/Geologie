@@ -20,6 +20,7 @@
 //                                              Include
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #include <stdlib.h>
 #include <unistd.h> // Macros, type Posix and co
 #include <pthread.h>
@@ -32,6 +33,7 @@
 #include "../com_common.h"
 #include <stdio.h>
 #include "../../tools.h"
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //                                              Variable et structure privee
@@ -57,7 +59,7 @@ static int8_t keepGoing = 1;
 
 /**
  * @fn static void* readMsg();
- * @brief methode appelee par un thread pour recevoir les action a faire 
+ * @brief methode appelee par un thread pour recevoir les action a faire
  *
  * cette metode lira la socket et effectuera les actions
  */

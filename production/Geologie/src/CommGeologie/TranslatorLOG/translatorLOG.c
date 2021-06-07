@@ -317,11 +317,11 @@ extern void TranslatorLog_translateForExperimentalTrajects(uint8_t nbTraject, co
     // TODO
 }
 
-extern void Translator_translateForSignalCalibrationEnd(const Trame* dest) {
+extern void Translator_translateForSignalCalibrationEnd(Trame* dest) {
     composeHeader(SIGNAL_CALIRATION_END, 0, dest);
 }
 
-extern void Translator_translateForSignalCalibrationEndPosition(const Trame* dest) {
+extern void Translator_translateForSignalCalibrationEndPosition(Trame* dest) {
     composeHeader(SIGNAL_CALIBRATION_END_POSITION, 0, dest);
 }
 
@@ -348,23 +348,19 @@ static uint16_t convertBytesToUint16_t(const Trame* bytes) {
 }
 
 static void convertUint16_tToBytes(uint16_t value, Trame* dest) {
-    value = htons(value);
+    uint32_t bigEndian = htons(value);
 
-    for (uint8_t i = 0; i < 2; i++) {
-        dest[i] = (value >> (8 - (8 * i))) & 0xFF;
-    }
+    dest = (Trame*) &bigEndian;
 }
 
 static void convertUint32_tToBytes(uint32_t value, Trame* dest) {
-    value = htonl(value);
+    uint32_t bigEndian = htonl(value);
 
-    for (uint8_t i = 0; i < 4; i++) {
-        dest[i] = (value >> (24 - (8 * i))) & 0xFF;
-    }
+    dest = (Trame*) &bigEndian;
 }
 
 static void convertFloatToByte(float value, Trame* dest) {
-    convertUint32_tToBytes(value, dest); // Is cast in uint32_t
+    convertUint32_tToBytes(*((uint32_t*) &value), dest); // Is cast in uint32_t
 }
 
 static void convertPositionToByte(const Position* position, Trame* dest) {
