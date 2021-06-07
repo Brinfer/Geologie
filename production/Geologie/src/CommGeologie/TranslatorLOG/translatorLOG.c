@@ -233,7 +233,7 @@ extern uint16_t TranslatorLog_getTrameSize(Commande cmd, uint8_t nbElements) {
     return returnValue;
 }
 
-extern void TranslatorLog_translateTrameToHeader(const Trame trame, Header* dest) {
+extern void TranslatorLog_translateTrameToHeader(const Trame * trame, Header* dest) {
     /* CMD */
     dest->commande = trame[0];
 
