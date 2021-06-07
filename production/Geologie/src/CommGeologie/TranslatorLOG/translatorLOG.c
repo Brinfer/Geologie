@@ -119,7 +119,7 @@
  *
  * @warning @dest doit une taille superieur ou egale a #SIZE_HEADER
  */
-static void composeHeader(Commande cmd, uint8_t nbElements, Trame dest);
+static void composeHeader(Commande cmd, uint8_t nbElements, Trame* dest);
 
 /**
  * @brief Convertie le tableau d'octet en un uint16_t.
@@ -129,7 +129,7 @@ static void composeHeader(Commande cmd, uint8_t nbElements, Trame dest);
  *
  * @warning @a bytes doit avoir une taille superieur ou egale a deux.
  */
-static uint16_t convertBytesToUint16_t(const Trame bytes);
+static uint16_t convertBytesToUint16_t(const Trame* bytes);
 
 /**
  * @brief Convertie un uint16_t en un tableau d'octet.
@@ -141,7 +141,7 @@ static uint16_t convertBytesToUint16_t(const Trame bytes);
  *
  * @warning @a dest doit avoir une taille superieur ou egale a deux.
  */
-static void convertUint16_tToBytes(uint16_t value, Trame dest);
+static void convertUint16_tToBytes(uint16_t value, Trame* dest);
 
 /**
  * @brief Convertie un uint32_t en un tableau d'octet.
@@ -153,7 +153,7 @@ static void convertUint16_tToBytes(uint16_t value, Trame dest);
  *
  * @warning @a dest doit avoir une taille superieur ou egale a quatre.
  */
-static void convertUint32_tToBytes(uint32_t value, Trame dest);
+static void convertUint32_tToBytes(uint32_t value, Trame* dest);
 
 /**
  * @brief Convertie un float en un tableau d'octet.
@@ -165,7 +165,7 @@ static void convertUint32_tToBytes(uint32_t value, Trame dest);
  *
  * @warning @a dest doit avoir une taille superieur ou egale a quatre.
  */
-static void convertFloatToByte(float value, Trame dest);
+static void convertFloatToByte(float value, Trame* dest);
 
 /**
  * @brief Convertie une #Position en un tableau d'octet.
@@ -177,7 +177,7 @@ static void convertFloatToByte(float value, Trame dest);
  *
  * @warning @a dest doit avoir une taille superieur ou egale a #SIZE_POSITION.
  */
-static void convertPositionToByte(const Position* position, Trame dest);
+static void convertPositionToByte(const Position* position, Trame* dest);
 
 /**
  * @brief Convertie un #BeaconData en un tableau d'octet.
@@ -189,7 +189,7 @@ static void convertPositionToByte(const Position* position, Trame dest);
  *
  * @warning @a dest doit avoir une taille superieur ou egale a #SIZE_BEACON_DATA.
  */
-static void convertBeaconDataToByte(const BeaconData* beaconData, Trame dest);
+static void convertBeaconDataToByte(const BeaconData* beaconData, Trame* dest);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -233,7 +233,7 @@ extern uint16_t TranslatorLog_getTrameSize(Commande cmd, uint8_t nbElements) {
     return returnValue;
 }
 
-extern void TranslatorLog_translateTrameToHeader(const Trame * trame, Header* dest) {
+extern void TranslatorLog_translateTrameToHeader(const Trame* trame, Header* dest) {
     /* CMD */
     dest->commande = trame[0];
 
@@ -241,7 +241,7 @@ extern void TranslatorLog_translateTrameToHeader(const Trame * trame, Header* de
     dest->size = convertBytesToUint16_t(trame + 1);
 }
 
-extern void TranslatorLog_translateForSendExperimentalPositions(uint8_t nbExperimentalPositions, const ExperimentalPosition* experimentalPositions, Trame dest) {
+extern void TranslatorLog_translateForSendExperimentalPositions(uint8_t nbExperimentalPositions, const ExperimentalPosition* experimentalPositions, Trame* dest) {
     /* Header */
     composeHeader(SEND_EXPERIMENTAL_POSITIONS, nbExperimentalPositions, dest);
 
@@ -255,7 +255,7 @@ extern void TranslatorLog_translateForSendExperimentalPositions(uint8_t nbExperi
     }
 }
 
-extern void TranslatorLog_translateForSendAllBeaconsData(uint8_t nbBeacons, const BeaconData* beaconsData, Date currentDate, Trame dest) {
+extern void TranslatorLog_translateForSendAllBeaconsData(uint8_t nbBeacons, const BeaconData* beaconsData, Date currentDate, Trame* dest) {
      /* Header */
     composeHeader(SEND_ALL_BEACONS_DATA, nbBeacons, dest);
 
@@ -271,7 +271,7 @@ extern void TranslatorLog_translateForSendAllBeaconsData(uint8_t nbBeacons, cons
     }
 }
 
-extern void TranslatorLog_translateForSendCurrentPosition(const Position* currentPosition, Date currentDate, Trame dest) {
+extern void TranslatorLog_translateForSendCurrentPosition(const Position* currentPosition, Date currentDate, Trame* dest) {
      /* Header */
     composeHeader(SEND_CURRENT_POSITION, 0, dest);
 
@@ -282,7 +282,7 @@ extern void TranslatorLog_translateForSendCurrentPosition(const Position* curren
     convertPositionToByte(currentPosition, dest + SIZE_HEADER + SIZE_TIMESTAMP);
 }
 
-extern void TranslatorLog_translateForRepCalibrationPosition(uint8_t nbCalibrationPositions, const CalibrationPosition* calibrationPositions, Trame dest) {
+extern void TranslatorLog_translateForRepCalibrationPosition(uint8_t nbCalibrationPositions, const CalibrationPosition* calibrationPositions, Trame* dest) {
      /* Header */
     composeHeader(REP_CALIBRATION_POSITIONS, nbCalibrationPositions, dest);
 
@@ -296,7 +296,7 @@ extern void TranslatorLog_translateForRepCalibrationPosition(uint8_t nbCalibrati
     }
 }
 
-extern void TranslatorLog_translateForSendMemoryAndProcessorLoad(const ProcessorAndMemoryLoad* processorAndMemoryLoad, Date currentDate, Trame dest) {
+extern void TranslatorLog_translateForSendMemoryAndProcessorLoad(const ProcessorAndMemoryLoad* processorAndMemoryLoad, Date currentDate, Trame* dest) {
      /* Header */
     composeHeader(SEND_MEMORY_PROCESSOR_LOAD, 0, dest);
 
@@ -310,11 +310,11 @@ extern void TranslatorLog_translateForSendMemoryAndProcessorLoad(const Processor
     convertFloatToByte(processorAndMemoryLoad->processorLoad, dest + SIZE_HEADER + SIZE_TIMESTAMP + SIZE_MEMORY_LOAD);
 }
 
-extern CalibrationPositionId TranslatorLog_translateForSignalCalibrationPosition(const Trame trame) {
+extern CalibrationPositionId TranslatorLog_translateForSignalCalibrationPosition(const Trame* trame) {
     return trame[SIZE_HEADER];
 }
 
-extern void translateForExperimentalTrajects(uint8_t nbTraject, const ExperimentalTraject* experimentalTrajects, Trame dest) {
+extern void translateForExperimentalTrajects(uint8_t nbTraject, const ExperimentalTraject* experimentalTrajects, Trame* dest) {
     // TODO
 }
 
@@ -324,7 +324,7 @@ extern void translateForExperimentalTrajects(uint8_t nbTraject, const Experiment
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-static void composeHeader(Commande cmd, uint8_t nbElements, Trame dest) {
+static void composeHeader(Commande cmd, uint8_t nbElements, Trame* dest) {
     uint16_t size = TranslatorLog_getTrameSize(cmd, nbElements);
 
     /* CMD */
@@ -335,11 +335,11 @@ static void composeHeader(Commande cmd, uint8_t nbElements, Trame dest) {
 }
 
 
-static uint16_t convertBytesToUint16_t(const Trame bytes) {
+static uint16_t convertBytesToUint16_t(const Trame* bytes) {
     return ntohs(*(uint16_t*) bytes);
 }
 
-static void convertUint16_tToBytes(uint16_t value, Trame dest) {
+static void convertUint16_tToBytes(uint16_t value, Trame* dest) {
     value = htons(value);
 
     for (uint8_t i = 0; i < 2; i++) {
@@ -347,7 +347,7 @@ static void convertUint16_tToBytes(uint16_t value, Trame dest) {
     }
 }
 
-static void convertUint32_tToBytes(uint32_t value, Trame dest) {
+static void convertUint32_tToBytes(uint32_t value, Trame* dest) {
     value = htonl(value);
 
     for (uint8_t i = 0; i < 4; i++) {
@@ -355,16 +355,16 @@ static void convertUint32_tToBytes(uint32_t value, Trame dest) {
     }
 }
 
-static void convertFloatToByte(float value, Trame dest) {
+static void convertFloatToByte(float value, Trame* dest) {
     convertUint32_tToBytes(value, dest); // Is cast in uint32_t
 }
 
-static void convertPositionToByte(const Position* position, Trame dest) {
+static void convertPositionToByte(const Position* position, Trame* dest) {
     convertUint32_tToBytes(position->X, dest);
     convertUint32_tToBytes(position->Y, dest + (SIZE_POSITION % 2));
 }
 
-static void convertBeaconDataToByte(const BeaconData* beaconData, Trame dest) {
+static void convertBeaconDataToByte(const BeaconData* beaconData, Trame* dest) {
     /* ID */
     memcpy(dest, beaconData->ID, SIZE_BEACON_ID);
 
