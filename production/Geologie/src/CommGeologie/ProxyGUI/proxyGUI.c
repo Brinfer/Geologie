@@ -139,7 +139,7 @@ extern int8_t ProxyGUI_setCalibrationPositions(CalibrationPosition * calibration
     uint16_t sizeTrame = TranslatorLog_getTrameSize(commande, NB_CALIBRATION_POSITIONS);
     trame=malloc(sizeTrame);
     TranslatorLog_translateForRepCalibrationPosition(size,calibrationPositions,trame);
-    returnError = PostmanLOG_sendMsg(trame,sizeTrame); //    PostmanLOG_sendMsg(Trame * trame, uint16t size);
+    returnError = PostmanLOG_sendMsg(trame,sizeTrame); 
 
     return returnError;
 }
@@ -151,8 +151,8 @@ extern int8_t ProxyGUI_signalEndCalibrationPosition(){
     Commande commande=SIGNAL_END_CALIBRATION_POSITION;
     u_int16_t sizeTrame = TranslatorLog_getTrameSize(commande, 0);
     trame=malloc(sizeTrame);
-    Translator_translateForSignalCalibrationEnd(trame); //TODO manque traduction pour avoir le header
-    returnError = PostmanLOG_sendMsg(trame,sizeTrame); //    PostmanLOG_sendMsg(Trame * trame, uint16t size);
+    Translator_translateForSignalCalibrationEnd(trame); 
+    returnError = PostmanLOG_sendMsg(trame,sizeTrame); 
 
     return returnError;
 }
@@ -165,7 +165,7 @@ extern int8_t ProxyGUI_signalEndCalibration(){
     u_int16_t sizeTrame = TranslatorLog_getTrameSize(commande, 0);
     trame=malloc(sizeTrame);
     Translator_translateForSignalCalibrationEnd(trame);
-    returnError = PostmanLOG_sendMsg(trame,sizeTrame); //    PostmanLOG_sendMsg(Trame * trame, uint16t size);
+    returnError = PostmanLOG_sendMsg(trame,sizeTrame); 
 
     return returnError;
 }
