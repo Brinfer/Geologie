@@ -31,6 +31,7 @@
 #include <stdint.h>
 #include "../com_common.h"
 #include <stdio.h>
+#include "../../tools.h"
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //                                              Variable et structure privee
@@ -240,7 +241,7 @@ static void performAction(Trame* trame, Header* Header);
 
 
 static void mqInit(void) {
-    printf("On entre dans le Init\n");
+    TRACE("On entre dans le Init\n");
     attr.mq_flags = 0; //Flags de la file
     attr.mq_maxmsg = MQ_MAX_MESSAGES; //Nombre maximum de messages dans la file
     attr.mq_msgsize = sizeof(MqMsg); //Taille maximale de chaque message
@@ -260,13 +261,13 @@ static void mqInit(void) {
     if (descripteur == -1) {
         perror("Erreur Open :\n");
     } else {
-        printf("BAL ouverte\n");
+        TRACE("BAL ouverte\n");
     }
 
 }
 
 static void mqDone(void) {
-    printf("On entre dans le Done\n");
+    TRACE("On entre dans le Done\n");
 
     /* fermeture de la BAL */
     mq_close(descripteur); //On ferme la BAL en mettant en paramètre le descripteur
@@ -276,7 +277,7 @@ static void mqDone(void) {
 }
 
 static void mqReceive(MqMsg* this) {
-    printf("On entre dans le mq_receive\n");
+    TRACE("On entre dans le mq_receive\n");
     mq_receive(descripteur, (char*) this, sizeof(*this), NULL);
 }
 
@@ -286,6 +287,7 @@ static void performAction(Trame* trame, Header* header) {
     switch (header->commande)     {
     case ASK_CALIBRATION_POSITIONS:
         /* code */
+        Geographer_askCalibrationPositions();
         break;
     case SEND_EXPERIMENTAL_POSITIONS:
         /* code */
@@ -310,6 +312,8 @@ static void performAction(Trame* trame, Header* header) {
         break;
     case SIGNAL_CALIBRATION_POSITION:
         /* code */
+        CalibrationPositionId calibrationPositionId= TranslatorLog_translateForSignalCalibrationPosition(trame);
+        Geographer_validatePosition(calibrationPositionId);
         break;
     case SIGNAL_CALIRATION_END:
         /* code */
@@ -319,7 +323,8 @@ static void performAction(Trame* trame, Header* header) {
     }
 
 
-    //free(msg->trame);
+    free(trame);
+    free(header);
 }
 
 static uint8_t sendMsgToQueue(MqMsg* msg) { //TODO pas besoin mutex, deja protege/a revoir
@@ -332,17 +337,17 @@ static uint8_t sendMsgToQueue(MqMsg* msg) { //TODO pas besoin mutex, deja proteg
 
 static void readHeader(Header* header) {
     Trame headerTrame[SIZE_HEADER];
-    PostmanLOG_readMsg(headerTrame, SIZE_HEADER); //on lit le header d'abord
-    TranslatorLog_translateTrameToHeader(headerTrame, header);
+    PostmanLOG_readMsg(headerTrame, SIZE_HEADER); //on lit la trame contenant le header
+    TranslatorLog_translateTrameToHeader(headerTrame, header); //on traduit la trame header en header
 }
 
 
 
 static void* listen() {
-    printf("order\n");
+    TRACE("order\n");
     while (keepGoing) {
         Header header;
-        readHeader(&header); //on lit d'abord le header
+        readHeader(&header); //on lit d'abord le header et on le traduit
 
         Trame* trame;
         trame = malloc(header.size);
