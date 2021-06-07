@@ -91,13 +91,6 @@ typedef int CalibrationPositionId;
  */
 typedef uint64_t Date;
 
-/**
- * @brief structure qui va prendre les coordonnees d'un point (X et Y seront des entiers et seront en cm)
- */
-typedef struct {
-    uint32_t X;
-    uint32_t Y;
-} Position;
 
 /**
  * @brief creation d'une structure qui va prendre les differentes donnees d'une balise

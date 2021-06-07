@@ -33,11 +33,6 @@
 #define RAW_DATA_UUID_VALUE_INDEX
 
 typedef struct {
-    int X;
-    int Y;
-} Position;
-
-typedef struct {
     char name[2];
     int uuid[2];
     int8_t rssi;
