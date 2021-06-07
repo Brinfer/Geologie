@@ -43,9 +43,13 @@
 
 #define NB_BEACONS_AVAILABLE 3
 
+#define BEACONS_UUID 0x181A
+
 static BeaconsSignal beaconsSignal[NB_BEACONS_AVAILABLE];
 
 static BeaconsChannel * beaconsChannel[NB_BEACONS_AVAILABLE];
+
+static int index_channel = 0;
 
 static int channel_INDEX;
 
@@ -125,18 +129,46 @@ State_RECEIVER myState;
 
 static void Receiver_translateChannelToBeaconsSignal(){
     int i;
+	int index_signal = 0;
+	int index_channel = 0;
+	BeaconsSignal signal;
+	printf("TRANSLATING\n");
 
-	for (i = 0; i < sizeof(beaconsChannel); i++)
+	signal = TranslatorBeacon_translateChannelToBeaconsSignal(beaconsChannel[0]);
+	printf("Index n° : %d\n", 0);
+	printf("Name : %s\n", signal.name);
+	printf("X : %d\n", signal.position.X);
+	printf("Y : %d\n", signal.position.Y);
+	printf("UUID : %d\n", signal.uuid[0]);
+	printf("RSSI : %d\n", signal.rssi);
+	
+
+
+
+	/*for (i = 0; i < sizeof(BeaconsChannel); i++)
 	{
-		/*printf("TRANSLATING");
-		beaconsSignal[i] = TranslatorBeacon_translateChannelToBeaconsSignal(beaconsChannel[i]);
-		printf("Name %s\n", beaconsSignal[i].name);
-		printf("UUID %d\n", beaconsSignal[i].uuid[0]);
-		printf("RSSI %d\n", beaconsSignal[i].rssi);*/
-		beaconsSignal[0] = TranslatorBeacon_translateChannelToBeaconsSignal(beaconsChannel[0]);
-		printf("Name : %s\n", beaconsSignal[0].name);
-		printf("Name : %d\n", beaconsSignal[0].rssi);
-	}
+		signal = TranslatorBeacon_translateChannelToBeaconsSignal(beaconsChannel[index_channel]);
+		printf("Index n° : %d\n", i);
+		printf("Name : %s\n", signal.name);
+		printf("X : %d\n", signal.position.X);
+		printf("Y : %d\n", signal.position.Y);
+		printf("UUID : %d\n", signal.uuid[0]);
+		printf("RSSI : %d\n", signal.rssi);
+		/*if(signal.uuid[0] == BEACONS_UUID){
+			beaconsSignal[index_signal] = signal;
+			index_signal ++;
+		}
+		index_channel ++;*/
+	//}*/
+	/*int k;
+	for(k = 0; k< sizeof(beaconsSignal); k ++){
+		printf("Index n° : %d\n", k);
+		printf("Name : %s\n", beaconsSignal[k].name);
+		printf("Name : %d\n", beaconsSignal[k].position.X);
+		printf("Name : %d\n", beaconsSignal[k].position.Y);
+		printf("Name : %d\n", beaconsSignal[k].uuid[0]);
+		printf("Name : %d\n", beaconsSignal[k].rssi);
+	}*/
 	
 }
 
@@ -225,7 +257,7 @@ static void Receiver_getAllBeaconsChannel(){
 	int uuid[2];
 	int len;
 
-	while(1){
+	while(1){ //Thread pour la suite
 		len = read(device, buf, sizeof(buf));
 		if ( len >= HCI_EVENT_HDR_SIZE ){
 			meta_event = (evt_le_meta_event*)(buf+HCI_EVENT_HDR_SIZE+1);
@@ -239,12 +271,24 @@ static void Receiver_getAllBeaconsChannel(){
 						perror("Failed to enable scan.");
 					}			
 
-					memcpy(uuid, info->data + 21, 2);
+					memcpy(uuid, info->data + 21, 2); //cond pour le Name
 
-					if(uuid[0] == 6170){
+					if(uuid[0] == BEACONS_UUID){
 						beaconsChannel[0] = info;
+						index_channel ++;
+					}
+
+					beaconsChannel[index_channel] = info;
+					
+					Receiver_translateChannelToBeaconsSignal();
+
+					//beaconsChannel[0] = info;
+					
+					/*if(index_channel == 100){
 						Receiver_translateChannelToBeaconsSignal();
-					}			
+					}*/
+
+					//Receiver_translateChannelToBeaconsSignal();
 
 					offset = info->data + info->length + 2;
 				}
