@@ -45,15 +45,6 @@ typedef struct {
 
 typedef le_advertising_info BeaconsChannel;
 
-typedef struct {
-    unsigned char* flags_length;
-    unsigned char* name_length;
-    unsigned char* uuid_length;
-    unsigned char* flags_value;
-    unsigned char* name_value;
-    unsigned char* uuid_value;
-} RawData;
-
 extern void Receiver_new();
 
 extern void Receiver_ask4StartReceiver();

@@ -28,6 +28,7 @@
 #include <inttypes.h>
 
 #include "receiver.h"
+#include "../translatorBeacon/translatorBeacon.h"
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -40,11 +41,13 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#define NB_BEACONS_AVAILABLE 3
 
-static BeaconsSignal beaconsSignal[100];
+static BeaconsSignal beaconsSignal[NB_BEACONS_AVAILABLE];
 
-static BeaconsChannel beaconsChannel[100];
+static BeaconsChannel * beaconsChannel[NB_BEACONS_AVAILABLE];
 
+static int channel_INDEX;
 
 typedef enum{
     S_SCANNING = 0,
@@ -120,8 +123,21 @@ State_RECEIVER myState;
 
  */
 
-static void Receiver_translateChannelToBeaconsSignal(BeaconsChannel channel[]){
-    //for each -> translatorBeacon
+static void Receiver_translateChannelToBeaconsSignal(){
+    int i;
+
+	for (i = 0; i < sizeof(beaconsChannel); i++)
+	{
+		/*printf("TRANSLATING");
+		beaconsSignal[i] = TranslatorBeacon_translateChannelToBeaconsSignal(beaconsChannel[i]);
+		printf("Name %s\n", beaconsSignal[i].name);
+		printf("UUID %d\n", beaconsSignal[i].uuid[0]);
+		printf("RSSI %d\n", beaconsSignal[i].rssi);*/
+		beaconsSignal[0] = TranslatorBeacon_translateChannelToBeaconsSignal(beaconsChannel[0]);
+		printf("Name : %s\n", beaconsSignal[0].name);
+		printf("Name : %d\n", beaconsSignal[0].rssi);
+	}
+	
 }
 
 /**
@@ -195,36 +211,40 @@ static void Receiver_getAllBeaconsChannel(){
 	hci_filter_clear(&nf);
 	hci_filter_set_ptype(HCI_EVENT_PKT, &nf);
 	hci_filter_set_event(EVT_LE_META_EVENT, &nf);
-	if ( setsockopt(device, SOL_HCI, HCI_FILTER, &nf, sizeof(nf)) < 0 ) {
+	if (setsockopt(device, SOL_HCI, HCI_FILTER, &nf, sizeof(nf)) < 0){
 		hci_close_dev(device);
 		perror("Could not set socket options\n");
 	}
 
-	printf("Scanning....\n");
+	printf("Scanning...\n");
 
 	uint8_t buf[HCI_MAX_EVENT_SIZE];
 	evt_le_meta_event * meta_event;
-	le_advertising_info * info;
+	BeaconsChannel * info;
+	BeaconsSignal bs;
+	int uuid[2];
 	int len;
 
-	while(1) {
+	while(1){
 		len = read(device, buf, sizeof(buf));
-		if ( len >= HCI_EVENT_HDR_SIZE ) {
+		if ( len >= HCI_EVENT_HDR_SIZE ){
 			meta_event = (evt_le_meta_event*)(buf+HCI_EVENT_HDR_SIZE+1);
-			if ( meta_event->subevent == EVT_LE_ADVERTISING_REPORT ) {
+			if ( meta_event->subevent == EVT_LE_ADVERTISING_REPORT){
 				uint8_t reports_count = meta_event->data[0];
 				void * offset = meta_event->data + 1;
 				while ( reports_count-- ) {
-					info = (le_advertising_info *)offset;
-					char addr[18];
+					info = (BeaconsChannel *)offset;
 					if ( ret < 0 ) {
 						hci_close_dev(device);
 						perror("Failed to enable scan.");
-					}
-					ba2str(&(info->bdaddr), addr);
+					}			
 
-        //checkUUID
-        //if OK -> Translate
+					memcpy(uuid, info->data + 21, 2);
+
+					if(uuid[0] == 6170){
+						beaconsChannel[0] = info;
+						Receiver_translateChannelToBeaconsSignal();
+					}			
 
 					offset = info->data + info->length + 2;
 				}
@@ -329,10 +349,10 @@ extern void Receiver_free(){
     myState = S_DEATH;
 }
 
-/*int main(){
+int main(){
     Receiver_getAllBeaconsChannel();
-    sleep(10);
+    //sleep(10);
     Receiver_translateChannelToBeaconsSignal(beaconsChannel);
-    Receiver_ask4BeaconsSignal();
+    //Receiver_ask4BeaconsSignal();*/
     return 0;
-}*/
+}
