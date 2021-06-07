@@ -47,21 +47,22 @@ typedef struct {
  * @brief Enumeration contenant l'identifiant des differentes commandes.
  */
 typedef enum {
-    ASK_CALIBRATION_POSITIONS = 0x01,   /**< GEOMOBILE demande à GEOLOGIE la liste des positions de calibrage. */
+    ASK_CALIBRATION_POSITIONS = 0x01,       /**< GEOMOBILE demande a GEOLOGIE la liste des positions de calibrage. */
 
-    SEND_EXPERIMENTAL_POSITIONS = 0x55, /**< GEOLOGIE envoie à GEOMOBILE la liste des positions experimentales. */
-    SEND_EXPERIMENTAL_TRAJECTS = 0x56,  /**< GEOLOGIE envoie à GEOMOBILE la liste des trajets experimentaux. */
-    SEND_MEMORY_PROCESSOR_LOAD = 0x57,  /**< GEOLOGIE envoie à GEOMOBILE la charge memoire et processeur de GEOLOGIE. */
-    SEND_ALL_BEACONS_DATA = 0x58,       /**< GEOLOGIE envoie à GEOMOBILE les informations sur les balises. */
-    SEND_CURRENT_POSITION = 0x59,       /**< GEOLOGIE envoie à GEOMOBILE la position actuelle de GEOLOGIE. */
+    SEND_EXPERIMENTAL_POSITIONS = 0x02,     /**< GEOLOGIE envoie a GEOMOBILE la liste des positions experimentales. */
+    SEND_EXPERIMENTAL_TRAJECTS = 0x03,      /**< GEOLOGIE envoie a GEOMOBILE la liste des trajets experimentaux. */
+    SEND_MEMORY_PROCESSOR_LOAD = 0x04,      /**< GEOLOGIE envoie a GEOMOBILE la charge memoire et processeur de GEOLOGIE. */
+    SEND_ALL_BEACONS_DATA = 0x05,           /**< GEOLOGIE envoie a GEOMOBILE les informations sur les balises. */
+    SEND_CURRENT_POSITION = 0x06,           /**< GEOLOGIE envoie a GEOMOBILE la position actuelle de GEOLOGIE. */
 
-    REP_CALIBRATION_POSITIONS = 0x60,   /**< GEOLOGIE envoie à GEOMOBILE les positions de calibrage. */
+    REP_CALIBRATION_POSITIONS = 0x07,       /**< GEOLOGIE envoie a GEOMOBILE les positions de calibrage. */
 
-    SIGNAL_CALIBRATION_START = 0xAA,    /**< GEOMOBILE signale à GEOLOGIE une nouvelle session de calibrage. */
-    SIGNAL_CALIBRATION_POSITION = 0xAB, /**< GEOMOBILE signale à GEOLOGIE qu’il est bien place à l’emplacement de calibrage. */
-    SIGNAL_CALIRATION_END = 0xAC,       /**< GEOLOGIE signale à GEOMOBILE la fin du calibrage. */
+    SIGNAL_CALIBRATION_START = 0x08,        /**< GEOMOBILE signale a GEOLOGIE une nouvelle session de calibrage. */
+    SIGNAL_CALIBRATION_POSITION = 0x09,     /**< GEOMOBILE signale a GEOLOGIE qu’il est bien place a l’emplacement de calibrage. */
+    SIGNAL_CALIRATION_END = 0x0A,           /**< GEOLOGIE signale a GEOMOBILE la fin du calibrage. */
+    SIGNAL_CALIBRATION_END_POSITION = 0x0B,  /**< GEOLOGIE signale a GEOMOBILE la fin du calibrage a la position actuelle */
 
-    NB_COMMANDE = 10,                   /**< Le nombre de commande */
+    NB_COMMANDE = 11,                       /**< Le nombre de commande */
 } Commande;
 
 /**
