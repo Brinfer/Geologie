@@ -34,56 +34,56 @@
 /**
  * @brief Initialise ProxyLoggerMOB.
  *
- * @return int 0 en cas de succes, une autre valeur sinon.
+ * @return int8_t -1 en cas d'erreur, 0 sinon.
  */
-extern int ProxyLoggerMOB_new(void);
+extern int8_t ProxyLoggerMOB_new(void);
 
 /**
  * @brief Demarre ProxyLoggerMOB.
  *
- * @return int 0 en cas de succes, une autre valeur sinon.
+ * @return int8_t -1 en cas d'erreur, 0 sinon.
  */
-extern int ProxyLoggerMOB_start(void);
+extern int8_t ProxyLoggerMOB_start(void);
 
 /**
  * @brief Stoppe ProxyLoggerMOB.
  *
- * @return int 0 en cas de succes, une autre valeur sinon.
+ * @return int8_t -1 en cas d'erreur, 0 sinon.
  */
-extern int ProxyLoggerMOB_stop(void);
+extern int8_t ProxyLoggerMOB_stop(void);
 
 /**
  * @brief Libere le ProxyLoggerMOB.
  *
- * @return int 0 en cas de succes, une autre valeur sinon.
+ * @return int8_t -1 en cas d'erreur, 0 sinon.
  */
-extern int ProxyLoggerMOB_free(void);
+extern int8_t ProxyLoggerMOB_free(void);
 
 /**
  * @brief Envoie les trajet d'experimentation a LoggerMOB.
  *
  * @param experimentalTrajects Les trajets experimentaux a envoyer.
  * @param nbExperimentalTraject Le nombre de trajet experimentaux a envoyer.
- * @return int 0 en cas de succes, une autre valeur sinon.
+ * @return int8_t 0 en cas de succes, une autre valeur sinon.
  */
-extern int ProxyLoggerMOB_setExperimentalTrajects(const ExperimentalTraject* experimentalTrajects, unsigned short nbExperimentalTraject);
+extern int8_t ProxyLoggerMOB_setExperimentalTrajects(const ExperimentalTraject* experimentalTrajects, unsigned short nbExperimentalTraject);
 
 /**
  * @brief Envoie les position d'experimentation a LoggerMOB
  *
  * @param experimentalPositions Les position experimentale a envoyer
  * @param nbExperimentalPosition Le nombre de position experimentale a envoyer
- * @return int 0 en cas de succes, une autre valeur sinon
+ * @return int8_t -1 en cas d'erreur, 0 sinon.
  */
-extern int ProxyLoggerMOB_setExperimentalPositions(const ExperimentalPosition* experimentalPositions, unsigned short nbExperimentalPosition);
+extern int8_t ProxyLoggerMOB_setExperimentalPositions(const ExperimentalPosition* experimentalPositions, unsigned short nbExperimentalPosition);
 
 /**
  * @brief Envoie les donnees de calibration a LoggerMOB.
  *
  * @param calibrationData Les donnees de calibration a envoyer.
- * @return int 0 en cas de succes, une autre valeur sinon.
+ * @return int8_t -1 en cas d'erreur, 0 sinon.
  */
-extern int ProxyLoggerMOB_setcalibration(const CalibrationData* calibrationData);
+extern int8_t ProxyLoggerMOB_setCalibration(const CalibrationData* calibrationData);
 
 /**
  * @brief Envoie les donnees des balises a LoggerMOB.
@@ -91,26 +91,26 @@ extern int ProxyLoggerMOB_setcalibration(const CalibrationData* calibrationData)
  * @param beaconsData Les donnees des balises a envoyer.
  * @param nbBeacons Le nombre de donnees balise a envoyer
  * @param currentDate La date a laquelle les donnees on ete relevee.
- * @return int 0 en cas de succes, une autre valeur sinon.
+ * @return int8_t -1 en cas d'erreur, 0 sinon.
  */
-extern int ProxyLoggerMOB_setAllBeaconsData(const BeaconData* beaconsData, unsigned short nbBeacons, Date currentDate);
+extern int8_t ProxyLoggerMOB_setAllBeaconsData(const BeaconData* beaconsData, unsigned short nbBeacons, Date currentDate);
 
 /**
  * @brief Envoie la position actuelle a LoggerMOB.
  *
  * @param currentPosition La position a envoyer.
  * @param currentDate La date a laquelle la position a ete relevee.
- * @return int 0 en cas de succes, une autre valeur sinon.
+ * @return int8_t -1 en cas d'erreur, 0 sinon.
  */
-extern int ProxyLoggerMOB_setCurrentPosition(const Position* currentPosition, Date currentDate);
+extern int8_t ProxyLoggerMOB_setCurrentPosition(const Position* currentPosition, Date currentDate);
 
 /**
  * @brief Envoie la charge memoire et processeur a LoggerMOB.
  *
  * @param processorAndMemoryLoad
  * @param currentDate La date a laquelle la charge memoire et processuer ont ete relevees.
- * @return int 0 en cas de succes, une autre valeur sinon.
+ * @return int8_t -1 en cas d'erreur, 0 sinon.
  */
-extern int ProxyLoggerMOB_setProcessorAndMemoryLoad(const ProcessorAndMemoryLoad* processorAndMemoryLoad, Date currentDate);
+extern int8_t ProxyLoggerMOB_setProcessorAndMemoryLoad(const ProcessorAndMemoryLoad* processorAndMemoryLoad, Date currentDate);
 
 #endif // PROXY_LOGGER_MOB_
