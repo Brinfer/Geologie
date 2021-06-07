@@ -1,11 +1,10 @@
 /**
  * @file common.h
  *
- * @brief Fichier de commonuration du projet.
+ * @brief Fichier commun du projet.
  *
  * @version 1.0
  * @date 5 mai 2021
- * @author GAUTIER Pierre-Louis
  * @copyright Geo-Boot
  * @license BSD 2-clauses
  */
@@ -13,6 +12,13 @@
 #ifndef COMMON_
 #define COMMON_
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//                                              Include
+//
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#include <stdint.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -36,14 +42,10 @@
  */
 #define ATT_COEFF_1_METER (6) // TODO move
 
-/**
- * @struct type
- * @brief structure qui va prendre les coordonnees d'un point (X et Y seront des entiers et seront en cm)
- */
-typedef struct {
-    int X;
-    int Y;
-} Position;
+
+typedef uint8_t ExperimentalPositionId;
+
+typedef uint8_t ExperimentalTrajectId;
 
 /**
  * @typedef type Power
@@ -67,12 +69,6 @@ typedef float BeaconCoefficients[NB_BEACONS];
  * @brief  TODO
  *
  */
-typedef float ProcessorAndMemoryLoad[2];
-
-/**
- * @brief  TODO
- *
- */
 typedef short NbCoefficient;
 
 /**
@@ -82,23 +78,23 @@ typedef short NbCoefficient;
 typedef int CalibrationPositionId;
 
 /**
- * @brief  TODO
- * 
- */
-typedef unsigned long Date;
-
-/**
- * @struct type
  * @brief creation d'une structure qui va prendre les differentes donnees d'une balise
  */
-typedef unsigned long Date;
+typedef uint64_t Date;
 
 /**
- * @struct type
+ * @brief structure qui va prendre les coordonnees d'un point (X et Y seront des entiers et seront en cm)
+ */
+typedef struct {
+    uint32_t X;
+    uint32_t Y;
+} Position;
+
+/**
  * @brief creation d'une structure qui va prendre les differentes donnees d'une balise
  */
 typedef struct {
-    char ID[SIZE_BEACON_ID];
+    uint8_t ID[SIZE_BEACON_ID];
     Position position;
     Power power;
     AttenuationCoefficient attenuationCoefficient;
@@ -106,28 +102,36 @@ typedef struct {
     AttenuationCoefficient attenuationCoefficientsArray[NB_CALIBRATION_POSITIONS];
 } BeaconData;
 
-typedef struct
-{
-    /* data */
+typedef struct {
+    uint8_t TODO;
 } CalibrationData;
 
-typedef struct
-{
-    /* data */
+typedef struct {
+    CalibrationPositionId id;
+    Position position;
 } CalibrationPosition;
 
 /**
  * @brief  TODO
  *
  */
-typedef struct
-{
-    /* data */
+typedef struct {
+    ExperimentalTrajectId id;
+    Position* traject;
 } ExperimentalTraject;
 
-typedef struct
-{
-    /* data */
+typedef struct {
+    ExperimentalPositionId id;
+    Position position;
 } ExperimentalPosition;
+
+/**
+ * @brief  TODO
+ *
+ */
+typedef struct {
+    float memoryLoad;
+    float processorLoad;
+} ProcessorAndMemoryLoad;
 
 #endif // COMMON_
