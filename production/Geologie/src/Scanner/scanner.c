@@ -4,9 +4,6 @@
  * @file scanner.c
 
 
- *
-
-
  * @version 2.0
 
 
@@ -25,6 +22,7 @@
  */
 
 #include <stdlib.h>
+#include <pthread.h>
 #include "../common.h"
 #include "../Receiver/receiver.h"
 #include "../Geographer/geographer.h"
@@ -41,11 +39,11 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-static BeaconsData beaconsData[];
+static BeaconData beaconsData[10];
 static Position currentPosition;
 static ProcessorAndMemoryLoad currentProcessorAndMemoryLoad;
-static BeaconCoefficients beaconsCoefficient[];
-static BeaconsSignal beaconSignal[];
+static BeaconCoefficients beaconsCoefficient[10];
+static BeaconsSignal beaconSignal[10];
 
 typedef enum{
     S_BEGINNING = 0,
@@ -77,7 +75,7 @@ typedef struct {
     Action_SCANNER action;
 } Transition_SCANNER;
 
-static Transition_SCANNER stateMachine[NB_STATE - 1][NB_EVENT_SCANNER] =
+static Transition_SCANNER stateMachine[NB_STATE][NB_EVENT_SCANNER] =
 {
     [S_BEGINNING] [E_T_MAJ_DONE] = {S_WAITING_DATA_BEACONS, A_ASK_BEACONS_SIGNAL},
     [S_WAITING_DATA_BEACONS] [E_SET_BEACONS_SIGNAL] = {S_COMPUTE_POSITION, A_SET_CURRENT_POSITION},
@@ -87,6 +85,7 @@ static Transition_SCANNER stateMachine[NB_STATE - 1][NB_EVENT_SCANNER] =
 };
 
 static State_SCANNER myState;
+static pthread_t myThread;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -121,7 +120,7 @@ static void Scanner_performAction(Action_SCANNER action){
             break;
 
         case A_SET_CURRENT_POSITION:
-            MathematicianLOG_getCurrentPosition(beaconsData);
+            Mathematician_getCurrentPosition(beaconsData);
             Bookkeeper_ask4CurrentProcessorAndMemoryLoad();
             break;
 
@@ -149,7 +148,7 @@ static void Scanner_run(Event_SCANNER event){
 
     Action_SCANNER action = stateMachine[myState][event].action;
 	myState =  stateMachine[myState][event].destinationState;
-    Receiver_performAction(action);
+    Scanner_performAction(action);
 
 }
 
@@ -164,24 +163,40 @@ static void Scanner_run(Event_SCANNER event){
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+extern void Scanner_new(){
+    Receiver_new();
+    Bookkeeper_new();
+}
+
+extern void Scanner_free(){
+    Receiver_free();
+    Bookkeeper_free();
+}
+
+
 extern void Scanner_ask4StartScanner(){
+    Receiver_ask4StartReceiver();
+    Bookkeeper_askStartBookkeeper();
     myState = S_BEGINNING;
+    pthread_create(&myThread, NULL, &Scanner_run, NULL);
     //lancer le timer TMAJ : fonction de retour = ask4AllBeaconsSignal()
 }
 
 extern void Scanner_ask4StopScanner(){
-
+    Receiver_ask4StopReceiver();
+    Bookkeeper_askStopBookkeeper();
+    pthread_join(myThread, NULL);
 }
 
 
 extern void Scanner_ask4UpdateAttenuationCoefficientFromPosition(Position calibrationPosition){
 
-    int index;
+    /*int index;
     for(index = 0; index < sizeof(beaconsData); index++){
-        beaconsCoefficient[index] = MathematicianLOG_getAttenuationCoefficientFromPosition(beaconsData[index].power, beaconsData[index].Position, calibrationPosition);
+        beaconsCoefficient[index] = Mathematician_getAttenuationCoefficient(beaconsData[index].power, beaconsData[index].position, calibrationPosition); //voir avec Nathan pour les const
     }
 
-    Geographer_signalEndUpdateAttenuation();
+    Geographer_signalEndUpdateAttenuation();*/
 
 }
 
@@ -190,7 +205,7 @@ extern void Scanner_ask4AverageCalcul(){
 
     /*int index;
     for(index = 0; index < sizeof(beaconsData); index++){
-         MathematicianLOG_getAttenuationCoefficientFromPosition();
+         Mathematician_getAttenuationCoefficientFromPosition();
     }
 
     Geographer_signalEndAverageCalcul(calibrationData);*/ //TODO
