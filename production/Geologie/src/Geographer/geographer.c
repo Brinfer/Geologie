@@ -5,17 +5,17 @@
  * @date 03/06/21
  * @author Nathan BRIENT
  * @copyright BSD 2-clauses
- * 
+ *
  */
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//                                              Define 
+//                                              Define
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//                                              Include 
+//                                              Include
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #include "geographer.h"
@@ -27,22 +27,22 @@
 //                                              Variable et structure privee
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/** 
-* @brief Tableau d'entier 
-* creation d'un tableau constant d'entier 
+/**
+* @brief Tableau d'entier
+* creation d'un tableau constant d'entier
 */
 
-/** 
- * 
- * @brief On documente ce qui est privé 
- * (et uniquement ce qui
- * est privé) dans le fichier .c puisque le reste (public)
- * est documenté dans le fichier .h.
+/**
  *
- * Remarque : les variables globales sont à éviter. Elles sont
- * tolérées dans les cas connus suivants :
- * - partage de données entre tâches ou entre tâches et
- *   interruptions (attention à la synchronisation)
+ * @brief On documente ce qui est prive
+ * (et uniquement ce qui
+ * est prive) dans le fichier .c puisque le reste (public)
+ * est documente dans le fichier .h.
+ *
+ * Remarque : les variables globales sont a eviter. Elles sont
+ * tolerees dans les cas connus suivants :
+ * - partage de donnees entre tâches ou entre tâches et
+ *   interruptions (attention a la synchronisation)
  * - traduction d'une conception objet, dans le cas d'un
  *   singleton
  */
@@ -54,28 +54,28 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * @brief Ceci est une fonction privée.
+ * @brief Ceci est une fonction privee.
  *
- * On documente les fonctions privées (et seulement celles-ci) dans le .c.
+ * On documente les fonctions privees (et seulement celles-ci) dans le .c.
  *
- * Pour éviter une déclaration préalable (prototype), on les place
- * avant la définition des fonctions publiques.
+ * Pour eviter une declaration prealable (prototype), on les place
+ * avant la definition des fonctions publiques.
  *
- * @param[in,out] instance instance à initialiser
+ * @param[in,out] instance instance a initialiser
  * @param[in] val valeur d'initialisation
  */
 
 /**
  * @fn static uneFonctionPourLExemple(void)
  * @brief une fonction exemple
- * fonction exemple qui va montrer plusieurs cas à faire ou ne pas faire
- */ 
+ * fonction exemple qui va montrer plusieurs cas a faire ou ne pas faire
+ */
 
   /**
   * @brief Exemple de commentaire
-  * Un commentaire peut servir à réaliser un titre de "paragraphe",
-  * un paragraphe constituant (comme dans du texte) une étape/idée
-  * cohérente dans l'algorithme
+  * Un commentaire peut servir a realiser un titre de "paragraphe",
+  * un paragraphe constituant (comme dans du texte) une etape/idee
+  * coherente dans l'algorithme
   */
 
 
@@ -99,21 +99,21 @@ extern int Geographer_free(){
 }
 
 
-extern int Geographer_ask4SignalStartGeographer(){
+extern int Geographer_askSignalStartGeographer(){
     int returnError=EXIT_FAILURE;
 
     return returnError;
 }
 
 
-extern int Geographer_ask4SignalStopGeographer(){
+extern int Geographer_askSignalStopGeographer(){
     int returnError=EXIT_FAILURE;
 
     return returnError;
 }
 
 
-extern int Geographer_ask4CalibrationPositions(){
+extern int Geographer_askCalibrationPositions(){
     int returnError=EXIT_FAILURE;
 
     return returnError;
@@ -161,8 +161,3 @@ extern int Geographer_dateAndSendData(BeaconData beaconsData[], Position current
 
     return returnError;
 }
-
-
-
-
-

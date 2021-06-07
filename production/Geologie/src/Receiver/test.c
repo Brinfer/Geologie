@@ -92,23 +92,8 @@ static int convertBytesToInt(const unsigned char* src) {
 
 }
 
-void checkUUID(le_advertising_info * info){
-	int uuid[2] = {0};
-	int i;
-	for(i = UUID_FIRST_BYTE; i < UUID_LAST_BYTE+1; i++){
-		if(i == UUID_LAST_BYTE){
-			//printf("%d\n", info->data[i]);
-			uuid[1] = (char)info->data[i];
-		}
-		else{
-			//printf("%d", info->data[i]);
-			uuid[0] = (char)info->data[i];
-		}		
-	}
-	if(uuid[0] == 26 && uuid[1]==24){
-		translate(info);
-		//getNameAndRSSI(info);
-	}
+extern BeaconsData askAllBeaconsData(){
+    //setBeaconsData(BeaconsData)
 }
 
 int main()
