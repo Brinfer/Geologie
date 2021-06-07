@@ -25,6 +25,11 @@
  */
 
 #include <stdlib.h>
+#include "../common.h"
+#include "../Receiver/receiver.h"
+#include "../Geographer/geographer.h"
+#include "../Bookkeeper/bookkeeper.h"
+#include "scanner.h"
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -40,7 +45,7 @@ static BeaconsData beaconsData[];
 static Position currentPosition;
 static ProcessorAndMemoryLoad currentProcessorAndMemoryLoad;
 static BeaconCoefficients beaconsCoefficient[];
-static BeaconSignal beaconSignal[];
+static BeaconsSignal beaconSignal[];
 
 typedef enum{
     S_BEGINNING = 0,
