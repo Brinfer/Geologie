@@ -30,7 +30,7 @@
 /**
  * @brief Tableau de uint8_t composant un message envoye entre GEOMOBILE et GEOLOGIE.
  */
-typedef uint8_t Trame[];
+typedef uint8_t Trame;
 
 /**
  * @brief Composition du header des message envoye entre GEOMOBILE et GEOLOGIE.

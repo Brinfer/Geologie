@@ -59,7 +59,7 @@ extern uint16_t TranslatorLog_getTrameSize(Commande cmd, uint8_t nbElements);
  * @warning @a dest doit etre de la bonne taille.
  * @see #SIZE_HEADER
  */
-extern void TranslatorLog_translateTrameToHeader(const Trame trame, Header* dest);
+extern void TranslatorLog_translateTrameToHeader(const Trame * trame, Header* dest);
 
 /**
  * @brief Traduit les positions experimentales a envoyer en une trame. Compose aussi le header.
