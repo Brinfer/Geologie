@@ -33,19 +33,28 @@
  *
  */
 #define SIZE_BEACON_ID (3)
+#define NB_CALIBRATION_POSITIONS (10)
+#define ATT_COEFF_1_METER (6)
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//                                              include
+//
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#define NB_CALIBRATION_POSITIONS (10) // TODO move
-
+#include <stdint.h>
 /**
  * @brief  TODO
  *
  */
-#define ATT_COEFF_1_METER (6) // TODO move
 
 
 typedef uint8_t ExperimentalPositionId;
 
 typedef uint8_t ExperimentalTrajectId;
+typedef struct {
+    uint32_t X;
+    uint32_t Y;
+}Position;
 
 /**
  * @typedef type Power
