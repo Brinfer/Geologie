@@ -56,25 +56,25 @@ static int8_t keepGoing = 1;
 
 
 /**
- * @fn static void* listen();
+ * @fn static void* readMsg();
  * @brief methode appelee par un thread pour recevoir les action a faire 
  *
  * cette metode lira la socket et effectuera les actions
  */
-static void* listen();
+static void* readMsg();
 
 /**
- * @fn static void performAction(Action_GEOGRAPHER action, MqMsg* msg);
+ * @fn static void dispatch(Action_GEOGRAPHER action, MqMsg* msg);
  * @brief methode appelee par order pour executer les actions
  *
  * @param action action a effectuee
  * @param msg structure contenant les donnees a utiliser pour effectuer l'action
  */
-static void performAction(Trame* trame, Header* Header);
+static void dispatch(Trame* trame, Header* Header);
 
 
 
-static void performAction(Trame* trame, Header* header) {
+static void dispatch(Trame* trame, Header* header) {
     switch (header->commande)     {
     case ASK_CALIBRATION_POSITIONS:
         /* code */
@@ -125,8 +125,8 @@ static void readHeader(Header* header) {
 
 
 
-static void* listen() {
-    TRACE("listen%s","\n");
+static void* readMsg() {
+    TRACE("readMsg%s","\n");
     while (keepGoing) {
         Header header;
         readHeader(&header); //on lit d'abord le header et on le traduit
@@ -134,7 +134,7 @@ static void* listen() {
         Trame* trame;
         trame = malloc(header.size);
         PostmanLOG_readMsg(trame, header.size); //on lit ensuite toute la trame //TODO mettre un mutex sur lecture/ecriture de trame et header
-        performAction(trame,&header);
+        dispatch(trame,&header);
     }
     return 0;
 }
@@ -162,7 +162,7 @@ extern int8_t DispatcherLOG_start() {
     int8_t returnError = EXIT_FAILURE;
 
     if (returnError == EXIT_SUCCESS) {
-        returnError = pthread_create(&myThreadListen, NULL, &listen, NULL);
+        returnError = pthread_create(&myThreadListen, NULL, &readMsg, NULL);
         // premier thread pour recevoir
         if (keepGoing != EXIT_SUCCESS) {
             keepGoing = 0;
