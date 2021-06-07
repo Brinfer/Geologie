@@ -203,7 +203,6 @@ extern uint16_t TranslatorLog_getTrameSize(Commande cmd, uint8_t nbElements) {
     switch (cmd) {
         default:
         case ASK_CALIBRATION_POSITIONS:
-        case SIGNAL_CALIBRATION_START:
         case SIGNAL_CALIRATION_END:
             returnValue = SIZE_HEADER + 0;
             break;
