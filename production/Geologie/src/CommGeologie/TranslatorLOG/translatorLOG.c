@@ -314,9 +314,18 @@ extern CalibrationPositionId TranslatorLog_translateForSignalCalibrationPosition
     return trame[SIZE_HEADER];
 }
 
-extern void translateForExperimentalTrajects(uint8_t nbTraject, const ExperimentalTraject* experimentalTrajects, Trame* dest) {
+extern void TranslatorLog_translateForExperimentalTrajects(uint8_t nbTraject, const ExperimentalTraject* experimentalTrajects, Trame* dest) {
     // TODO
 }
+
+extern void Translator_translateForSignalCalibrationEnd(const Trame* dest) {
+    composeHeader(SIGNAL_CALIRATION_END, 0, dest);
+}
+
+extern void Translator_translateForSignalCalibrationEndPosition(const Trame* dest) {
+    composeHeader(SIGNAL_CALIBRATION_END_POSITION, 0, dest);
+}
+
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
