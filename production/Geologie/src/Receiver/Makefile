@@ -17,13 +17,13 @@ CCFLAGS += -I..
 #																				#
 #################################################################################
 
-all: build
+all: prod
 
 # Compilation
-build: $(OBJ)
+prod: $(OBJ)
 
 .c.o:
-	$(CC) -c $(CCFLAGS) $< -o $@ -lbluetooth
+	$(CC) -c $(CCFLAGS) $< -o $@
 
 # Nettoyage
 .PHONY: clean

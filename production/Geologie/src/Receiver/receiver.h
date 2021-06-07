@@ -1,12 +1,13 @@
 /**
  * @file receivers.h
  *
- * @brief 
+ * @brief TODO
+ *
  * @version 1.0.1
  * @date 5 mai 2021
  * @author LECENNE Gabriel
- * @copyright BSD 2-clauses
- *
+ * @copyright Geo-Boot
+ * @license BSD 2-clauses
  */
 
 //#include <stdlib.h>
@@ -24,8 +25,8 @@
 #ifndef RECEIVERS_H_
 #define RECEIVERS_H_
 
-#define RAW_DATA_FLAGS_LENGTH_INDEX 
-#define RAW_DATA_NAME_LENGTH_INDEX 
+#define RAW_DATA_FLAGS_LENGTH_INDEX
+#define RAW_DATA_NAME_LENGTH_INDEX
 #define RAW_DATA_UUID_LENGTH_INDEX
 #define RAW_DATA_FLAGS_VALUE_INDEX
 #define RAW_DATA_NAME_VALUE_INDEX
