@@ -59,7 +59,7 @@ extern int8_t PostmanLOG_start(void);
  * @param size La taille de la trame a envoyer.
  * @return int8_t 0 en cas de succes, une autre valeur sinon.
  */
-extern int8_t PostmanLOG_sendMsg(Trame trame, uint8_t size);
+extern int8_t PostmanLOG_sendMsg(Trame* trame, uint16_t size);
 
 /**
  * @brief Lie sur le socket le nombre d'octet indique.
@@ -70,7 +70,7 @@ extern int8_t PostmanLOG_sendMsg(Trame trame, uint8_t size);
  *
  * @warning Fonction bloquante.
  */
-extern int8_t PostmanLOG_readMsg(Trame destTrame, uint8_t nbToRead);
+extern int8_t PostmanLOG_readMsg(Trame* destTrame, uint8_t nbToRead);
 
 /**
  * @brief Fermeture du socket.

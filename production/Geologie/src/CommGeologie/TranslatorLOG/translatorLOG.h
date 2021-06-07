@@ -59,7 +59,7 @@ extern uint16_t TranslatorLog_getTrameSize(Commande cmd, uint8_t nbElements);
  * @warning @a dest doit etre de la bonne taille.
  * @see #SIZE_HEADER
  */
-extern void TranslatorLog_translateTrameToHeader(const Trame * trame, Header* dest);
+extern void TranslatorLog_translateTrameToHeader(const Trame* trame, Header* dest);
 
 /**
  * @brief Traduit les positions experimentales a envoyer en une trame. Compose aussi le header.
@@ -73,7 +73,7 @@ extern void TranslatorLog_translateTrameToHeader(const Trame * trame, Header* de
  * @warning @a dest doit etre de la bonne taille.
  * @see #TranslatorLog_getTrameSize
  */
-extern void TranslatorLog_translateForSendExperimentalPositions(uint8_t nbPosinbExperimentalPositionstions, const ExperimentalPosition* experimentalPositions, Trame dest);
+extern void TranslatorLog_translateForSendExperimentalPositions(uint8_t nbPosinbExperimentalPositionstions, const ExperimentalPosition* experimentalPositions, Trame* dest);
 
 /**
  * @brief Traduit les donnees balise en une trame. Compose aussi le header.
@@ -88,7 +88,7 @@ extern void TranslatorLog_translateForSendExperimentalPositions(uint8_t nbPosinb
  * @warning @a dest doit etre de la bonne taille.
  * @see #TranslatorLog_getTrameSize
  */
-extern void TranslatorLog_translateForSendAllBeaconsData(uint8_t nbBeacons, const BeaconData* beaconsData, Date currentDate, Trame dest);
+extern void TranslatorLog_translateForSendAllBeaconsData(uint8_t nbBeacons, const BeaconData* beaconsData, Date currentDate, Trame* dest);
 
 /**
  * @brief Traduit la position courante en une trame. Compose aussi le header.
@@ -102,7 +102,7 @@ extern void TranslatorLog_translateForSendAllBeaconsData(uint8_t nbBeacons, cons
  * @warning @a dest doit etre de la bonne taille.
  * @see #TranslatorLog_getTrameSize
  */
-extern void TranslatorLog_translateForSendCurrentPosition(const Position* currentPosition, Date currentDate, Trame dest);
+extern void TranslatorLog_translateForSendCurrentPosition(const Position* currentPosition, Date currentDate, Trame* dest);
 
 /**
  * @brief Traduit les donnees de calibration en une trame. Compose aussi le header.
@@ -116,7 +116,7 @@ extern void TranslatorLog_translateForSendCurrentPosition(const Position* curren
  * @warning @a dest doit etre de la bonne taille.
  * @see #TranslatorLog_getTrameSize
  */
-extern void TranslatorLog_translateForRepCalibrationPosition(uint8_t nbCalibrationPositions, const CalibrationPosition* calibrationPositions, Trame dest);
+extern void TranslatorLog_translateForRepCalibrationPosition(uint8_t nbCalibrationPositions, const CalibrationPosition* calibrationPositions, Trame* dest);
 
 /**
  * @brief Traduit la charge processeur et memoire en une trame. Compose aussi le header.
@@ -130,7 +130,7 @@ extern void TranslatorLog_translateForRepCalibrationPosition(uint8_t nbCalibrati
  * @warning @a dest doit etre de la bonne taille.
  * @see #TranslatorLog_getTrameSize
  */
-extern void TranslatorLog_translateForSendMemoryAndProcessorLoad(const ProcessorAndMemoryLoad* processorAndMemoryLoad, Date currentDate, Trame dest);
+extern void TranslatorLog_translateForSendMemoryAndProcessorLoad(const ProcessorAndMemoryLoad* processorAndMemoryLoad, Date currentDate, Trame* dest);
 
 /**
  * @brief Traduit une trame en un identifiant de position de calibration.
@@ -143,7 +143,7 @@ extern void TranslatorLog_translateForSendMemoryAndProcessorLoad(const Processor
  * @warning @a trame doit contenir le #Header.
  * @see #TranslatorLog_getTrameSize
  */
-extern CalibrationPositionId TranslatorLog_translateForSignalCalibrationPosition(const Trame trame);
+extern CalibrationPositionId TranslatorLog_translateForSignalCalibrationPosition(const Trame* trame);
 
 /**
  * @brief Traduit les trajets d'experimentation en une trame. Compose aussi le header.
@@ -157,6 +157,6 @@ extern CalibrationPositionId TranslatorLog_translateForSignalCalibrationPosition
  * @warning @a dest doit etre de la bonne taille.
  * @see #TranslatorLog_getTrameSize
  */
-extern void translateForExperimentalTrajects(uint8_t nbTraject, const ExperimentalTraject* experimentalTrajects, Trame dest);
+extern void translateForExperimentalTrajects(uint8_t nbTraject, const ExperimentalTraject* experimentalTrajects, Trame* dest);
 
 #endif // TRANSLATOR_LOG_

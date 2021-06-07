@@ -8,10 +8,10 @@ cd path/vers/le/dossier/du/projet
 
 ## Auteurs
 
-* BRIENT Nathan
-* GAUTIER Pierre-Louis
-* LECENNE Gabriel
-* MOLARD Simon
+* [BRIENT Nathan](https://www.linkedin.com/in/nathan-brient/)
+* [GAUTIER Pierre-Louis](https://www.linkedin.com/in/pierre-louis-gautier-7b1b37165/)
+* [LECENNE Gabriel](https://www.linkedin.com/in/gabriel-lecenne-461724180/)
+* [MOLARD Simon](https://www.linkedin.com/in/simon-molard-071a55197/)
 
 ## Copyright
 
@@ -147,7 +147,7 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 #### Copie du fichier vers la cible
 
-Pour partager une copie de l'executable générer à l'aide de la commande précédente, il faut utiliser la commande suivante:
+Pour partager une copie de l'executable générer à l'aide de la commande précédente, il faut utiliser la commande `scp` :
 
 ```bash
 scp <fichierACopier> <utilisateurCible>@<adresseIP>:<cheminOuCopierLeFichier>

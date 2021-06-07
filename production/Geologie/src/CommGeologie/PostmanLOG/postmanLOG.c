@@ -25,13 +25,16 @@
 #include "postmanLOG.h"
 
 #include <assert.h>
+#include <mqueue.h>
+#include <netinet/in.h>
+#include <pthread.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/socket.h>
-#include <netinet/in.h>
 
 #include "../../tools.h"
-#include "DispatcherLOG/dispatcherLOG.h"
+#include "../DispatcherLOG/dispatcherLOG.h"
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -55,7 +58,7 @@
  * @brief Le type de transmission des messages
  *
  * @see <a href="https://www.man7.org/linux/man-pages/man2/send.2.html">send()</a>
- * @see #sendMessage
+ * @see #socketSendMessage
  */
 #define SEND_FLAGS (0) // No flags
 
@@ -68,6 +71,39 @@
 #define RECV_FLAGS (MSG_WAITALL)
 
 /**
+ * @brief  TODO
+ *
+ */
+#define MQ_LABEL "MQ_POSTMAN_LOG"
+
+/**
+ * @brief  TODO
+ *
+ */
+#define MQ_MAX_MESSAGES (10)
+
+/**
+ * @brief  TODO
+ *
+ */
+#define MQ_FLAGS (O_CREAT | O_RDWR)
+
+/**
+ * @brief  TODO
+ *
+ */
+#define MQ_MODE (S_IRUSR | S_IWUSR)
+
+/**
+ * @brief  TODO
+ *
+ */
+typedef struct {
+    Trame* trame;
+    uint16_t size;
+} MqMsg;
+
+/**
  * @brief Socket serveur qui ecoute les connexions sur le port #ROBOT_PORT.
  *
  */
@@ -78,6 +114,18 @@ static int32_t myServerSocket;
  *
  */
 static int32_t myClientSocket;
+
+/**
+ * @brief  TODO
+ *
+ */
+static mqd_t myMq;
+
+/**
+ * @brief  TODO
+ *
+ */
+static pthread_t myThread;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -106,7 +154,7 @@ static int8_t tearDownSocket(void);
  * @param nbToRead Le nombre d'octet a lire.
  * @return int8_t Le nombre d'octet n'ayant pas ete lue (o en cas de succes une valeur negative sinon).
  */
-static int8_t readMessage(Trame destTrame, uint8_t nbToRead);
+static int8_t readMessage(Trame* destTrame, uint8_t nbToRead);
 
 /**
  * @brief Envoie @a size d'octet et contenue dans @a trame .
@@ -115,7 +163,7 @@ static int8_t readMessage(Trame destTrame, uint8_t nbToRead);
  * @param size La taille de la la trame a envoye.
  * @return int8_t Le nombre d'octet n'ayant pas ete envoye (o en cas de succes une valeur negative sinon).
  */
-static int8_t sendMessage(Trame trame, uint8_t size);
+static int8_t socketSendMessage(Trame* trame, uint8_t size);
 
 /**
  * @brief Accepte la connexion avec le client
@@ -131,6 +179,30 @@ static int8_t connectClient(void);
  */
 static int8_t disconnectClient(void);
 
+/**
+ * @brief  TODO
+ *
+ * @param trame
+ * @param size
+ * @return int8_t
+ */
+static int8_t mqSendMessage(const Trame* trame, uint16_t size);
+
+/**
+ * @brief  TODO
+ *
+ * @param message
+ * @return int8_t
+ */
+static int8_t mqReadMessage(MqMsg* message);
+
+/**
+ * @brief  TODO
+ *
+ * @param _
+ * @return void*
+ */
+static void* run(void* _);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -141,26 +213,43 @@ static int8_t disconnectClient(void);
 extern int8_t PostmanLOG_new(void) {
     int8_t returnError = EXIT_SUCCESS;
 
+    /* Init Socket */
     returnError = setUpSocket();
     STOP_ON_ERROR(returnError < 0);
+
+    /* Init Mq */
+    mq_unlink(MQ_LABEL);
+
+    struct mq_attr attr;
+    attr.mq_flags = 0;
+    attr.mq_maxmsg = MQ_MAX_MESSAGES;
+    attr.mq_msgsize = sizeof(MqMsg);
+    attr.mq_curmsgs = 0;
+    myMq = mq_open(MQ_LABEL, MQ_FLAGS, MQ_MODE, &attr);
+    STOP_ON_ERROR(myMq < 0);
 
     return returnError;
 }
 
 extern int8_t PostmanLOG_start(void) {
+    int8_t returnError;
+
+    returnError = pthread_create(&myThread, NULL, &run, NULL);
+    STOP_ON_ERROR(returnError < 0);
+
     return 0;
 }
 
-extern int8_t PostmanLOG_sendMsg(Trame trame, uint8_t size) {
+extern int8_t PostmanLOG_sendMsg(Trame* trame, uint16_t size) {
     int8_t returnError = EXIT_SUCCESS;
 
-    returnError = sendMessage(trame, size);
+    returnError = mqSendMessage(trame, size);
     STOP_ON_ERROR(returnError < 0);
 
     return returnError;
 }
 
-extern int8_t PostmanLOG_readMsg(Trame destTrame, uint8_t nbToRead) {
+extern int8_t PostmanLOG_readMsg(Trame* destTrame, uint8_t nbToRead) {
     int8_t returnError = EXIT_SUCCESS;
 
     returnError = readMessage(destTrame, nbToRead);
@@ -170,6 +259,7 @@ extern int8_t PostmanLOG_readMsg(Trame destTrame, uint8_t nbToRead) {
 }
 
 extern int8_t PostmanLOG_stop(void) {
+    // TODO
     return 0;
 }
 
@@ -177,6 +267,12 @@ extern int8_t PostmanLOG_free(void) {
     int8_t returnError = EXIT_SUCCESS;
 
     returnError = tearDownSocket();
+    STOP_ON_ERROR(returnError < 0);
+
+    returnError = mq_unlink(MQ_LABEL);
+    STOP_ON_ERROR(returnError < 0);
+
+    returnError = mq_close(myMq);
     STOP_ON_ERROR(returnError < 0);
 
     return returnError;
@@ -221,7 +317,7 @@ static int8_t tearDownSocket(void) {
     return returnError;
 }
 
-static int8_t readMessage(Trame destTrame, uint8_t nbToRead) {
+static int8_t readMessage(Trame* destTrame, uint8_t nbToRead) {
     TRACE("%sRead a message%s", "\033[36m", "\033[0m\n");
 
     uint8_t quantityReaddean = 0;
@@ -232,14 +328,15 @@ static int8_t readMessage(Trame destTrame, uint8_t nbToRead) {
         LOG("Error when receiving the message%s", "\n");
     } else if (quantityReaddean == 0) {
         TRACE("%s Client is disconnect%s", "\033[43m\033[37m", "\033[0m\n");
-        // DISCONECT
-        // TODO
+        disconnectClient();
+
+        // TODO > prevent dispatcher to prevent Geographer
     }
 
     return (quantityReaddean - nbToRead);
 }
 
-static int8_t sendMessage(Trame trame, uint8_t size) {
+static int8_t socketSendMessage(Trame* trame, uint8_t size) {
     TRACE("%sSend a message%s", "\033[36m", "\033[0m\n");
 
     uint8_t quantityWritten = 0;
@@ -259,14 +356,16 @@ static int8_t sendMessage(Trame trame, uint8_t size) {
 }
 
 static int8_t connectClient(void) {
-    int8_t returnError = EXIT_SUCCESS;
+    int8_t returnError;
+
+    returnError = listen(myServerSocket, MAX_PENDING_CONNECTIONS);
+    STOP_ON_ERROR(returnError < 0);
+
     myClientSocket = accept(myServerSocket, NULL, 0);
 
     if (myClientSocket < 0) {
         LOG("Error when connecting the client%s", "\n");
         returnError = -1;
-    } else {
-        LOG("Establish a connection with the client%s", "\n");
     }
 
     return returnError;
@@ -279,9 +378,55 @@ static int8_t disconnectClient(void) {
 
     if (returnError < 0) {
         LOG("Error when disconnecting the client%s", "\n");
-    } else {
-        LOG("Client is dosconnected%s", "\n");
     }
 
     return returnError;
+}
+
+static int8_t mqSendMessage(const Trame* trame, uint16_t size) {
+    int8_t returnError;
+    uint8_t* returnErrorPointeur;
+
+    Trame* msgPointer = calloc(1, size * sizeof(Trame));
+    assert(msgPointer != NULL);
+
+    returnErrorPointeur = memcpy(msgPointer, trame, size * sizeof(Trame));
+    assert(returnErrorPointeur != msgPointer);
+
+    MqMsg msg = { .size = size, .trame = msgPointer };
+    returnError = mq_send(myMq, (char*) &msg, sizeof(MqMsg), 0);
+    STOP_ON_ERROR(returnError < 0);
+
+    return returnError;
+}
+
+static int8_t mqReadMessage(MqMsg* dest) {
+    int8_t returnError;
+    returnError = mq_receive(myMq, (char*) dest, sizeof(MqMsg), NULL);
+    STOP_ON_ERROR(returnError < 0);
+    return returnError;
+}
+
+static void* run(void* _) {
+    int8_t returnError;
+
+    fd_set l_env;
+
+    while (1) {
+        connectClient();
+
+        MqMsg msg;
+        mqReadMessage(&msg);
+
+        /* Is connected test */
+        // TODO
+
+        /* send message */
+        returnError = socketSendMessage(msg.trame, msg.size);
+        STOP_ON_ERROR(returnError);
+
+        free(msg.trame);
+    }
+
+    return NULL;
 }
