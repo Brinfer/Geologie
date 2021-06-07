@@ -100,7 +100,7 @@
 
 */
 
-extern int Scanner_new();
+extern void Scanner_new();
 
 /**
 
@@ -116,7 +116,7 @@ extern int Scanner_new();
 
 */
 
-extern int Scanner_free();
+extern void Scanner_free();
 
 /**
 
@@ -130,7 +130,7 @@ extern int Scanner_free();
 
 */
 
-extern int Scanner_ask4StartScanner();
+extern void Scanner_ask4StartScanner();
 
 /**
 
@@ -144,7 +144,7 @@ extern int Scanner_ask4StartScanner();
 
 */
 
-extern int Scanner_ask4StopScanner();
+extern void Scanner_ask4StopScanner();
 
 /**
 
@@ -164,7 +164,7 @@ extern int Scanner_ask4StopScanner();
 
 */
 
-extern int Scanner_ask4UpdateAttenuationCoefficientFromPosition(Position calibrationPosition);
+extern void Scanner_ask4UpdateAttenuationCoefficientFromPosition(Position calibrationPosition);
 
 /**
 
@@ -182,7 +182,7 @@ extern int Scanner_ask4UpdateAttenuationCoefficientFromPosition(Position calibra
 
 */
 
-extern int Scanner_ask4AverageCalcul();
+extern void Scanner_ask4AverageCalcul();
 
 /**
 
@@ -204,7 +204,7 @@ extern int Scanner_ask4AverageCalcul();
 
 */
 
-extern int Scanner_setAllBeaconsSignal(BeaconsSignal beaconsSignal);
+extern void Scanner_setAllBeaconsSignal(BeaconsSignal beaconsSignal);
 
 /**
 
@@ -226,7 +226,7 @@ extern int Scanner_setAllBeaconsSignal(BeaconsSignal beaconsSignal);
 
 */
 
-extern int setCurrentProcessorAndMemoryLoad(ProcessorAndMemoryLoad currentProcessorAndMemoryLoad);
+extern void setCurrentProcessorAndMemoryLoad(ProcessorAndMemoryLoad currentProcessorAndMemoryLoad);
 
 
 #endif /* SCANNER_H */
