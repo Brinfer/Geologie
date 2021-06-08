@@ -447,7 +447,7 @@ static void performAction(Action_GEOGRAPHER anAction, MqMsg* msg) {
         break;
 
     case A_ASK_4_UPDATE_ATTENUATION_COEFFICIENT:
-        Scanner_askUpdateAttenuationCoefficientFromPosition(calibrationPositions[calibrationCounter]);
+        Scanner_ask4UpdateAttenuationCoefficientFromPosition(calibrationPositions[calibrationCounter]);
         break;
 
     case A_END_CALIBRATION_POSITION:
@@ -463,7 +463,7 @@ static void performAction(Action_GEOGRAPHER anAction, MqMsg* msg) {
         break;
 
     case A_ASK_4_AVERAGE_CALCUL:
-        Scanner_askAverageCalcul();
+        Scanner_ask4AverageCalcul();
         break;
 
     default:
@@ -507,7 +507,7 @@ extern uint8_t Geographer_free() {
     mqDone();
 
 
-    returnError = Scanner_free();
+    //returnError = Scanner_free();
 
     if (returnError == EXIT_SUCCESS) {
         ProxyLoggerMOB_free();
@@ -527,7 +527,7 @@ extern uint8_t Geographer_askSignalStartGeographer() {
         ProxyLoggerMOB_start();
     }
     if (returnError == EXIT_SUCCESS) {
-        Scanner_askStartScanner();
+        Scanner_ask4StartScanner();
     }
     myState = S_WATING_FOR_CONNECTION;
     connectionState = DISCONNECTED;
@@ -541,7 +541,7 @@ extern uint8_t Geographer_askSignalStartGeographer() {
 
 extern uint8_t Geographer_askSignalStopGeographer() {
     uint8_t returnError = EXIT_FAILURE;
-    returnError = Scanner_askStopScanner();
+    //returnError = Scanner_ask4StopScanner();
 
     if (returnError == EXIT_SUCCESS) {
         ProxyLoggerMOB_stop();

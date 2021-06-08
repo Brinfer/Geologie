@@ -115,7 +115,7 @@ extern int TranslatorBeacon_free();
 
 */
 
-extern BeaconsSignal TranslatorBeacon_translateChannelToBeaconsSignal(BeaconsChannel * beaconsChannel);
+extern BeaconSignal TranslatorBeacon_translateChannelToBeaconsSignal(BeaconsChannel * beaconsChannel);
 
 
 #endif /* TRANSLATORBEACON_H */

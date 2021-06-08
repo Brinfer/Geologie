@@ -32,13 +32,6 @@
 #define RAW_DATA_NAME_VALUE_INDEX
 #define RAW_DATA_UUID_VALUE_INDEX
 
-typedef struct {
-    char name[2];
-    int uuid[2];
-    int8_t rssi;
-    Position position;
-} BeaconsSignal;
-
 typedef le_advertising_info BeaconsChannel;
 
 extern void Receiver_new();

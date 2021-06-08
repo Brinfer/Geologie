@@ -52,7 +52,7 @@ static BeaconData beaconsData[MAX_BEACONS_DATA];
 static Position currentPosition;
 static ProcessorAndMemoryLoad currentProcessorAndMemoryLoad;
 //static BeaconCoefficients beaconsCoefficient[MAX_BEACONS_COEFFICIENTS];
-static BeaconsSignal * beaconSignal;
+static BeaconSignal * beaconSignal;
 
 typedef enum{
     S_DEATH = 0,
@@ -107,7 +107,7 @@ static Transition_SCANNER stateMachine[NB_STATE][NB_EVENT_SCANNER] =
 
 typedef struct {
     Event_SCANNER event;
-    BeaconsSignal * beaconsSignal;
+    BeaconSignal * beaconsSignal;
     ProcessorAndMemoryLoad currentProcessorAndMemoryLoad;
     CalibrationPosition calibrationPosition;
 } MqMsg;
@@ -208,7 +208,7 @@ static void performAction(Action_SCANNER action, MqMsg * msg){
 
         case A_SET_CURRENT_PROCESSOR_AND_MEMORY:
             currentProcessorAndMemoryLoad = msg->currentProcessorAndMemoryLoad;
-            Geographer_dateAndSendData(beaconsData, currentPosition, currentProcessorAndMemoryLoad);
+            Geographer_dateAndSendData(beaconsData, sizeof(BeaconData), &(currentPosition), &(currentProcessorAndMemoryLoad)); //revoir 2è arg
             MqMsg message = { 
                         .event = E_ASK_BEACONS_SIGNAL
                         };
@@ -340,7 +340,7 @@ extern void Scanner_ask4AverageCalcul(){
 }
 
 
-extern void Scanner_setAllBeaconsSignal(BeaconsSignal * beaconsSignal){
+extern void Scanner_setAllBeaconsSignal(BeaconSignal * beaconsSignal){
     MqMsg msg = { 
                 .event = E_SET_BEACONS_SIGNAL,
                 .beaconsSignal = beaconsSignal
