@@ -145,7 +145,7 @@ typedef struct {
 
 /**
  * @brief  TODO
- *
+ * 
  */
 typedef struct {
     /* data */
