@@ -62,17 +62,8 @@ extern AttenuationCoefficient Mathematician_getAttenuationCoefficient(const Powe
 * @param  beaconCoefficients tableau contenant les coefficients d'attenuations pour une balise
 * @return la moyenne des coefficients d'attenuations
 */
-extern AttenuationCoefficient Mathematician_getAverageCalcul(const BeaconCoefficients beaconCoefficients);
+extern AttenuationCoefficient Mathematician_getAverageCalcul(const BeaconCoefficients *  beaconCoefficients);
 
-
-/**
-* @fn extern AttenuationCoefficient Mathematician_getAverageCalcul(const BeaconCoefficients beaconCoefficients)
-* @brief calcul la moyenne des coefficients d'attenuations
-*
-* @param  beaconCoefficients tableau contenant les coefficients d'attenuations pour une balise
-* @return la moyenne des coefficients d'attenuations
-*/
-extern AttenuationCoefficient Mathematician_getAverageCalcul(const BeaconCoefficients beaconCoefficients);
 
 /**
 * @fn extern AttenuationCoefficient Mathematician_getCurrentPosition(const BeaconCoefficients beaconCoefficients)

@@ -43,9 +43,18 @@
  * @param nbElements Le nombre d'element composant le message.
  * @return uint16_t La taille que la trame doit avoir pour pouvoir envoyer le message.
  *
- * @todo Faire pour la commande SEND_EXPERIMENTAL_TRAJECTS
+ * @warning Pour la commande #SEND_EXPERIMENTAL_TRAJECTS, il faut utiliser #TranslatorLog_getTrameSizeExperimentalTraject.
  */
 extern uint16_t TranslatorLog_getTrameSize(Commande cmd, uint8_t nbElements);
+
+/**
+ * @brief Donne la taille de la trame necessaire pour envoyer le message de la commande #SEND_EXPERIMENTAL_TRAJECTS.
+ *
+ * @param experimentalTrajects Le trajet de trajet experimentaux a envoyer.
+ * @param nbExperimentalTrajects Le nombre de trajet experimentaux.
+ * @return uint16_t La taille que la trame doit avoir pour pouvoir envoyer le message.
+ */
+extern uint16_t TranslatorLog_getTrameSizeExperimentalTraject(const ExperimentalTraject* experimentalTrajects, uint8_t nbExperimentalTrajects);
 
 /**
  * @brief Traduit la trame en un #Header.
@@ -79,14 +88,14 @@ extern void TranslatorLog_translateForSendExperimentalPositions(uint8_t nbPosinb
  *
  * Traduit @a experimentalTrajects en une #Trame et place la traduction dans @a dest.
  *
- * @param nbTraject Le nombre de trajet experimentaux.
  * @param ExperimentalTraject Les trajet experimentaux a traduire.
+ * @param nbTraject Le nombre de trajet experimentaux.
  * @param dest La trame de destination de la traduction.
  *
  * @warning @a dest doit etre de la bonne taille.
  * @see #TranslatorLog_getTrameSize
  */
-extern void TranslatorLog_translateForExperimentalTrajects(uint8_t nbTraject, const ExperimentalTraject* experimentalTrajects, Trame* dest);
+extern void TranslatorLog_translateForExperimentalTrajects(const ExperimentalTraject* experimentalTrajects, uint8_t nbTraject, Trame* dest);
 
 /**
  * @brief Traduit les donnees balise en une trame. Compose aussi le header.
@@ -181,5 +190,19 @@ extern void Translator_translateForSignalCalibrationEnd(Trame* dest);
  * @see #TranslatorLog_getTrameSize
  */
 extern void Translator_translateForSignalCalibrationEndPosition(Trame* dest);
+
+/**
+ * @brief Compose la trame pour la commande #SEND_CALIBRATION_DATA. Compose aussi le header.
+ *
+ * Compose une une #Trame et la place dans @a dest.
+ *
+ * @param calibrationsData Les donnees de calibration a envoyer.
+ * @param nbCalibrationData Le nombre de donnee de calibration a envoyer.
+ * @param dest La trame de destination du message.
+ *
+ * @warning @a dest doit etre de la bonne taille.
+ * @see #TranslatorLog_getTrameSize
+ */
+extern void Translator_translateForSendCalibrationData(const CalibrationData* calibrationsData, uint8_t nbCalibrationData, Trame* dest);
 
 #endif // TRANSLATOR_LOG_
