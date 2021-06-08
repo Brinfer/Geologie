@@ -100,6 +100,7 @@ typedef unsigned long Date;
  * @brief Id d'une balise
  */
 typedef int CalibrationPositionId;
+
 typedef struct {
     char ID[SIZE_BEACON_ID];
     Position position;
@@ -110,7 +111,8 @@ typedef struct {
 } BeaconData;
 
 typedef struct {
-    uint8_t TODO;
+    uint8_t baliseId;
+    BeaconCoefficients * beaconCoefficient;
 } CalibrationData;
 
 typedef struct {
@@ -130,6 +132,7 @@ typedef struct {
 typedef struct {
     ExperimentalTrajectId id;
     Position* traject;
+    uint8_t nbPosition;
 } ExperimentalTraject;
 
 typedef struct {
