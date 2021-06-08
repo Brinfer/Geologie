@@ -29,6 +29,7 @@
 
 #include "receiver.h"
 #include "../translatorBeacon/translatorBeacon.h"
+#include "../common.h"
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -393,10 +394,10 @@ extern void Receiver_free(){
     myState = S_DEATH;
 }
 
-int main(){
+/*int main(){
     Receiver_getAllBeaconsChannel();
     //sleep(10);
     Receiver_translateChannelToBeaconsSignal(beaconsChannel);
-    //Receiver_ask4BeaconsSignal();*/
+    //Receiver_ask4BeaconsSignal();
     return 0;
-}
+}*/
