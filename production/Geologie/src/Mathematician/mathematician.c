@@ -67,14 +67,14 @@ extern AttenuationCoefficient Mathematician_getAttenuationCoefficient(const Powe
     return attenuationCoefficient;
 }
 
-extern AttenuationCoefficient Mathematician_getAverageCalcul(const BeaconCoefficients beaconCoefficients) {
+extern AttenuationCoefficient Mathematician_getAverageCalcul(const BeaconCoefficients *  beaconCoefficients) {
     AttenuationCoefficient somme = 0;
-    AttenuationCoefficient AttenuationCoefficient = 0;
+    AttenuationCoefficient attenuationCoefficient = 0;
     for (int i = 0; i < NB_CALIBRATION_POSITIONS; i++) {
-        somme = somme + beaconCoefficients[i];
+        somme = somme + beaconCoefficients[i].attenuationCoefficient;
     }
-    AttenuationCoefficient = somme / NB_CALIBRATION_POSITIONS;
-    return AttenuationCoefficient;
+    attenuationCoefficient = somme / NB_CALIBRATION_POSITIONS;
+    return attenuationCoefficient;
 }
 
 

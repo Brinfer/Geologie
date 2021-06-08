@@ -31,6 +31,7 @@
 #include <stdbool.h>
 fd_set l_env;
 
+#include <errno.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
@@ -76,7 +77,7 @@ fd_set l_env;
 /**
  * @brief Le nom de la boite au lettre de PostmanLOG.
  */
-#define MQ_LABEL "MQ_POSTMAN_LOG"
+#define MQ_LABEL "/MQ_POSTMAN_LOG"
 
 /**
  * @brief Le nombre maximale de message dans la boite aux lettre de PostmanLOG.
@@ -94,12 +95,19 @@ fd_set l_env;
  */
 #define MQ_MODE (S_IRUSR | S_IWUSR)
 
+
+typedef enum {
+    SEND = 0,
+    STOP = 1
+} Flag;
+
 /**
  * @brief La structure correspondant aux message passant par la boite aux letres de PostmanLOG.
  */
 typedef struct {
     Trame* trame;   /**< Un pointeur vers la #Trame a faire passer. */
     uint16_t size;  /**< La taille de la #Trame a faire passer. */
+    Flag flag;
 } MqMsg;
 
 /**
@@ -281,6 +289,8 @@ extern int8_t PostmanLOG_new(void) {
 }
 
 extern int8_t PostmanLOG_start(void) {
+    TRACE("%sStart the server%s", "\033[44m\033[37m", "\033[0m\n");
+
     int8_t returnError = EXIT_SUCCESS;
 
     setKeepGoing(true);
@@ -295,7 +305,7 @@ extern int8_t PostmanLOG_start(void) {
 extern int8_t PostmanLOG_sendMsg(Trame* trame, uint16_t size) {
     int8_t returnError = EXIT_SUCCESS;
 
-    MqMsg msg = { .size = size, .trame = trame };
+    MqMsg msg = { .size = size, .trame = trame, .flag = SEND };
 
     returnError = mqSendMessage(&msg);
     STOP_ON_ERROR(returnError < 0);
@@ -313,12 +323,20 @@ extern int8_t PostmanLOG_readMsg(Trame* destTrame, uint8_t nbToRead) {
 }
 
 extern int8_t PostmanLOG_stop(void) {
+    TRACE("%sStop the server%s", "\033[44m\033[37m", "\033[0m\n");
+
     int8_t returnError = EXIT_SUCCESS;
 
     setKeepGoing(false);
     setConnectionState(DISCONNECTED);
 
-    MqMsg msg = { .size = 0, .trame = NULL };
+    returnError = disconnectClient();
+    STOP_ON_ERROR(returnError < 0);
+
+    returnError = shutdown(myServerSocket, SHUT_RDWR); // wake up accept and recv, do not destroy the socket
+    STOP_ON_ERROR(returnError < 0);
+
+    MqMsg msg = { .size = 0, .trame = NULL, .flag = STOP };
     returnError = mqSendMessage(&msg); // wake up the PostmanLOG's thread to stop him
     STOP_ON_ERROR(returnError < 0);
 
@@ -375,8 +393,10 @@ static int8_t tearDownSocket(void) {
 
     int8_t returnError = EXIT_SUCCESS;
 
-    returnError = close(myClientSocket);
-    assert(returnError >= 0);
+    if (myClientSocket > 0) {
+        returnError = close(myClientSocket);
+        assert(returnError >= 0);
+    }
 
     returnError = close(myServerSocket);
     assert(returnError >= 0);
@@ -397,7 +417,7 @@ static int8_t socketReadMessage(Trame* destTrame, uint8_t nbToRead) {
         } else if (quantityReaddean == 0) {
             TRACE("%s Client is disconnect%s", "\033[43m\033[37m", "\033[0m\n");
             disconnectClient();
-            MqMsg msg = { .size = 0, .trame = NULL };
+            MqMsg msg = { .size = 0, .trame = NULL, .flag = STOP };
             int8_t returnError = mqSendMessage(&msg); // wake up the PostmanLOG's thread to stop him
             STOP_ON_ERROR(returnError < 0);
         }
@@ -421,7 +441,6 @@ static int8_t socketSendMessage(Trame* trame, uint8_t size) {
             quantityToWrite -= quantityWritten;
         }
     }
-
     return (quantityWritten - size);
 }
 
@@ -434,8 +453,14 @@ static int8_t connectClient(void) {
     myClientSocket = accept(myServerSocket, NULL, 0);
 
     if (myClientSocket < 0) {
-        LOG("Error when connecting the client%s", "\n");
-        returnError = -1;
+        printf("%d", errno);
+        if (errno == EINVAL) {
+            // Socket no more accept any connection
+            LOG("Connection aborted by the server%s", "\n");
+        } else {
+            LOG("Error when connecting the client%s", "\n");
+            returnError = -1;
+        }
     } else {
         setConnectionState(CONNECTED);
         DispatcherLOG_setConnectionState(CONNECTED);
@@ -516,14 +541,15 @@ static void* run(void* _) {
         }
 
         returnError = mqReadMessage(&msg);
-        STOP_ON_ERROR(returnError);
+        STOP_ON_ERROR(returnError < 0);
 
-        if (getConnectionState() == CONNECTED && getKeepGoing() == true) {
-            returnError = socketSendMessage(msg.trame, msg.size);
-            STOP_ON_ERROR(returnError);
+        if (msg.flag == SEND) {
+            if (getConnectionState() == CONNECTED && getKeepGoing() == true) {
+                returnError = socketSendMessage(msg.trame, msg.size);
+                STOP_ON_ERROR(returnError);
+            }
+            free(msg.trame);
         }
-
-        free(msg.trame);
     }
     return NULL;
 }
