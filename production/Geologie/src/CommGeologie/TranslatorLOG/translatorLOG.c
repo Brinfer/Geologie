@@ -24,6 +24,7 @@
 
 #include "../com_common.h"
 #include "../../common.h"
+#include "../../tools.h"
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -60,11 +61,6 @@
  * @brief La taille en octet d'un coefficient d'attenuation.
  */
 #define SIZE_ATTENUATION_COEFFICIENT (4)
-
-/**
- * @brief La taille en octet de l'identifiant d'une balise.
- */
-#define SIZE_BEACON_ID (3)
 
 /**
  * @brief La taille en octet de l'identifiant d'une position de calibration
@@ -238,6 +234,9 @@ extern uint16_t TranslatorLog_getTrameSize(Commande cmd, uint8_t nbElements) {
         case SIGNAL_CALIBRATION_POSITION:
             returnValue = SIZE_HEADER + SIZE_CALIBRATION_POSITION_ID;
             break;
+        case SEND_CALIBRATION_DATA:
+            returnValue = SIZE_HEADER + 1 + SIZE_BEACON_ID + SIZE_ATTENUATION_COEFFICIENT + 1 + nbElements * (SIZE_CALIBRATION_POSITION_ID + SIZE_ATTENUATION_COEFFICIENT);
+            break;
         case SEND_EXPERIMENTAL_TRAJECTS:
             STOP_ON_ERROR(1); // should use TranslatorLog_getTrameSizeExperimentalTraject
             break;
@@ -345,7 +344,7 @@ extern void TranslatorLog_translateForExperimentalTrajects(const ExperimentalTra
         dest[SIZE_HEADER + i + 1] = experimentalTrajects[i].nbPosition;
 
         for (uint8_t j = 0; j < experimentalTrajects[i].nbPosition; j++) {
-            convertPositionToByte(&(experimentalTrajects[i].traject[j]), dest[SIZE_HEADER + i + 2 + j]);
+            convertPositionToByte(&(experimentalTrajects[i].traject[j]), &(dest[SIZE_HEADER + i + 2 + j]));
         }
     }
 }
@@ -358,6 +357,33 @@ extern void Translator_translateForSignalCalibrationEndPosition(Trame* dest) {
     composeHeader(SIGNAL_CALIBRATION_END_POSITION, 0, dest);
 }
 
+extern void Translator_translateForSendCalibrationData(const CalibrationData* calibrationsData, uint8_t nbCalibrationData, Trame* dest) {
+    composeHeader(SEND_CALIBRATION_DATA, nbCalibrationData, dest);
+    uint8_t sizeBeaconCalibrationDataPrevious = SIZE_HEADER;
+
+    for (uint8_t i = 0; i < nbCalibrationData; i++) {
+        uint8_t sizeBeaconCalibrationDataCurrent = 0;
+
+        memcpy(&(dest[sizeBeaconCalibrationDataPrevious]), &(calibrationsData[i].beaconId), SIZE_BEACON_ID);
+        sizeBeaconCalibrationDataCurrent += SIZE_BEACON_ID;
+
+        convertFloatToByte(calibrationsData[i].coefficientAverage, &(dest[sizeBeaconCalibrationDataPrevious + sizeBeaconCalibrationDataCurrent]));
+        sizeBeaconCalibrationDataCurrent += 1;
+
+        dest[sizeBeaconCalibrationDataPrevious + sizeBeaconCalibrationDataCurrent] = calibrationsData[i].nbCoefficient;
+        sizeBeaconCalibrationDataCurrent += 1;
+
+        for (uint8_t j = 0; j < calibrationsData[i].nbCoefficient; j++) {
+            dest[sizeBeaconCalibrationDataPrevious + sizeBeaconCalibrationDataCurrent] = calibrationsData[i].beaconCoefficient[j].positionId;
+            sizeBeaconCalibrationDataCurrent += SIZE_CALIBRATION_POSITION_ID;
+
+            convertFloatToByte(calibrationsData[i].beaconCoefficient[j].attenuationCoefficient, &(dest[sizeBeaconCalibrationDataPrevious + sizeBeaconCalibrationDataCurrent]));
+            sizeBeaconCalibrationDataCurrent += SIZE_ATTENUATION_COEFFICIENT;
+        }
+
+        sizeBeaconCalibrationDataPrevious += sizeBeaconCalibrationDataCurrent;
+    }
+}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -422,5 +448,5 @@ static void convertBeaconDataToByte(const BeaconData* beaconData, Trame* dest) {
     convertFloatToByte(beaconData->power, dest + 1 + SIZE_POSITION);
 
     /* Attenuation Coefficient */
-    convertUint32_tToBytes(beaconData->attenuationCoefficient, dest + 1 + SIZE_POSITION + SIZE_POWER);
+    convertUint32_tToBytes(beaconData->coefficientAverage, dest + 1 + SIZE_POSITION + SIZE_POWER);
 }
