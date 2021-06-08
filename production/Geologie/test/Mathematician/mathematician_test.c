@@ -89,8 +89,8 @@ ParametersTestCalculDistancePosition parametersTestCalculDistancePosition[] = {
  */
 ParametersTestCalculDistancePower parametersTestCalculDistancePower[] = {
     {.attenuationCoefficient = 1,.power = -40,   .expectedDistance = 1},
-    {.attenuationCoefficient = 1,.power = -50,   .expectedDistance = 0},
-    {.attenuationCoefficient = 2,.power = -40,   .expectedDistance = 0.000976},
+    {.attenuationCoefficient = 1,.power = -50,   .expectedDistance = 1.0000},
+    {.attenuationCoefficient = 2,.power = -50,   .expectedDistance = 1.0000},
     {.attenuationCoefficient = 2,.power = -80,   .expectedDistance = 57.665039},
     {.attenuationCoefficient = 2,.power = -100,   .expectedDistance = 9536.743164},
     {.attenuationCoefficient = 3,.power = -50,   .expectedDistance = 0},
@@ -112,11 +112,18 @@ ParametersTestCalculDistancePower parametersTestCalculDistancePower[] = {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * @brief Teste la conversion d'une Position en un tableau d'octet.
+ * @brief Teste le calcul d'une distance avec deux position
  *
  * @param state
  */
 static void test_distanceCalculWithPosition(void** state);
+
+/**
+ * @brief Teste le calcul d'une distance avec une puissance
+ *
+ * @param state
+ */
+static void test_distanceCalculWithPower(void** state);
 
 
 /**
@@ -142,21 +149,21 @@ static const struct CMUnitTest tests[] =
 
 
     // Calcul Distance with Power
-    cmocka_unit_test_prestate(test_distanceCalculWithPosition, &(parametersTestCalculDistancePower[0])),
-    cmocka_unit_test_prestate(test_distanceCalculWithPosition, &(parametersTestCalculDistancePower[1])),
-    cmocka_unit_test_prestate(test_distanceCalculWithPosition, &(parametersTestCalculDistancePower[2])),
-    cmocka_unit_test_prestate(test_distanceCalculWithPosition, &(parametersTestCalculDistancePower[3])),
-    cmocka_unit_test_prestate(test_distanceCalculWithPosition, &(parametersTestCalculDistancePower[4])),
-    cmocka_unit_test_prestate(test_distanceCalculWithPosition, &(parametersTestCalculDistancePower[5])),
-    cmocka_unit_test_prestate(test_distanceCalculWithPosition, &(parametersTestCalculDistancePower[6])),
-    cmocka_unit_test_prestate(test_distanceCalculWithPosition, &(parametersTestCalculDistancePower[7])),
-    cmocka_unit_test_prestate(test_distanceCalculWithPosition, &(parametersTestCalculDistancePower[8])),
-    cmocka_unit_test_prestate(test_distanceCalculWithPosition, &(parametersTestCalculDistancePower[9])),
-    cmocka_unit_test_prestate(test_distanceCalculWithPosition, &(parametersTestCalculDistancePower[10])),
-    cmocka_unit_test_prestate(test_distanceCalculWithPosition, &(parametersTestCalculDistancePower[11])),
-    cmocka_unit_test_prestate(test_distanceCalculWithPosition, &(parametersTestCalculDistancePower[12])),
-    cmocka_unit_test_prestate(test_distanceCalculWithPosition, &(parametersTestCalculDistancePower[13])),
-    cmocka_unit_test_prestate(test_distanceCalculWithPosition, &(parametersTestCalculDistancePower[14])),
+    cmocka_unit_test_prestate(test_distanceCalculWithPower, &(parametersTestCalculDistancePower[0])),
+    cmocka_unit_test_prestate(test_distanceCalculWithPower, &(parametersTestCalculDistancePower[1])),
+    cmocka_unit_test_prestate(test_distanceCalculWithPower, &(parametersTestCalculDistancePower[2])),
+    cmocka_unit_test_prestate(test_distanceCalculWithPower, &(parametersTestCalculDistancePower[3])),
+    cmocka_unit_test_prestate(test_distanceCalculWithPower, &(parametersTestCalculDistancePower[4])),
+    cmocka_unit_test_prestate(test_distanceCalculWithPower, &(parametersTestCalculDistancePower[5])),
+    cmocka_unit_test_prestate(test_distanceCalculWithPower, &(parametersTestCalculDistancePower[6])),
+    cmocka_unit_test_prestate(test_distanceCalculWithPower, &(parametersTestCalculDistancePower[7])),
+    cmocka_unit_test_prestate(test_distanceCalculWithPower, &(parametersTestCalculDistancePower[8])),
+    cmocka_unit_test_prestate(test_distanceCalculWithPower, &(parametersTestCalculDistancePower[9])),
+    cmocka_unit_test_prestate(test_distanceCalculWithPower, &(parametersTestCalculDistancePower[10])),
+    cmocka_unit_test_prestate(test_distanceCalculWithPower, &(parametersTestCalculDistancePower[11])),
+    cmocka_unit_test_prestate(test_distanceCalculWithPower, &(parametersTestCalculDistancePower[12])),
+    cmocka_unit_test_prestate(test_distanceCalculWithPower, &(parametersTestCalculDistancePower[13])),
+    cmocka_unit_test_prestate(test_distanceCalculWithPower, &(parametersTestCalculDistancePower[14])),
 };
 
 /**
