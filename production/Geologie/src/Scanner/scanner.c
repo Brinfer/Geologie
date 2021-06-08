@@ -48,11 +48,12 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-static BeaconData beaconsData[MAX_BEACONS_DATA];
+static BeaconData * beaconsData;
 static Position currentPosition;
 static ProcessorAndMemoryLoad currentProcessorAndMemoryLoad;
-//static BeaconCoefficients beaconsCoefficient[MAX_BEACONS_COEFFICIENTS];
+static BeaconCoefficients * beaconsCoefficient;
 static BeaconSignal * beaconSignal;
+static CalibrationData * calibrationData;
 
 typedef enum{
     S_DEATH = 0,
@@ -176,6 +177,28 @@ static void mqReceive(MqMsg* this) {
 
 }
 
+static BeaconData * translateBeaconsSignalToBeaconsData(BeaconSignal * beaconSignal){
+    /*BeaconData * bd;
+    BeaconData data[sizeof(beaconSignal)]; //revoir size of beaconSignal
+    int index;
+    int i;
+    for (index = 0; index < sizeof(beaconSignal); index++) //revoir size of beaconSignal
+    {
+        data[index].ID = beaconSignal[index].name;
+        data[index].position = beaconSignal[index].position;
+        data[index].power = beaconSignal[index].rssi;
+        for (i = 0; i < sizeof(calibrationData); i++) //revoir calibrationData
+        {
+            if(calibrationData[i].beaconId == data[index].ID)
+            {
+                data[index].coefficientAverage = calibrationData[i].coefficientAverage;
+            }
+        }
+        bd = *(data);
+        return bd;*/
+        return 0;
+}
+
 
 /**
 
@@ -202,6 +225,7 @@ static void performAction(Action_SCANNER action, MqMsg * msg){
 
         case A_SET_CURRENT_POSITION:
             beaconSignal = msg->beaconsSignal;
+            beaconsData = translateBeaconsSignalToBeaconsData(msg->beaconsSignal);
             Mathematician_getCurrentPosition(beaconsData);
             Bookkeeper_ask4CurrentProcessorAndMemoryLoad();
             break;
@@ -216,11 +240,17 @@ static void performAction(Action_SCANNER action, MqMsg * msg){
             break;
 
         case A_ASK_CALIBRATION_FROM_POSITION:
-        //TODO
+            for(index = 0; index < sizeof(beaconsData); index++){
+                Mathematician_getAttenuationCoefficient(&(beaconsData[index].power), &(beaconsData[index].position), &(calibrationPosition)); //alimente beaconsCoeffcicient
+            }
+            Geographer_signalEndUpdateAttenuation();
             break;
 
         case A_ASK_CALIBRATION_AVERAGE:
-        //TODO
+            for(int index = 0; index < sizeof(beaconsCoefficient); index++){
+                Mathematician_getAverageCalcul(&(beaconsCoefficient[index])); //va dans calibrationData
+            }
+            //Geographer_signalEndAverageCalcul(calibrationData, ); //TODO calibrationData et demander pour nbCalibration
             break;
 
         default:
@@ -310,14 +340,6 @@ extern void Scanner_ask4UpdateAttenuationCoefficientFromPosition(CalibrationPosi
                 };
 
     sendMsg(&msg);
-    
-    /*int index;
-    AttenuationCoefficient coef;
-    for(index = 0; index < sizeof(beaconsData); index++){
-        beaconsCoefficient[index] = *(Mathematician_getAttenuationCoefficient(&(beaconsData[index].power), &(beaconsData[index].position), &(calibrationPosition)));
-    }
-
-    Geographer_signalEndUpdateAttenuation();*/
 
 }
 
@@ -329,13 +351,6 @@ extern void Scanner_ask4AverageCalcul(){
                 };
 
     sendMsg(&msg);
-
-    /*int index;
-    for(index = 0; index < sizeof(beaconsCoefficient); index++){
-         Mathematician_getAverageCalcul(&(beaconsCoefficient[index]));
-    }
-
-    //Geographer_signalEndAverageCalcul(calibrationData); //TODO calibrationData*/
 
 }
 
