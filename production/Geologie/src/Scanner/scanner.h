@@ -164,7 +164,7 @@ extern void Scanner_ask4StopScanner();
 
 */
 
-extern void Scanner_ask4UpdateAttenuationCoefficientFromPosition(Position calibrationPosition);
+extern void Scanner_ask4UpdateAttenuationCoefficientFromPosition(CalibrationPosition calibrationPosition);
 
 /**
 
