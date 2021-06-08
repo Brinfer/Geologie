@@ -67,9 +67,9 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-extern BeaconsSignal TranslatorBeacon_translateChannelToBeaconsSignal(le_advertising_info * info){
+extern BeaconSignal TranslatorBeacon_translateChannelToBeaconsSignal(le_advertising_info * info){
 
-    BeaconsSignal bs;
+    BeaconSignal bs;
 
     char posX[POSITION_LENGTH];
 	char posY[POSITION_LENGTH];

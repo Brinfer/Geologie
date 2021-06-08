@@ -204,7 +204,7 @@ extern void Scanner_ask4AverageCalcul();
 
 */
 
-extern void Scanner_setAllBeaconsSignal(BeaconsSignal beaconsSignal[]);
+extern void Scanner_setAllBeaconsSignal(BeaconSignal beaconsSignal[]);
 
 /**
 

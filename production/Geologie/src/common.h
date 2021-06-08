@@ -150,7 +150,10 @@ typedef struct {
  * 
  */
 typedef struct {
-    /* data */
+    char name[2];
+    int uuid[2];
+    int8_t rssi;
+    Position position;
 } BeaconSignal;
 
 /**
