@@ -34,7 +34,7 @@
  * @brief  TODO
  *
  */
-#define ATT_COEFF_1_METER (6) // TODO move
+#define ATT_COEFF_1_METER (50) // TODO move
 
 /**
  * @struct type

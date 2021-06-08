@@ -17,15 +17,12 @@
 //                                              Include
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 #include <string.h>
 #include <stdarg.h>
 #include <stddef.h>
 #include <setjmp.h>
 #include <limits.h>
-
 #include "cmocka.h"
-
 #include "Mathematician/mathematician.c"
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -45,6 +42,18 @@ typedef struct {
     Position positionTested[2];            /**< La Position a convertir */
     float expectedResult;    /**< Le resultat de la conversion attendue */
 } ParametersTestCalculDistancePosition;
+
+/**
+ * @struct ParametersTestCalculDistancePower
+ *
+ * @brief Structure des donnees passees en parametre des fonction de test pour la conversion des Puissances
+ * en tableau d'octet.
+ */
+typedef struct {
+    AttenuationCoefficient attenuationCoefficient;  /**< Le coefficient d'attenuation */
+    Power power;            /**< La Puissance a convertir */
+    float expectedDistance;    /**< Le resultat de la conversion attendue */
+} ParametersTestCalculDistancePower;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -71,6 +80,29 @@ ParametersTestCalculDistancePosition parametersTestCalculDistancePosition[] = {
     {.positionTested = {{.X = 1048, .Y = 82 },{.X = -85, .Y = 48}},    .expectedResult = 1133.510035},
     {.positionTested = {{.X = 72, .Y = 87 },{.X = 1001, .Y = -1001 }},    .expectedResult = 1430.658939},
     {.positionTested = {{.X = 0, .Y = 0 },{.X = 0, .Y = 0 }},    .expectedResult = 0}
+};
+
+
+/**
+ * @brief Tableau contenant les donnees de test pour la conversion des Puissances.
+ *
+ */
+ParametersTestCalculDistancePower parametersTestCalculDistancePower[] = {
+    {.attenuationCoefficient = 1,.power = -40,   .expectedDistance = 1},
+    {.attenuationCoefficient = 1,.power = -50,   .expectedDistance = 0},
+    {.attenuationCoefficient = 2,.power = -40,   .expectedDistance = 0.000976},
+    {.attenuationCoefficient = 2,.power = -80,   .expectedDistance = 57.665039},
+    {.attenuationCoefficient = 2,.power = -100,   .expectedDistance = 9536.743164},
+    {.attenuationCoefficient = 3,.power = -50,   .expectedDistance = 0},
+    {.attenuationCoefficient = 3,.power = -70,   .expectedDistance = 0.017341},
+    {.attenuationCoefficient = 3,.power = -90,   .expectedDistance = 17.757726},
+    {.attenuationCoefficient = 4,.power = -40,   .expectedDistance = 0},
+    {.attenuationCoefficient = 4,.power = -60,   .expectedDistance = 0},
+    {.attenuationCoefficient = 4,.power = -90,   .expectedDistance = 1},
+    {.attenuationCoefficient = 5,.power = -70,   .expectedDistance = 0.000104},
+    {.attenuationCoefficient = 5,.power = -100,   .expectedDistance = 1},
+    {.attenuationCoefficient = 6,.power = -60,   .expectedDistance = 0.000016},
+    {.attenuationCoefficient = 6,.power = -80,   .expectedDistance = 0.00604},
 };
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -109,8 +141,22 @@ static const struct CMUnitTest tests[] =
     cmocka_unit_test_prestate(test_distanceCalculWithPosition, &(parametersTestCalculDistancePosition[12])),
 
 
-    // Calucl Distance with Power
-
+    // Calcul Distance with Power
+    cmocka_unit_test_prestate(test_distanceCalculWithPosition, &(parametersTestCalculDistancePower[0])),
+    cmocka_unit_test_prestate(test_distanceCalculWithPosition, &(parametersTestCalculDistancePower[1])),
+    cmocka_unit_test_prestate(test_distanceCalculWithPosition, &(parametersTestCalculDistancePower[2])),
+    cmocka_unit_test_prestate(test_distanceCalculWithPosition, &(parametersTestCalculDistancePower[3])),
+    cmocka_unit_test_prestate(test_distanceCalculWithPosition, &(parametersTestCalculDistancePower[4])),
+    cmocka_unit_test_prestate(test_distanceCalculWithPosition, &(parametersTestCalculDistancePower[5])),
+    cmocka_unit_test_prestate(test_distanceCalculWithPosition, &(parametersTestCalculDistancePower[6])),
+    cmocka_unit_test_prestate(test_distanceCalculWithPosition, &(parametersTestCalculDistancePower[7])),
+    cmocka_unit_test_prestate(test_distanceCalculWithPosition, &(parametersTestCalculDistancePower[8])),
+    cmocka_unit_test_prestate(test_distanceCalculWithPosition, &(parametersTestCalculDistancePower[9])),
+    cmocka_unit_test_prestate(test_distanceCalculWithPosition, &(parametersTestCalculDistancePower[10])),
+    cmocka_unit_test_prestate(test_distanceCalculWithPosition, &(parametersTestCalculDistancePower[11])),
+    cmocka_unit_test_prestate(test_distanceCalculWithPosition, &(parametersTestCalculDistancePower[12])),
+    cmocka_unit_test_prestate(test_distanceCalculWithPosition, &(parametersTestCalculDistancePower[13])),
+    cmocka_unit_test_prestate(test_distanceCalculWithPosition, &(parametersTestCalculDistancePower[14])),
 };
 
 /**
@@ -129,4 +175,11 @@ static void test_distanceCalculWithPosition(void** state) {
     result = distanceCalculWithPosition(&param->positionTested[0], &param->positionTested[1]);
     assert_float_equal(result, param->expectedResult, EPSILON);
 
+}
+
+static void test_distanceCalculWithPower(void** state) {
+    ParametersTestCalculDistancePower* param = (ParametersTestCalculDistancePower*) *state;
+    float result;
+    result = distanceCalculWithPower(&param->power, &param->attenuationCoefficient);
+    assert_float_equal(result, param->expectedDistance, EPSILON);
 }
