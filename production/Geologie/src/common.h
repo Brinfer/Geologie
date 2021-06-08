@@ -157,6 +157,7 @@ typedef struct {
  */
 typedef struct {
     ExperimentalTrajectId id;
+    uint8_t nbPosition;
     Position* traject;
 } ExperimentalTraject;
 
@@ -164,9 +165,7 @@ typedef struct {
     ExperimentalPositionId id;
     Position position;
 } ExperimentalPosition;
-    float memoryLoad;
-    float processorLoad;
-} ProcessorAndMemoryLoad;
+
 
 typedef struct {
     /* data */
