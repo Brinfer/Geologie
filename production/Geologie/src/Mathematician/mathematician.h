@@ -47,7 +47,7 @@
  * @fn extern Mathematician_getAttenuationCoefficient(const Power* power, const Position* beaconPosition, const Position* calibrationPosition)
  * @brief calcule du coefficient d'attenuation
  *
- * @param power prend la puissance reçue de la balise
+ * @param power prend la puissance recue de la balise
  * @param beaconPosition position connue de la balise a calibrer
  * @param calibrationPosition position a calibrer
  * @return le coefficient d'attenuation calcule
@@ -62,17 +62,8 @@ extern AttenuationCoefficient Mathematician_getAttenuationCoefficient(const Powe
 * @param  beaconCoefficients tableau contenant les coefficients d'attenuations pour une balise
 * @return la moyenne des coefficients d'attenuations
 */
-extern AttenuationCoefficient Mathematician_getAverageCalcul(const AttenuationCoefficient * beaconCoefficients);
+extern AttenuationCoefficient Mathematician_getAverageCalcul(const BeaconCoefficients *  beaconCoefficients);
 
-
-/**
-* @fn extern AttenuationCoefficient Mathematician_getAverageCalcul(const BeaconCoefficients beaconCoefficients)
-* @brief calcul la moyenne des coefficients d'attenuations
-*
-* @param  beaconCoefficients tableau contenant les coefficients d'attenuations pour une balise
-* @return la moyenne des coefficients d'attenuations
-*/
-extern AttenuationCoefficient Mathematician_getAverageCalcul(const AttenuationCoefficient * beaconCoefficients);
 
 /**
 * @fn extern AttenuationCoefficient Mathematician_getCurrentPosition(const BeaconCoefficients beaconCoefficients)
