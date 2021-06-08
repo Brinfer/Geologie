@@ -4,15 +4,16 @@
 #include <stddef.h>
 #include <setjmp.h>
 
-/** Nombre de suites de tests a excuter. */
-#define NB_SUITE_TESTS 2
+/** Nombre de suites de tests a executer. */
+#define NB_SUITE_TESTS (2)
 
-extern int translator_run_tests(void);
+extern int translatorBeacon_run_tests(void);
 extern int mathematician_run_tests(void);
 
-/** Liste des suites de tests a excuter. */
+/** Liste des suites de tests a executer. */
 int (*suite_tests[])(void) = {
-    mathematician_run_tests
+    mathematician_run_tests,
+    translatorBeacon_run_tests
 };
 
 /**
