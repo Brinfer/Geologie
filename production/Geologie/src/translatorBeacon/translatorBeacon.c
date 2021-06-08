@@ -67,7 +67,16 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-extern BeaconSignal TranslatorBeacon_translateChannelToBeaconsSignal(le_advertising_info * info){
+extern int TranslatorBeacon_new() {
+    return 0;
+}
+
+extern int TranslatorBeacon_free() {
+    return 0;
+}
+
+
+extern BeaconSignal TranslatorBeacon_translateChannelToBeaconsSignal(le_advertising_info* info) {
 
     BeaconSignal bs;
 
@@ -84,7 +93,7 @@ extern BeaconSignal TranslatorBeacon_translateChannelToBeaconsSignal(le_advertis
 
 	sscanf(posX, "%d", &(bs.position.X));
 
-	memcpy(posY, info->data + DEVICE_POSITION_Y_FIRST_BYTE, POSITION_LENGTH);	
+	memcpy(posY, info->data + DEVICE_POSITION_Y_FIRST_BYTE, POSITION_LENGTH);
 
 	sscanf(posY, "%d", &(bs.position.Y));
 

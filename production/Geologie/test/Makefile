@@ -5,7 +5,7 @@
 #################################################################################
 
 # Packages.
-PACKAGES = Geographer ManagerLOG UI Mathematician Scanner CommGeologie Led
+PACKAGES = Geographer ManagerLOG UI Mathematician Scanner CommGeologie Led translatorBeacon
 
 #################################################################################
 #																				#
@@ -49,7 +49,7 @@ CCFLAGS += -fprofile-arcs -ftest-coverage -fprofile-abs-path
 #																				#
 #################################################################################
 
-SRC  = $(wildcard */*.c)
+SRC  = $(wildcard */*.c) $(wildcard */**/*.c)
 OBJ = $(SRC:.c=.o)
 
 # Point d'entre du programme
