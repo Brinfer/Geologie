@@ -443,7 +443,7 @@ static void performAction(Action_GEOGRAPHER anAction, MqMsg* msg) {
 
     case A_SET_CALIBRATION_POSITIONS:
         calibrationCounter = 0;
-        ProxyGUI_setCalibrationPositions(calibrationPositions);
+        ProxyGUI_setCalibrationPositions(calibrationPositions,NB_CALIBRATION_POSITIONS);
         break;
 
     case A_ASK_4_UPDATE_ATTENUATION_COEFFICIENT:
@@ -452,7 +452,7 @@ static void performAction(Action_GEOGRAPHER anAction, MqMsg* msg) {
 
     case A_END_CALIBRATION_POSITION:
 
-        ProxyLoggerMOB_setCalibrationData(msg->calibrationData);
+        ProxyLoggerMOB_setCalibrationData(msg->calibrationData, msg->nbCalibration);
         break;
 
     case A_END_CALIBRATION: //TODO
@@ -467,7 +467,7 @@ static void performAction(Action_GEOGRAPHER anAction, MqMsg* msg) {
         break;
 
     default:
-        TRACE("Action inconnue, pb ds la MAE de geographer \n ");
+        TRACE("Action inconnue, pb ds la MAE de geographer %s ","\n");
         break;
     }
 }
