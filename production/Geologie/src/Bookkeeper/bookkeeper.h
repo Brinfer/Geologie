@@ -1,5 +1,5 @@
 /**
- * @file bookeper.h
+ * @file bookkeeper.h
  *
  * @brief TODO
  *
@@ -41,24 +41,28 @@
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+extern void Bookkeeper_new();
+
+extern void Bookkeeper_free();
+
 /**
  * @fn extern void askStartBookkeeper(void)
  * @brief Demande le demarrage de bookkeeper.
  */
-extern void askStartBookkeeper(void);
+extern void Bookkeeper_askStartBookkeeper(void);
 
 /**
  * @fn extern void askStopBookkeeper(void)
  * 
  * @brief Demande l'arret de Bookkeeper.
  */
-extern void askStopBookkeeper(void);
+extern void Bookkeeper_askStopBookkeeper(void);
 
 /**
  * @fn extern void askCurrentProcessorAndMemoryLoad(void);
  * 
  * @brief Demande les charges mémoire et processeur actuelles.
  */
-extern void askCurrentProcessorAndMemoryLoad(void);
+extern void Bookkeeper_ask4CurrentProcessorAndMemoryLoad(void);
 
 #endif /* BOOKKEEPER */

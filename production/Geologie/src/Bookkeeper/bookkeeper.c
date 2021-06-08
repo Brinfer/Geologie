@@ -30,7 +30,7 @@
  *
  * @return float entre 1 et 100.
  */
-static float getCurrentProcessorLoad(void);
+static float Bookkeeper_getCurrentProcessorLoad(void);
 
 /**
  * @fn static  float getCurrentProcessorLoad(void)
@@ -38,7 +38,7 @@ static float getCurrentProcessorLoad(void);
  *
  * @return float entre 1 et 100.
  */
-static float getCurrentMemoryLoad(void);
+static float Bookkeeper_getCurrentMemoryLoad(void);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -46,14 +46,22 @@ static float getCurrentMemoryLoad(void);
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-extern void askStartBookkeeper(void){
+extern void Bookkeeper_new(){
 
 }
 
-extern void askStopBookkeeper(void){
+extern void Bookkeeper_free(){
+
+}
+
+extern void Bookkeeper_askStartBookkeeper(void){
+
+}
+
+extern void Bookkeeper_askStopBookkeeper(void){
     
 }
 
-extern void askCurrentProcessorAndMemoryLoad(void){
+extern void Bookkeeper_ask4CurrentProcessorAndMemoryLoad(void){
     
 }
