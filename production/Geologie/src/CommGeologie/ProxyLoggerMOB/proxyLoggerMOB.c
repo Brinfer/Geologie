@@ -31,22 +31,6 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//                                              Define
-//
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-//                                              Prototypes de fonctions
-//
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
 //                                              Fonctions publiques
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -76,7 +60,7 @@ extern int8_t ProxyLoggerMOB_setExperimentalTrajects(const ExperimentalTraject* 
     uint16_t size = TranslatorLog_getTrameSizeExperimentalTraject(experimentalTrajects, nbExperimentalTraject);
     Trame* trame = calloc(1, size);
 
-    TranslatorLog_translateForSendExperimentalT(experimentalTrajects, nbExperimentalTraject, trame);
+    TranslatorLog_translateForExperimentalTrajects(experimentalTrajects, nbExperimentalTraject, trame);
     returnError = PostmanLOG_sendMsg(trame, size);
 
     return returnError;
@@ -93,9 +77,15 @@ extern int8_t ProxyLoggerMOB_setExperimentalPositions(const ExperimentalPosition
     return returnError;
 }
 
-extern int8_t ProxyLoggerMOB_setCalibrationData(const CalibrationData* calibrationData) {
-    // TODO
-    return EXIT_SUCCESS;
+extern int8_t ProxyLoggerMOB_setCalibrationData(const CalibrationData* calibrationData, uint8_t nbCalibrationData) {
+    int8_t returnError;
+    uint16_t size = TranslatorLog_getTrameSize(SEND_CALIBRATION_DATA, nbCalibrationData);
+    Trame* trame = calloc(1, size);
+
+    Translator_translateForSendCalibrationData(calibrationData, nbCalibrationData, trame);
+    returnError = PostmanLOG_sendMsg(trame, size);
+
+    return returnError;
 }
 
 extern int8_t ProxyLoggerMOB_setAllBeaconsData(const BeaconData* beaconsData, unsigned short nbBeacons, Date currentDate) {
