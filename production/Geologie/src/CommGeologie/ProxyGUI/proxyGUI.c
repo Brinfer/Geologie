@@ -36,7 +36,6 @@
 
 
 
-static int8_t keepGoing = 1;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //                                              Fonctions privee
@@ -47,59 +46,6 @@ static int8_t keepGoing = 1;
 
 
 
-//static void performAction() {
-    // switch () {
-    // case ASK_CALIBRATION_POSITIONS:
-    //     /* code */
-    //     break;
-    // case SEND_EXPERIMENTAL_POSITIONS:
-    //     /* code */
-    //     break;
-    // case SEND_EXPERIMENTAL_TRAJECTS:
-    //     /* code */
-    //     break;
-    // case SEND_MEMORY_PROCESSOR_LOAD:
-    //     /* code */
-    //     break;
-    // case SEND_ALL_BEACONS_DATA:
-    //     /* code */
-    //     break;
-    // case SEND_CURRENT_POSITION:
-    //     /* code */
-    //     break;
-    // case REP_CALIBRATION_POSITIONS:
-    //     /* code */
-    //     break;
-    // case SIGNAL_CALIBRATION_START:
-    //     /* code */
-    //     break;
-    // case SIGNAL_CALIBRATION_POSITION:
-    //     /* code */
-    //     break;
-    // case SIGNAL_CALIRATION_END:
-    //     /* code */
-    //     break;
-    // default:
-    //     break;
-    // }
-
-//}
-/*
-static int8_t sendMsgToQueue(MqMsg* msg) { //TODO pas besoin mutex, deja protege/a revoir
-    int8_t returnError = EXIT_FAILURE;
-    if (mq_send(descripteur, (char*) &msg, sizeof(msg), 0) == 0) {
-        returnError = EXIT_SUCCESS;
-    }
-    return returnError;
-}
-*/
-
-// static int8_t sendMsg() { //TODO pas besoin mutex, deja protege/a revoir
-//     int8_t returnError = EXIT_FAILURE;
-
-//     return returnError;
-// }
-
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //                                              Fonctions publiques
@@ -108,27 +54,25 @@ static int8_t sendMsgToQueue(MqMsg* msg) { //TODO pas besoin mutex, deja protege
 
 
 extern int8_t ProxyGUI_new() {
-
+    /* Nothing to do */
+    return EXIT_SUCCESS;
 
     return 0;
 }
 
 
 extern int8_t ProxyGUI_free() {
-    return 0;
-}
+    /* Nothing to do */
+    return EXIT_SUCCESS;}
 
 extern int8_t ProxyGUI_start() {
-    int8_t returnError = EXIT_FAILURE;
-   
-    return returnError;
+    /* Nothing to do */
+    return EXIT_SUCCESS;
 }
 
 extern int8_t ProxyGUI_stop() {
-    int8_t returnError = EXIT_FAILURE;
-
-
-    return returnError;
+    /* Nothing to do */
+    return EXIT_SUCCESS;
 }
 
 

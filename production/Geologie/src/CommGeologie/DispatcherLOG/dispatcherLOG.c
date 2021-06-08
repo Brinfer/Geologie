@@ -150,14 +150,14 @@ static void* readMsg() {
 
 
 extern int8_t DispatcherLOG_new() {
-
-
-    return 0;
+    /* Nothing to do */
+    return EXIT_SUCCESS;
 }
 
 
 extern int8_t DispatcherLOG_free() {
-    return 0;
+    /* Nothing to do */
+    return EXIT_SUCCESS;
 }
 
 extern int8_t DispatcherLOG_start() {
