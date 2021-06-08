@@ -88,21 +88,21 @@ ParametersTestCalculDistancePosition parametersTestCalculDistancePosition[] = {
  *
  */
 ParametersTestCalculDistancePower parametersTestCalculDistancePower[] = {
-    {.attenuationCoefficient = 1,.power = -40,   .expectedDistance = 1},
+    {.attenuationCoefficient = 1,.power = -40,   .expectedDistance = 0.10000},
     {.attenuationCoefficient = 1,.power = -50,   .expectedDistance = 1.0000},
     {.attenuationCoefficient = 2,.power = -50,   .expectedDistance = 1.0000},
-    {.attenuationCoefficient = 2,.power = -80,   .expectedDistance = 57.665039},
-    {.attenuationCoefficient = 2,.power = -100,   .expectedDistance = 9536.743164},
-    {.attenuationCoefficient = 3,.power = -50,   .expectedDistance = 0},
-    {.attenuationCoefficient = 3,.power = -70,   .expectedDistance = 0.017341},
-    {.attenuationCoefficient = 3,.power = -90,   .expectedDistance = 17.757726},
-    {.attenuationCoefficient = 4,.power = -40,   .expectedDistance = 0},
-    {.attenuationCoefficient = 4,.power = -60,   .expectedDistance = 0},
-    {.attenuationCoefficient = 4,.power = -90,   .expectedDistance = 1},
-    {.attenuationCoefficient = 5,.power = -70,   .expectedDistance = 0.000104},
-    {.attenuationCoefficient = 5,.power = -100,   .expectedDistance = 1},
-    {.attenuationCoefficient = 6,.power = -60,   .expectedDistance = 0.000016},
-    {.attenuationCoefficient = 6,.power = -80,   .expectedDistance = 0.00604},
+    {.attenuationCoefficient = 2,.power = -80,   .expectedDistance = 31.62277},
+    {.attenuationCoefficient = 2,.power = -100,   .expectedDistance = 316.227766},
+    {.attenuationCoefficient = 3,.power = -50,   .expectedDistance = 1},
+    {.attenuationCoefficient = 3,.power = -70,   .expectedDistance = 4.64158},
+    {.attenuationCoefficient = 3,.power = -90,   .expectedDistance = 21.54434},
+    {.attenuationCoefficient = 4,.power = -40,   .expectedDistance = 0.562341},
+    {.attenuationCoefficient = 4,.power = -60,   .expectedDistance = 1.778279},
+    {.attenuationCoefficient = 4,.power = -90,   .expectedDistance = 10.00000},
+    {.attenuationCoefficient = 5,.power = -70,   .expectedDistance = 2.511886},
+    {.attenuationCoefficient = 5,.power = -100,   .expectedDistance = 10.000},
+    {.attenuationCoefficient = 6,.power = -60,   .expectedDistance = 1.467799},
+    {.attenuationCoefficient = 6,.power = -80,   .expectedDistance = 3.162277},
 };
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
