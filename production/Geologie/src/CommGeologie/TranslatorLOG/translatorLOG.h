@@ -191,4 +191,18 @@ extern void Translator_translateForSignalCalibrationEnd(Trame* dest);
  */
 extern void Translator_translateForSignalCalibrationEndPosition(Trame* dest);
 
+/**
+ * @brief Compose la trame pour la commande #SEND_CALIBRATION_DATA. Compose aussi le header.
+ *
+ * Compose une une #Trame et la place dans @a dest.
+ *
+ * @param calibrationsData Les donnees de calibration a envoyer.
+ * @param nbCalibrationData Le nombre de donnee de calibration a envoyer.
+ * @param dest La trame de destination du message.
+ *
+ * @warning @a dest doit etre de la bonne taille.
+ * @see #TranslatorLog_getTrameSize
+ */
+extern void Translator_translateForSendCalibrationData(const CalibrationData* calibrationsData, uint8_t nbCalibrationData, Trame* dest);
+
 #endif // TRANSLATOR_LOG_

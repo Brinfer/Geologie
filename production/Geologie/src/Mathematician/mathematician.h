@@ -47,7 +47,7 @@
  * @fn extern Mathematician_getAttenuationCoefficient(const Power* power, const Position* beaconPosition, const Position* calibrationPosition)
  * @brief calcule du coefficient d'attenuation
  *
- * @param power prend la puissance recue de la balise
+ * @param power prend la puissance reçue de la balise
  * @param beaconPosition position connue de la balise a calibrer
  * @param calibrationPosition position a calibrer
  * @return le coefficient d'attenuation calcule
