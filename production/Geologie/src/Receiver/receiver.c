@@ -46,7 +46,7 @@
 
 #define BEACONS_UUID 0x181A
 
-static BeaconsSignal beaconsSignal[NB_BEACONS_AVAILABLE];
+static BeaconSignal beaconsSignal[NB_BEACONS_AVAILABLE];
 
 static BeaconsChannel * beaconsChannel[NB_BEACONS_AVAILABLE];
 
@@ -132,7 +132,7 @@ static void Receiver_translateChannelToBeaconsSignal(){
     int i;
 	int index_signal = 0;
 	int index_channel = 0;
-	BeaconsSignal signal;
+	BeaconSignal signal;
 	printf("TRANSLATING\n");
 
 	signal = TranslatorBeacon_translateChannelToBeaconsSignal(beaconsChannel[0]);
@@ -254,7 +254,7 @@ static void Receiver_getAllBeaconsChannel(){
 	uint8_t buf[HCI_MAX_EVENT_SIZE];
 	evt_le_meta_event * meta_event;
 	BeaconsChannel * info;
-	BeaconsSignal bs;
+	BeaconSignal bs;
 	int uuid[2];
 	int len;
 
