@@ -11,6 +11,13 @@
 
 #ifndef COMMON_
 #define COMMON_
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//                                              Include
+//
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#include <stdint.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -42,10 +49,18 @@
  */
 #define ATT_COEFF_1_METER (6) // TODO move
 
-
 typedef uint8_t ExperimentalPositionId;
 
 typedef uint8_t ExperimentalTrajectId;
+
+/**
+ * @struct type
+ * @brief structure qui va prendre les coordonnees d'un point (X et Y seront des entiers et seront en cm)
+ */
+typedef struct {
+    int X;
+    int Y;
+} Position;
 
 /**
  * @typedef type Power
@@ -58,12 +73,17 @@ typedef float Power;
  * @brief type representant un coefficient d'attenuation
  */
 typedef float AttenuationCoefficient;
-
 /**
+ * @struct Header
  * @brief  TODO
  *
  */
+ /**
+  *  @brief  TODO
+ *
+ */
 typedef float BeaconCoefficients[NB_BEACONS];
+
 
 /**
  * @brief  TODO
@@ -71,11 +91,6 @@ typedef float BeaconCoefficients[NB_BEACONS];
  */
 typedef short NbCoefficient;
 
-/**
- * @brief  TODO
- *
- */
-typedef int CalibrationPositionId;
 
 /**
  * @brief creation d'une structure qui va prendre les differentes donnees d'une balise
@@ -93,6 +108,11 @@ typedef struct {
 /**
  * @brief creation d'une structure qui va prendre les differentes donnees d'une balise
  */
+/**
+ * @struct CalibrationPositionId
+ * @brief Id d'une balise
+ */
+typedef int CalibrationPositionId;
 typedef struct {
     uint8_t ID[SIZE_BEACON_ID];
     Position position;
@@ -111,6 +131,26 @@ typedef struct {
     Position position;
 } CalibrationPosition;
 
+
+
+
+
+
+/** * @brief  TODO
+ *
+ */
+
+typedef struct {
+    ExperimentalTrajectId id;
+    uint8_t nbPosition;
+    Position* traject;
+} ExperimentalTraject;
+
+typedef struct {
+    ExperimentalPositionId id;
+    Position position;
+} ExperimentalPosition;
+
 /**
  * @brief  TODO
  *
@@ -124,6 +164,13 @@ typedef struct {
     ExperimentalPositionId id;
     Position position;
 } ExperimentalPosition;
+    float memoryLoad;
+    float processorLoad;
+} ProcessorAndMemoryLoad;
+
+typedef struct {
+    /* data */
+} BeaconSignal;
 
 /**
  * @brief  TODO

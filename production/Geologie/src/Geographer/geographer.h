@@ -38,6 +38,8 @@
 #include "../CommGeologie/ProxyGUI/proxyGUI.h"
 #include "../CommGeologie/com_common.h"
 #include "../common.h"
+#include "../tools.h"
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //                                              Variable et structure extern
@@ -50,36 +52,36 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * @fn extern int Geographer_new()
+ * @fn extern uint8_t Geographer_new()
  * @brief Instancie et initialise l'objet Geographer
  * *
  * @return retourne 1 s'il y a une erreur dans l'execution de la methode
  *
 */
-extern int Geographer_new();
+extern uint8_t Geographer_new();
 
 /**
- * @fn extern int Geographer_free()
+ * @fn extern uint8_t Geographer_free()
  * @brief Libere et supprime l'objet Geographer
  * *
  * @return retourne 1 s'il y a une erreur dans l'execution de la methode
  *
 */
-extern int Geographer_free();
+extern uint8_t Geographer_free();
 
 /**
- * @fn extern int askSignalStartGeographer()
- * @brief Demande le demarrage de geographer
+ * @fn extern uint8_t askSignalStartGeographer()
+ * @brief Demande le démarrage de geographer
  *
  * Demande a geographer de demarrer, demarre le thread
  *
  * @return retourne 1 s'il y a une erreur dans l'execution de la methode
  *
 */
-extern int Geographer_askSignalStartGeographer();
+extern uint8_t Geographer_askSignalStartGeographer();
 
 /**
- * @fn extern int askSignalSStopGeographer()
+ * @fn extern uint8_t askSignalSStopGeographer()
  * @brief Demande l'arret de geographer
  *
  * Demande a geographer de s'arreter, arrete le thread ferme la boite aux lettres
@@ -87,10 +89,10 @@ extern int Geographer_askSignalStartGeographer();
  * @return retourne 1 s'il y a une erreur dans l'execution de la methode
  *
 */
-extern int Geographer_askSignalStopGeographer();
+extern uint8_t Geographer_askSignalStopGeographer();
 
 /**
- * @fn extern int askCalibrationPositions()
+ * @fn extern uint8_t askCalibrationPositions()
  * @brief Demande les positions de calibrage
  *
  * Demande a geographer les positions de calibrage qui les enverra a GUI
@@ -100,10 +102,10 @@ extern int Geographer_askSignalStopGeographer();
  * @return retourne 1 s'il y a une erreur dans l'execution de la methode
  *
 */
-extern int Geographer_askCalibrationPositions();
+extern uint8_t Geographer_askCalibrationPositions();
 
 /**
- * @fn extern int Geographer_validatePosition(CalibrationPositionId calibrationPositionId)
+ * @fn extern uint8_t Geographer_validatePosition(CalibrationPositionId calibrationPositionId)
  *
  * @brief Valide la demande de calibration a la position ayant calibrationPositionId comme Id
  *
@@ -113,10 +115,10 @@ extern int Geographer_askCalibrationPositions();
  * @return retourne 1 s'il y a une erreur dans l'execution de la methode
  *
 */
-extern int Geographer_validatePosition(CalibrationPositionId calibrationPositionId);
+extern uint8_t Geographer_validatePosition(CalibrationPositionId calibrationPositionId);
 
 /**
- * @fn extern int Geographer_signalEndUpdateAttenuation()
+ * @fn extern uint8_t Geographer_signalEndUpdateAttenuation()
  *
  * @brief Signale la fin du calcul d'attenuation pour une balise
  *
@@ -126,10 +128,10 @@ extern int Geographer_validatePosition(CalibrationPositionId calibrationPosition
  * @return retourne 1 s'il y a une erreur dans l'execution de la methode
  *
 */
-extern int Geographer_signalEndUpdateAttenuation();
+extern uint8_t Geographer_signalEndUpdateAttenuation();
 
 /**
- * @fn extern int Geographer_signalEndAverageCalcul(CalibrationData calibrationData[])
+ * @fn extern uint8_t Geographer_signalEndAverageCalcul(CalibrationData calibrationData[])
  *
  * @brief Signale la fin du calcul d'attenuation moyen pour chaque balise
  *
@@ -141,10 +143,10 @@ extern int Geographer_signalEndUpdateAttenuation();
  * @return retourne 1 s'il y a une erreur dans l'execution de la methode
  *
 */
-extern int Geographer_signalEndAverageCalcul(CalibrationData calibrationData[]);
+extern uint8_t Geographer_signalEndAverageCalcul(CalibrationData calibrationData[], uint8_t nbCalibration);
 
 /**
- * @fn extern int Geographer_signalConnectionEstablished()
+ * @fn extern uint8_t Geographer_signalConnectionEstablished()
  *
  * @brief Signale la connexion entre GEOLOGIE et GEOMOBILE
  *
@@ -154,10 +156,10 @@ extern int Geographer_signalEndAverageCalcul(CalibrationData calibrationData[]);
  * @return retourne 1 s'il y a une erreur dans l'execution de la methode
  *
 */
-extern int Geographer_signalConnectionEstablished();
+extern uint8_t Geographer_signalConnectionEstablished();
 
 /**
- * @fn extern int Geographer_signalConnectionDown()
+ * @fn extern uint8_t Geographer_signalConnectionDown()
  *
  * @brief Signale la fin de la connexion entre GEOLOGIE et GEOMOBILE
  *
@@ -167,10 +169,10 @@ extern int Geographer_signalConnectionEstablished();
  * @return retourne 1 s'il y a une erreur dans l'execution de la methode
  *
 */
-extern int Geographer_signalConnectionDown();
+extern uint8_t Geographer_signalConnectionDown();
 
 /**
- * @fn extern int Geographer_dateAndSendData(BeaconData beaconsData[], Position currentPosition, ProcessorAndMemoryLoad currentProcessorAndMemoryLoad)
+ * @fn extern uint8_t Geographer_dateAndSendData(BeaconData beaconsData[], Position currentPosition, ProcessorAndMemoryLoad currentProcessorAndMemoryLoad)
  *
  * @brief Reçoit les donnee actuelle, les dates et les renvoie
  *
@@ -182,7 +184,6 @@ extern int Geographer_signalConnectionDown();
  * @return retourne 1 s'il y a une erreur dans l'execution de la methode
  *
 */
-extern int Geographer_dateAndSendData(BeaconData beaconsData[], Position currentPosition, ProcessorAndMemoryLoad currentProcessorAndMemoryLoad);
-
+extern uint8_t Geographer_dateAndSendData(BeaconData * beaconsData, uint8_t beaconsDataSize, Position * currentPosition, ProcessorAndMemoryLoad * currentProcessorAndMemoryLoad);
 
 #endif /* GEOGRAPHER_H */

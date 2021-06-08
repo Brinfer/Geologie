@@ -441,7 +441,6 @@ static int8_t socketSendMessage(Trame* trame, uint8_t size) {
             quantityToWrite -= quantityWritten;
         }
     }
-
     return (quantityWritten - size);
 }
 

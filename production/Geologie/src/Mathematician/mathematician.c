@@ -67,7 +67,7 @@ extern AttenuationCoefficient Mathematician_getAttenuationCoefficient(const Powe
     return attenuationCoefficient;
 }
 
-extern AttenuationCoefficient Mathematician_getAverageCalcul(const BeaconCoefficients beaconCoefficients) {
+extern AttenuationCoefficient Mathematician_getAverageCalcul(const AttenuationCoefficient * beaconCoefficients) {
     AttenuationCoefficient somme = 0;
     AttenuationCoefficient AttenuationCoefficient = 0;
     for (int i = 0; i < NB_CALIBRATION_POSITIONS; i++) {
