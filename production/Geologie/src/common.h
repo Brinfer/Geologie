@@ -75,7 +75,10 @@ typedef float AttenuationCoefficient;
   *  @brief  TODO
  *
  */
-typedef float BeaconCoefficients[NB_BEACONS];
+typedef struct {
+    uint8_t positionId;
+    AttenuationCoefficient attenuationCoefficientAverage;
+}BeaconCoefficients;
 
 
 /**
@@ -105,20 +108,20 @@ typedef struct {
     char ID[SIZE_BEACON_ID];
     Position position;
     Power power;
-    AttenuationCoefficient attenuationCoefficient;
-    unsigned char nbCoefficientAttenuations;
-    AttenuationCoefficient attenuationCoefficientsArray[NB_CALIBRATION_POSITIONS];
+    AttenuationCoefficient coefficientAverage;
 } BeaconData;
 
 typedef struct {
-    uint8_t baliseId;
-    BeaconCoefficients * beaconCoefficient;
+    uint8_t beaconId;
+    BeaconCoefficients* beaconCoefficient;
+    uint8_t nbCoefficient;
+    AttenuationCoefficient coefficientAverage;
 } CalibrationData;
 
 typedef struct {
     CalibrationPositionId id;
     Position position;
-} CalibrationPosition;
+}CalibrationPosition;
 
 
 
