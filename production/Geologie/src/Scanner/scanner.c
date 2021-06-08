@@ -30,9 +30,13 @@
 #include "../Receiver/receiver.h"
 #include "../Geographer/geographer.h"
 #include "../Bookkeeper/bookkeeper.h"
+#include "../Watchdog/watchdog.h"
 #include "scanner.h"
 
 #define MQ_MAX_MESSAGES (5)
+#define MAX_BEACONS_SIGNAL 10
+#define MAX_BEACONS_COEFFICIENTS 10
+#define MAX_BEACONS_DATA 10
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -44,14 +48,15 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-static BeaconData beaconsData[10];
+static BeaconData beaconsData[MAX_BEACONS_DATA];
 static Position currentPosition;
 static ProcessorAndMemoryLoad currentProcessorAndMemoryLoad;
-static BeaconCoefficients beaconsCoefficient[10];
-static BeaconsSignal beaconSignal[10];
+//static BeaconCoefficients beaconsCoefficient[MAX_BEACONS_COEFFICIENTS];
+static BeaconsSignal * beaconSignal;
 
 typedef enum{
-    S_BEGINNING = 0,
+    S_DEATH = 0,
+    S_BEGINNING,
     S_WAITING_DATA_BEACONS,
     S_COMPUTE_POSITION,
     S_COMPUTE_LOAD,
@@ -62,11 +67,11 @@ typedef enum{
 
 typedef enum {
     E_STOP = 0,
+    E_ASK_BEACONS_SIGNAL,
     E_ASK_UPDATE_COEF_FROM_POSITION,
     E_ASK_AVERAGE_CALCUL,
     E_SET_BEACONS_SIGNAL,
     E_SET_PROCESSOR_AND_MEMORY,
-    E_T_MAJ_DONE,
     NB_EVENT_SCANNER
 } Event_SCANNER;
 
@@ -88,10 +93,10 @@ typedef struct {
 
 static Transition_SCANNER stateMachine[NB_STATE][NB_EVENT_SCANNER] =
 {
-    [S_BEGINNING] [E_T_MAJ_DONE] = {S_WAITING_DATA_BEACONS, A_ASK_BEACONS_SIGNAL},
+    [S_BEGINNING] [E_ASK_BEACONS_SIGNAL] = {S_WAITING_DATA_BEACONS, A_ASK_BEACONS_SIGNAL},
     [S_WAITING_DATA_BEACONS] [E_SET_BEACONS_SIGNAL] = {S_COMPUTE_POSITION, A_SET_CURRENT_POSITION},
     [S_COMPUTE_POSITION] [E_SET_PROCESSOR_AND_MEMORY] = {S_COMPUTE_LOAD, A_SET_CURRENT_PROCESSOR_AND_MEMORY},
-    [S_COMPUTE_LOAD] [E_T_MAJ_DONE] = {S_WAITING_DATA_BEACONS, A_ASK_BEACONS_SIGNAL},
+    [S_COMPUTE_LOAD] [E_ASK_BEACONS_SIGNAL] = {S_WAITING_DATA_BEACONS, A_ASK_BEACONS_SIGNAL},
     [S_WAITING_DATA_BEACONS] [E_ASK_UPDATE_COEF_FROM_POSITION] = {S_COMPUTE_CALIBRATION_POSITION, A_ASK_CALIBRATION_FROM_POSITION},
     [S_COMPUTE_POSITION] [E_ASK_UPDATE_COEF_FROM_POSITION] = {S_COMPUTE_CALIBRATION_POSITION, A_ASK_CALIBRATION_FROM_POSITION},
     [S_COMPUTE_LOAD] [E_ASK_UPDATE_COEF_FROM_POSITION] = {S_COMPUTE_CALIBRATION_POSITION, A_ASK_CALIBRATION_FROM_POSITION},   
@@ -108,12 +113,13 @@ typedef struct {
 } MqMsg;
 
 static State_SCANNER myState;
-static Event_SCANNER myEvent;
 static pthread_t myThread;
 
 static const char BAL[] = "/BALScanner";
 static mqd_t descripteur;
 static struct mq_attr attr;
+
+Watchdog * wtd_TMaj;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -182,7 +188,7 @@ static void mqReceive(MqMsg* this) {
 
  */
 
-static void performAction(Action_SCANNER action){
+static void performAction(Action_SCANNER action, MqMsg * msg){
 
     switch (action) {
         case A_STOP:
@@ -190,16 +196,31 @@ static void performAction(Action_SCANNER action){
             break;
 
         case A_ASK_BEACONS_SIGNAL:
-            Receiver_ask4BeaconsSignal();        
+            Watchdog_start(wtd_TMaj);
+            Receiver_ask4BeaconsSignal();
             break;
 
         case A_SET_CURRENT_POSITION:
+            beaconSignal = msg->beaconsSignal;
             Mathematician_getCurrentPosition(beaconsData);
             Bookkeeper_ask4CurrentProcessorAndMemoryLoad();
             break;
 
         case A_SET_CURRENT_PROCESSOR_AND_MEMORY:
+            currentProcessorAndMemoryLoad = msg->currentProcessorAndMemoryLoad;
             Geographer_dateAndSendData(beaconsData, currentPosition, currentProcessorAndMemoryLoad);
+            MqMsg message = { 
+                        .event = E_ASK_BEACONS_SIGNAL
+                        };
+            sendMsg(&message);
+            break;
+
+        case A_ASK_CALIBRATION_FROM_POSITION:
+        //TODO
+            break;
+
+        case A_ASK_CALIBRATION_AVERAGE:
+        //TODO
             break;
 
         default:
@@ -219,11 +240,21 @@ static void performAction(Action_SCANNER action){
  */
 
 static void * run(){
-    printf("run\n");
-    Action_SCANNER action = stateMachine[myState][myEvent].action;
-	myState =  stateMachine[myState][myEvent].destinationState;
-    performAction(action);
-    return 0;
+    
+    MqMsg msg;
+
+    Action_SCANNER action;
+
+    while (myState != S_DEATH) {
+
+        mqReceive(&msg); 
+        action = stateMachine[myState][msg.event].action;
+        performAction(action, &msg);
+        myState =  stateMachine[myState][msg.event].destinationState;
+
+    }
+        
+   return 0;
 }
 
 
@@ -238,11 +269,15 @@ static void * run(){
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 extern void Scanner_new(){
+    wtd_TMaj = Watchdog_construct(1000000, &(Receiver_ask4BeaconsSignal));
+    myState = S_BEGINNING;
     Receiver_new();
     Bookkeeper_new();
 }
 
 extern void Scanner_free(){
+    myState = S_DEATH;
+    Watchdog_destroy(wtd_TMaj);
     Receiver_free();
     Bookkeeper_free();
 }
@@ -253,9 +288,11 @@ extern void Scanner_ask4StartScanner(){
     Receiver_ask4StartReceiver();
     Bookkeeper_askStartBookkeeper();
     mqInit();
-    myState = S_BEGINNING;
+    MqMsg msg = { 
+                .event = E_ASK_BEACONS_SIGNAL
+                };
+    sendMsg(&msg);
     pthread_create(&myThread, NULL, &run, NULL);
-    //lancer le timer TMAJ : fonction de retour = ask4AllBeaconsSignal()
 }
 
 extern void Scanner_ask4StopScanner(){
@@ -265,7 +302,14 @@ extern void Scanner_ask4StopScanner(){
 }
 
 
-extern void Scanner_ask4UpdateAttenuationCoefficientFromPosition(Position calibrationPosition){
+extern void Scanner_ask4UpdateAttenuationCoefficientFromPosition(CalibrationPosition calibrationPosition){
+
+    MqMsg msg = { 
+                .event = E_ASK_UPDATE_COEF_FROM_POSITION,
+                .calibrationPosition = calibrationPosition
+                };
+
+    sendMsg(&msg);
     
     /*int index;
     AttenuationCoefficient coef;
@@ -279,6 +323,12 @@ extern void Scanner_ask4UpdateAttenuationCoefficientFromPosition(Position calibr
 
 
 extern void Scanner_ask4AverageCalcul(){
+    
+    MqMsg msg = { 
+                .event = E_ASK_AVERAGE_CALCUL
+                };
+
+    sendMsg(&msg);
 
     /*int index;
     for(index = 0; index < sizeof(beaconsCoefficient); index++){
@@ -295,12 +345,8 @@ extern void Scanner_setAllBeaconsSignal(BeaconsSignal * beaconsSignal){
                 .event = E_SET_BEACONS_SIGNAL,
                 .beaconsSignal = beaconsSignal
                 };
-    int index;
-    for(index = 0; index < sizeof(beaconsSignal); index++){
-        beaconSignal[index] = beaconsSignal[index];
-    }
 
-    myEvent = E_SET_BEACONS_SIGNAL;  
+    sendMsg(&msg);
 }
 
 
@@ -311,8 +357,6 @@ extern void Scanner_setCurrentProcessorAndMemoryLoad(ProcessorAndMemoryLoad curr
                 .currentProcessorAndMemoryLoad = currentPAndMLoad
                 };
 
-    currentProcessorAndMemoryLoad = currentPAndMLoad;
-
-    myEvent = E_SET_PROCESSOR_AND_MEMORY;
+    sendMsg(&msg);
 
 }
