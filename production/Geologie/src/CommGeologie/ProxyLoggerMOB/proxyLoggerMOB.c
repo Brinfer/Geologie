@@ -72,8 +72,14 @@ extern int8_t ProxyLoggerMOB_free(void) {
 }
 
 extern int8_t ProxyLoggerMOB_setExperimentalTrajects(const ExperimentalTraject* experimentalTrajects, unsigned short nbExperimentalTraject) {
-    // TODO
-    return EXIT_SUCCESS;
+    int8_t returnError;
+    uint16_t size = TranslatorLog_getTrameSizeExperimentalTraject(experimentalTrajects, nbExperimentalTraject);
+    Trame* trame = calloc(1, size);
+
+    TranslatorLog_translateForSendExperimentalT(experimentalTrajects, nbExperimentalTraject, trame);
+    returnError = PostmanLOG_sendMsg(trame, size);
+
+    return returnError;
 }
 
 extern int8_t ProxyLoggerMOB_setExperimentalPositions(const ExperimentalPosition* experimentalPositions, unsigned short nbExperimentalPosition) {
@@ -87,7 +93,7 @@ extern int8_t ProxyLoggerMOB_setExperimentalPositions(const ExperimentalPosition
     return returnError;
 }
 
-extern int8_t ProxyLoggerMOB_setCalibration(const CalibrationData* calibrationData) {
+extern int8_t ProxyLoggerMOB_setCalibrationData(const CalibrationData* calibrationData) {
     // TODO
     return EXIT_SUCCESS;
 }
