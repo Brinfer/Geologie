@@ -12,9 +12,9 @@
 //                                              Define
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#define EXP_POSITION_NUMBER 12
-#define EXP_TRAJECT_NUMBER 12
-#define CALIBRATION_POSITION_NUMBER 12
+#define EXP_POSITION_NUMBER (25)
+#define EXP_TRAJECT_NUMBER (3)
+#define CALIBRATION_POSITION_NUMBER (25)
 
 #define MQ_MAX_MESSAGES (10)
 
@@ -40,11 +40,85 @@
 * @brief Tableau d'entier
 * creation d'un tableau constant d'entier
 */
-static ExperimentalPosition experimentalPositions[EXP_POSITION_NUMBER];
+static ExperimentalPosition experimentalPositions[]={
+    {.id = 1, .position = {.X = 550, .Y = 200}},
+    {.id = 2, .position = {.X = 550, .Y = 400}},
+    {.id = 3, .position = {.X = 550, .Y = 480}},
+    {.id = 4, .position = {.X = 550, .Y = 600}},
+    {.id = 5, .position = {.X = 550, .Y = 800}},
+    {.id = 6, .position = {.X = 550, .Y = 1000}},
+    {.id = 7, .position = {.X = 550, .Y = 1200}},
+    {.id = 8, .position = {.X = 500, .Y = 1200}},
+    {.id = 9, .position = {.X = 600, .Y = 1200}},
+    {.id = 10, .position = {.X = 410, .Y = 1060}},
+    {.id = 11, .position = {.X = 360, .Y = 970}},
+    {.id = 12, .position = {.X = 260, .Y = 800}},
+    {.id = 13, .position = {.X = 160, .Y = 630}},
+    {.id = 14, .position = {.X = 150, .Y = 480}},
+    {.id = 15, .position = {.X = 350, .Y = 480}},
+    {.id = 16, .position = {.X = 750, .Y = 480}},
+    {.id = 17, .position = {.X = 950, .Y = 480}},
+    {.id = 18, .position = {.X = 930, .Y = 630}},
+    {.id = 19, .position = {.X = 800, .Y = 800}},
+    {.id = 20, .position = {.X = 750, .Y = 1000}},
+    {.id = 21, .position = {.X = 650, .Y = 1150}},
+    {.id = 22, .position = {.X = 950, .Y = 1300}},
+    {.id = 23, .position = {.X = 150, .Y = 1300}},
+    {.id = 24, .position = {.X = 150, .Y = 200}},
+    {.id = 25, .position = {.X = 950, .Y = 200}}
+};
 
-static CalibrationPosition calibrationPositions[CALIBRATION_POSITION_NUMBER];
+static CalibrationPosition calibrationPositions[]={
+    {.id = 1, .position = {.X = 550, .Y = 200}},
+    {.id = 2, .position = {.X = 550, .Y = 400}},
+    {.id = 3, .position = {.X = 550, .Y = 480}},
+    {.id = 4, .position = {.X = 550, .Y = 600}},
+    {.id = 5, .position = {.X = 550, .Y = 800}},
+    {.id = 6, .position = {.X = 550, .Y = 1000}},
+    {.id = 7, .position = {.X = 550, .Y = 1200}},
+    {.id = 8, .position = {.X = 500, .Y = 1200}},
+    {.id = 9, .position = {.X = 600, .Y = 1200}},
+    {.id = 10, .position = {.X = 410, .Y = 1060}},
+    {.id = 11, .position = {.X = 360, .Y = 970}},
+    {.id = 12, .position = {.X = 260, .Y = 800}},
+    {.id = 13, .position = {.X = 160, .Y = 630}},
+    {.id = 14, .position = {.X = 150, .Y = 480}},
+    {.id = 15, .position = {.X = 350, .Y = 480}},
+    {.id = 16, .position = {.X = 750, .Y = 480}},
+    {.id = 17, .position = {.X = 950, .Y = 480}},
+    {.id = 18, .position = {.X = 930, .Y = 630}},
+    {.id = 19, .position = {.X = 800, .Y = 800}},
+    {.id = 20, .position = {.X = 750, .Y = 1000}},
+    {.id = 21, .position = {.X = 650, .Y = 1150}},
+    {.id = 22, .position = {.X = 950, .Y = 1300}},
+    {.id = 23, .position = {.X = 150, .Y = 1300}},
+    {.id = 24, .position = {.X = 150, .Y = 200}},
+    {.id = 25, .position = {.X = 950, .Y = 200}}
+};
 
-static ExperimentalTraject experimentalTrajects[EXP_TRAJECT_NUMBER];
+
+Position traject1[]={
+    {.X = 100, .Y = 1300 },
+    {.X = 1000, .Y = 1300 },
+    {.X = 1000, .Y = 200 },
+    {.X = 100, .Y = 200 },
+    {.X = 100, .Y = 1300}
+};
+Position traject2[]={
+    {.X = 50, .Y = 1300 },
+    {.X = 1050, .Y = 1000 }
+};
+Position traject3[]={
+    {.X = 950, .Y = 1000 },
+    {.X = 350, .Y = 1200 },
+    {.X = 50, .Y = 1000 }
+};
+
+static ExperimentalTraject experimentalTrajects[]={
+    {.id= 1, .traject = traject1, .nbPosition=5},
+    {.id= 2, .traject = traject2, .nbPosition=2},
+    {.id= 3, .traject = traject3, .nbPosition=3},
+};
 
 static ConnectionState connectionState;
 
