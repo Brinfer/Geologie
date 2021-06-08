@@ -76,28 +76,32 @@ extern int TranslatorBeacon_free() {
 }
 
 
-extern BeaconSignal TranslatorBeacon_translateChannelToBeaconsSignal(le_advertising_info* info) {
+extern BeaconSignal TranslatorBeacon_translateChannelToBeaconsSignal(uint8_t * info) {
 
     BeaconSignal bs;
 
     char posX[POSITION_LENGTH];
 	char posY[POSITION_LENGTH];
 
-	memcpy(bs.name, info->data + DEVICE_NAME_FIRST_BYTE, DEVICE_NAME_LENGTH);
+	memcpy(bs.name, info + DEVICE_NAME_FIRST_BYTE, DEVICE_NAME_LENGTH);
 
-	memcpy(bs.uuid, info->data + DEVICE_UUID_FIRST_BYTE, DEVICE_UUID_LENGTH);
+	/*bs.name[0] = (int32_t) info[DEVICE_NAME_FIRST_BYTE];
+	bs.name[1] = (int32_t) info[DEVICE_NAME_FIRST_BYTE + 1];*/
 
-    //printf("\nUUID : %d\n", bs.uuid[0]);
+	//memcpy(bs.uuid, info + DEVICE_UUID_FIRST_BYTE, DEVICE_UUID_LENGTH);
 
-	memcpy(posX, info->data + DEVICE_POSITION_X_FIRST_BYTE, POSITION_LENGTH);
+	bs.uuid[0] = (int32_t) info[DEVICE_UUID_FIRST_BYTE];
+	bs.uuid[1] = (int32_t) info[DEVICE_UUID_FIRST_BYTE + 1];
+
+	memcpy(posX, info + DEVICE_POSITION_X_FIRST_BYTE, POSITION_LENGTH);
 
 	sscanf(posX, "%d", &(bs.position.X));
 
-	memcpy(posY, info->data + DEVICE_POSITION_Y_FIRST_BYTE, POSITION_LENGTH);
+	memcpy(posY, info + DEVICE_POSITION_Y_FIRST_BYTE, POSITION_LENGTH);
 
 	sscanf(posY, "%d", &(bs.position.Y));
 
-	bs.rssi = (int8_t) info->data[info->length];
+	//bs.rssi = (int8_t) info[info->length];
 
     return bs;
 
@@ -112,3 +116,57 @@ extern BeaconSignal TranslatorBeacon_translateChannelToBeaconsSignal(le_advertis
 //
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*int main(){
+
+	BeaconSignal bs;
+
+	uint8_t * bc;
+	
+	uint8_t inputData[27] = {
+            0x02, 0x01, 0x06, 0x0F, 0x09,              // Not used
+            0x62, 0x31, 0x78, 0x33, 0x30, 0x30, 0x30, 0x30, 0x79, 0x34, 0x30, 0x30, 0x30, 0x30,
+			0x03, 0x03,					// Not used
+            0x18, 0x1A,                  // UUID, default value of the UUID
+			0x03, 0x19, 0x00, 0x03
+        };
+    uint8_t powerInput = 1;
+
+	bc = inputData;
+
+	bs = TranslatorBeacon_translateChannelToBeaconsSignal(bc);
+
+	//uint8_t name[2] = {'b', '1'};
+	uint8_t name[2] = {98, 49};
+
+	int32_t uuid[2] = { 24, 26 };
+
+	if(bs.name[0] == name[0]){
+		printf("Name OK !\n");
+	}
+	else{
+		printf("Name FALSE !\n");
+		printf("%d%d\n", bs.name[0], bs.name[1]);
+	}
+
+	if(bs.uuid[0] == uuid[0]){
+		printf("UUID OK !\n");
+	}
+	else{
+		printf("UUID FALSE !\n");
+		printf("%d%d", bs.uuid[0], bs.uuid[1]);
+	}
+
+	if(bs.position.X == 30000){
+		printf("X OK !\n");
+	}
+
+	if(bs.position.Y == 40000){
+		printf("Y OK !\n");
+	}
+	else{
+		printf("Y FALSE !\n");
+		printf("%d", bs.position.Y);
+	}
+
+}*/
