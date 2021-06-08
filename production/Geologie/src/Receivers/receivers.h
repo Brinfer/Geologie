@@ -20,6 +20,7 @@
 #include <bluetooth/hci.h>
 //#include <bluetooth/hci_lib.h>
 //#include <inttypes.h>
+//#include "common.h"
 
 #ifndef RECEIVERS_H_
 #define RECEIVERS_H_
@@ -39,9 +40,20 @@ typedef struct {
 } Receivers_t;
 
 typedef struct {
-    char name[8];
+    char name[2];
+    int uuid[2];
     int8_t rssi;
-} BeaconsData;
+} BeaconsSignal;
+
+
+typedef struct {
+    unsigned char* flags_length;
+    unsigned char* name_length;
+    unsigned char* uuid_length;
+    unsigned char* flags_value;
+    unsigned char* name_value;
+    unsigned char* uuid_value;
+} BeaconsChannel;
 
 typedef struct {
     unsigned char* flags_length;
@@ -52,12 +64,15 @@ typedef struct {
     unsigned char* uuid_value;
 } RawData;
 
-extern void Receivers_getAllBeaconsData();
+extern void Receiver_new();
 
-extern Receivers_t * Receivers_new();
-extern void Receivers_free(Receivers_t * this);
-extern void Receivers_start(Receivers_t * this);
-extern void Receivers_stop(Receivers_t * this);
+extern void Receiver_ask4StartReceiver();
+
+extern void Receiver_ask4BeaconsSignal();
+
+extern void Receiver_ask4StopReceiver();
+
+extern void Receiver_free();
 
 
 #endif /* RECEIVERS_H_ */

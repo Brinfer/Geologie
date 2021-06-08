@@ -64,7 +64,7 @@ struct hci_request ble_hci_request(uint16_t ocf, int clen, void * status, void *
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-BeaconsData beaconsData[3];
+//BeaconsData beaconsData[3];
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -73,23 +73,23 @@ BeaconsData beaconsData[3];
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-extern Receivers_t * Receivers_new(){
+extern void * Receivers_new(){
 
 }
 
-extern void Receivers_free(Receivers_t * this){
+extern void Receivers_free(){
 
 }
 
-extern void Receivers_start(Receivers_t * this){
+extern void Receivers_start(){
 
 }
 
-extern void Receivers_stop(Receivers_t * this){
+extern void Receivers_stop(){
 
 }
 
-extern BeaconsData askAllBeaconsData(){
+extern void askAllBeaconsData(){
     //setBeaconsData(BeaconsData)
 }
 
