@@ -32,7 +32,7 @@
 
 /**
  * @brief Donne la taille de la trame necessaire pour envoyer le message de la commande en fonction du
- * nombre d'element qui la compose si celle-ci est de taille variable.
+ * nombre d'element qui la compose si celle-ci est de taille variable, la taille du header est comprise.
  *
  * Dans le cas ou la commande n'est pas de taille variable, l'argument @a nbElements est ignore.
  *

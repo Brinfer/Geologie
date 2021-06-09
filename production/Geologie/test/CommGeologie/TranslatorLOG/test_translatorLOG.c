@@ -1,17 +1,16 @@
 
 #include <stdlib.h>
-#include <stdarg.h>
-#include <stddef.h>
-#include <setjmp.h>
 
 /** Nombre de suites de tests a excuter. */
-#define NB_SUITE_TESTS_TRANSLATOR_LOG (1)
+#define NB_SUITE_TESTS_TRANSLATOR_LOG (2)
 
 extern int test_TranslatorLOG_run_translateTrameToHeader(void);
+extern int test_TranslatorLOG_run_translateForSendCurrentPosition(void);
 
 /** Liste des suites de tests a excuter. */
 static int (*suite_tests[])(void) = {
-   test_TranslatorLOG_run_translateTrameToHeader
+   test_TranslatorLOG_run_translateTrameToHeader,
+   test_TranslatorLOG_run_translateForSendCurrentPosition
 };
 
 /**
