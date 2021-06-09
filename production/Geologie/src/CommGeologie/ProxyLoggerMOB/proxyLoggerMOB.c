@@ -57,10 +57,10 @@ extern int8_t ProxyLoggerMOB_free(void) {
 
 extern int8_t ProxyLoggerMOB_setExperimentalTrajects(const ExperimentalTraject* experimentalTrajects, unsigned short nbExperimentalTraject) {
     int8_t returnError;
-    uint16_t size = TranslatorLog_getTrameSizeExperimentalTraject(experimentalTrajects, nbExperimentalTraject);
+    uint16_t size = TranslatorLOG_getTrameSizeExperimentalTraject(experimentalTrajects, nbExperimentalTraject);
     Trame* trame = calloc(1, size);
 
-    TranslatorLog_translateForExperimentalTrajects(experimentalTrajects, nbExperimentalTraject, trame);
+    TranslatorLOG_translateForExperimentalTrajects(experimentalTrajects, nbExperimentalTraject, trame);
     returnError = PostmanLOG_sendMsg(trame, size);
 
     return returnError;
@@ -68,10 +68,10 @@ extern int8_t ProxyLoggerMOB_setExperimentalTrajects(const ExperimentalTraject* 
 
 extern int8_t ProxyLoggerMOB_setExperimentalPositions(const ExperimentalPosition* experimentalPositions, unsigned short nbExperimentalPosition) {
     int8_t returnError;
-    uint16_t size = TranslatorLog_getTrameSize(SEND_EXPERIMENTAL_POSITIONS, nbExperimentalPosition);
+    uint16_t size = TranslatorLOG_getTrameSize(SEND_EXPERIMENTAL_POSITIONS, nbExperimentalPosition);
     Trame* trame = calloc(1, size);
 
-    TranslatorLog_translateForSendExperimentalPositions(nbExperimentalPosition, experimentalPositions, trame);
+    TranslatorLOG_translateForSendExperimentalPositions(nbExperimentalPosition, experimentalPositions, trame);
     returnError = PostmanLOG_sendMsg(trame, size);
 
     return returnError;
@@ -79,10 +79,10 @@ extern int8_t ProxyLoggerMOB_setExperimentalPositions(const ExperimentalPosition
 
 extern int8_t ProxyLoggerMOB_setCalibrationData(const CalibrationData* calibrationData, uint8_t nbCalibrationData) {
     int8_t returnError;
-    uint16_t size = TranslatorLog_getTrameSize(SEND_CALIBRATION_DATA, nbCalibrationData);
+    uint16_t size = TranslatorLOG_getTrameSize(SEND_CALIBRATION_DATA, nbCalibrationData);
     Trame* trame = calloc(1, size);
 
-    Translator_translateForSendCalibrationData(calibrationData, nbCalibrationData, trame);
+    TranslatorLOG_translateForSendCalibrationData(calibrationData, nbCalibrationData, trame);
     returnError = PostmanLOG_sendMsg(trame, size);
 
     return returnError;
@@ -90,10 +90,10 @@ extern int8_t ProxyLoggerMOB_setCalibrationData(const CalibrationData* calibrati
 
 extern int8_t ProxyLoggerMOB_setAllBeaconsData(const BeaconData* beaconsData, unsigned short nbBeacons, Date currentDate) {
     int8_t returnError;
-    uint16_t size = TranslatorLog_getTrameSize(SEND_ALL_BEACONS_DATA, nbBeacons);
+    uint16_t size = TranslatorLOG_getTrameSize(SEND_ALL_BEACONS_DATA, nbBeacons);
     Trame* trame = calloc(1, size);
 
-    TranslatorLog_translateForSendAllBeaconsData(nbBeacons, beaconsData, currentDate, trame);
+    TranslatorLOG_translateForSendAllBeaconsData(nbBeacons, beaconsData, currentDate, trame);
     returnError = PostmanLOG_sendMsg(trame, size);
 
     return returnError;
@@ -101,10 +101,10 @@ extern int8_t ProxyLoggerMOB_setAllBeaconsData(const BeaconData* beaconsData, un
 
 extern int8_t ProxyLoggerMOB_setCurrentPosition(const Position* currentPosition, Date currentDate) {
     int8_t returnError;
-    uint16_t size = TranslatorLog_getTrameSize(SEND_CURRENT_POSITION, 0);
+    uint16_t size = TranslatorLOG_getTrameSize(SEND_CURRENT_POSITION, 0);
     Trame* trame = calloc(1, size);
 
-    TranslatorLog_translateForSendCurrentPosition(currentPosition, currentDate, trame);
+    TranslatorLOG_translateForSendCurrentPosition(currentPosition, currentDate, trame);
     returnError = PostmanLOG_sendMsg(trame, size);
 
     return returnError;
@@ -112,10 +112,10 @@ extern int8_t ProxyLoggerMOB_setCurrentPosition(const Position* currentPosition,
 
 extern int8_t ProxyLoggerMOB_setProcessorAndMemoryLoad(const ProcessorAndMemoryLoad* processorAndMemoryLoad, Date currentDate) {
     int8_t returnError;
-    uint16_t size = TranslatorLog_getTrameSize(SEND_MEMORY_PROCESSOR_LOAD, 0);
+    uint16_t size = TranslatorLOG_getTrameSize(SEND_MEMORY_PROCESSOR_LOAD, 0);
     Trame* trame = calloc(1, size);
 
-    TranslatorLog_translateForSendMemoryAndProcessorLoad(processorAndMemoryLoad, currentDate, trame);
+    TranslatorLOG_translateForSendMemoryAndProcessorLoad(processorAndMemoryLoad, currentDate, trame);
     returnError = PostmanLOG_sendMsg(trame, size);
 
     return returnError;

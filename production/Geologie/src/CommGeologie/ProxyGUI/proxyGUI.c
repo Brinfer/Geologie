@@ -80,10 +80,10 @@ extern int8_t ProxyGUI_setCalibrationPositions(CalibrationPosition * calibration
     int8_t returnError=EXIT_FAILURE;
     Trame * trame;
     Commande commande=REP_CALIBRATION_POSITIONS;
-    uint16_t sizeTrame = TranslatorLog_getTrameSize(commande, NB_CALIBRATION_POSITIONS);
+    uint16_t sizeTrame = TranslatorLOG_getTrameSize(commande, NB_CALIBRATION_POSITIONS);
     trame=malloc(sizeTrame);
-    TranslatorLog_translateForRepCalibrationPosition(size,calibrationPositions,trame);
-    returnError = PostmanLOG_sendMsg(trame,sizeTrame); 
+    TranslatorLOG_translateForRepCalibrationPosition(size,calibrationPositions,trame);
+    returnError = PostmanLOG_sendMsg(trame,sizeTrame);
 
     return returnError;
 }
@@ -93,10 +93,10 @@ extern int8_t ProxyGUI_signalEndCalibrationPosition(){
     int8_t returnError=EXIT_FAILURE;
     Trame * trame;
     Commande commande=SIGNAL_END_CALIBRATION_POSITION;
-    u_int16_t sizeTrame = TranslatorLog_getTrameSize(commande, 0);
+    u_int16_t sizeTrame = TranslatorLOG_getTrameSize(commande, 0);
     trame=malloc(sizeTrame);
-    Translator_translateForSignalCalibrationEnd(trame); 
-    returnError = PostmanLOG_sendMsg(trame,sizeTrame); 
+    TranslatorLOG_translateForSignalCalibrationEnd(trame);
+    returnError = PostmanLOG_sendMsg(trame,sizeTrame);
 
     return returnError;
 }
@@ -106,12 +106,10 @@ extern int8_t ProxyGUI_signalEndCalibration(){
     int8_t returnError=EXIT_FAILURE;
     Trame * trame;
     Commande commande=SIGNAL_CALIRATION_END;
-    u_int16_t sizeTrame = TranslatorLog_getTrameSize(commande, 0);
+    u_int16_t sizeTrame = TranslatorLOG_getTrameSize(commande, 0);
     trame=malloc(sizeTrame);
-    Translator_translateForSignalCalibrationEnd(trame);
-    returnError = PostmanLOG_sendMsg(trame,sizeTrame); 
+    TranslatorLOG_translateForSignalCalibrationEnd(trame);
+    returnError = PostmanLOG_sendMsg(trame,sizeTrame);
 
     return returnError;
 }
-
-

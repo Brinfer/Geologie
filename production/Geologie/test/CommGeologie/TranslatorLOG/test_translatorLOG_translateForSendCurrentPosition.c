@@ -16,8 +16,6 @@
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <float.h>
-#include <limits.h>
 #include <setjmp.h>
 #include <stdarg.h>
 #include <stddef.h>
@@ -35,14 +33,25 @@
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/**
+ * @brief La taille d'une #Position en octet.
+ *
+ */
 #define SIZE_POSITION (8)
 
+/**
+ * @brief La taille d'une #Date en octet.
+ *
+ */
 #define SIZE_TIMESTAMP (4)
 
+/**
+ * @brief Structure passee au fonction test.
+ */
 typedef struct {
-    Trame trameExpected[SIZE_HEADER + SIZE_POSITION + SIZE_TIMESTAMP];
-    Position positionInput;
-    Date dateInput;
+    Trame trameExpected[SIZE_HEADER + SIZE_POSITION + SIZE_TIMESTAMP];  /**< La #Trame attendue en resultat de TranslatorLog_translateForSendCurrentPosition */
+    Position positionInput;                                             /**< La #Position passee a TranslatorLog_translateForSendCurrentPosition */
+    Date dateInput;                                                     /**< La #Date passee a TranslatorLog_translateForSendCurrentPosition */
 } ParameterTestCurrentPosition;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -51,10 +60,13 @@ typedef struct {
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/**
+ * @brief Ensemble des donnees de tests.
+ */
 static ParameterTestCurrentPosition parameterTest[] = {
     {
         .positionInput = { .X = 0, .Y = 0},
-        .dateInput = 0x00000000,
+        .dateInput = 0,
         .trameExpected = {
             // Header
             SEND_CURRENT_POSITION,          // CMD
@@ -67,8 +79,8 @@ static ParameterTestCurrentPosition parameterTest[] = {
         }
     },
     {
-        .positionInput = { .X = 0xFFFFFFFF, .Y = 0xFFFFFFFF},
-        .dateInput = 0xFFFFFFFF,
+        .positionInput = { .X = 4294967295, .Y = 4294967295},
+        .dateInput = 4294967295,
         .trameExpected = {
             // Header
             SEND_CURRENT_POSITION,          // CMD
@@ -81,8 +93,8 @@ static ParameterTestCurrentPosition parameterTest[] = {
         }
     },
     {
-        .positionInput = { .X = 0xAAAAAAAA, .Y = 0x55555555},
-        .dateInput = 0xA5A5A5A5,
+        .positionInput = { .X = 2863311530, .Y = 1431655765},
+        .dateInput = 2779096485,
         .trameExpected = {
             // Header
             SEND_CURRENT_POSITION,          // CMD
@@ -103,8 +115,18 @@ static ParameterTestCurrentPosition parameterTest[] = {
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/**
+ * @brief Execute les tests de TranslatorLog_translateForSendCurrentPosition.
+ *
+ * @return int 0 en cas de succes, le numero du test qui a echoue sinon.
+ */
 extern int test_TranslatorLOG_run_translateForSendCurrentPosition(void);
 
+/**
+ * @brief La fonction test permettant de verifier le bon fonctionnement de TranslatorLOG_translateTrameToHeader.
+ *
+ * @param state Les donnees de test #ParameterTestCurrentPosition.
+ */
 static void test_TranslatorLOG_translateForSendCurrentPosition(void** state);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -113,6 +135,9 @@ static void test_TranslatorLOG_translateForSendCurrentPosition(void** state);
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/**
+ * @brief Ensemble des tests a executer.
+ */
 static const struct CMUnitTest testsCurrentPosition[] = {
     cmocka_unit_test_prestate(test_TranslatorLOG_translateForSendCurrentPosition, &(parameterTest[0])),
     cmocka_unit_test_prestate(test_TranslatorLOG_translateForSendCurrentPosition, &(parameterTest[1])),
@@ -121,19 +146,19 @@ static const struct CMUnitTest testsCurrentPosition[] = {
 
 
 extern int test_TranslatorLOG_run_translateForSendCurrentPosition(void) {
-    return cmocka_run_group_tests_name("Test of the module translatorLOG for function TranslatorLog_translateForSendCurrentPosition", testsCurrentPosition, NULL, NULL);
+    return cmocka_run_group_tests_name("Test of the module translatorLOG for function TranslatorLOG_translateForSendCurrentPosition", testsCurrentPosition, NULL, NULL);
 }
 
 static void test_TranslatorLOG_translateForSendCurrentPosition(void** state) {
     ParameterTestCurrentPosition* parameter = (ParameterTestCurrentPosition*) *state;
 
     /* Test trame sizeResult */
-    uint16_t sizeResult = TranslatorLog_getTrameSize(SEND_CURRENT_POSITION, 0);
+    uint16_t sizeResult = TranslatorLOG_getTrameSize(SEND_CURRENT_POSITION, 0);
     assert_int_equal(SIZE_HEADER + SIZE_POSITION + SIZE_TIMESTAMP, sizeResult);
 
     Trame currentResult[sizeResult];
-    TranslatorLog_translateForSendCurrentPosition(&(parameter->positionInput), parameter->dateInput, &currentResult);
+    TranslatorLOG_translateForSendCurrentPosition(&(parameter->positionInput), parameter->dateInput, currentResult);
 
     /* Test trame */
-    assert_memory_equal(&(parameter->trameExpected), &currentResult, sizeResult);
+    assert_memory_equal(parameter->trameExpected, currentResult, sizeResult);
 }
