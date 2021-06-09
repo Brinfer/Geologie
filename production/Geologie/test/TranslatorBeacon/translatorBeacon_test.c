@@ -24,7 +24,7 @@
 
 #include "cmocka.h"
 
-#include "translatorBeacon/translatorBeacon.c"
+#include "TranslatorBeacon/translatorBeacon.c"
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -32,10 +32,9 @@
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#define SIZE_TRAME (22)
+#define SIZE_TRAME (23)
 
 typedef struct {
-    uint8_t powerInput;
     uint8_t inputData[SIZE_TRAME];
     BeaconSignal resultExpected;
 } TestData;
@@ -54,9 +53,9 @@ TestData parametersTestData[] = {
             '0', '0', '0', '0', '1',    // Beacon Position X
             0,                          // Not used
             '0', '0', '0', '0', '1',    // Beacon Position Y
-            0x18, 0x1A                  // UUID, default value of the UUID
+            0x18, 0x1A,                 // UUID, default value of the UUID
+            0x01,                       // RSSI
         },
-        .powerInput = 1,
         .resultExpected = {.name = {'A', 'A', '\0'}, .uuid = { 0x18, 0x1A }, .rssi = 1, .position = { 1, 1 }}
     },
     {
@@ -66,9 +65,9 @@ TestData parametersTestData[] = {
             '5', '4', '3', '2', '1',    // Beacon Position X
             0,                          // Not used
             '1', '2', '3', '4', '5',    // Beacon Position Y
-            0x02, 0x00                  // UUID
+            0x02, 0x00,                 // UUID
+            0xFE,                       // RSSI
         },
-        .powerInput = -1,
         .resultExpected = {.name = {'2', 'B', '\0'}, .uuid = { 0x02, 0x00 }, .rssi = -2, .position = { 54321, 12345 }}
     },
     {
@@ -78,9 +77,9 @@ TestData parametersTestData[] = {
             '3', '3', '0', '0', '0',    // Beacon Position X
             0,                          // Not used
             '0', '0', '0', '3', '3',    // Beacon Position Y
-            0x00, 0x03                  // UUID
+            0x00, 0x03,                 // UUID
+            0x00,                       // RSSI
         },
-        .powerInput = 0,
         .resultExpected = {.name = {'C', '3', '\0'}, .uuid = { 0x00, 0x03 }, .rssi = 0, .position = { 33000, 33 }}
     },
     {
@@ -90,10 +89,10 @@ TestData parametersTestData[] = {
             '0', '0', '4', '0', '0',    // Beacon Position X
             0,                          // Not used
             '9', '6', '0', '7', '9',    // Beacon Position Y
-            0xFF, 0xFF                  // UUID
+            0xFF, 0xFF,                 // UUID
+            0x9C,                       // RSSI
         },
-        .powerInput = 0,
-        .resultExpected = {.name = {'4', '4', '\0'}, .uuid = { 0xFF, 0xFF }, .rssi = 0, .position = { 400, 96079 }}
+        .resultExpected = {.name = {'4', '4', '\0'}, .uuid = { 0xFF, 0xFF }, .rssi = 100, .position = { 400, 96079 }}
     },
 };
 
@@ -152,7 +151,7 @@ void test_translationToByte(void** state) {
     BeaconSignal currentResult;
 
     BeaconsChannel inputData;
-    inputData.length = testData->powerInput;
+    inputData.length = SIZE_TRAME;
     memcpy(inputData.data, testData->inputData, SIZE_TRAME);
 
     currentResult = TranslatorBeacon_translateChannelToBeaconsSignal(&inputData);
