@@ -1,7 +1,7 @@
 /**
  * @file managerLOG.c
  *
- * @brief Permet le démarrage et l’extinction de GEOLOGIE. A aussi pour role de creer tous les objets
+ * @brief Permet le demarrage et l’extinction de GEOLOGIE. A aussi pour role de creer tous les objets
  *  et de demarrer les differentes machines à etats.
  * Cette objet permet aussi de stopper les machines a etats et de detruire tous les objets
  * instancies à l’extinction.
@@ -41,7 +41,7 @@ extern void ManagerLOG_startGEOLOGIE(void) {
 
     TRACE("%sInitialization of GEOLOGIE%s%s", "\033[47m\033[30m", "\033[0m", "\n");
 
-    int8_t returnError = EXIT_FAILURE;
+    int8_t returnError = EXIT_SUCCESS;
 
     returnError = UI_new();
     STOP_ON_ERROR(returnError < 0);
@@ -77,7 +77,7 @@ extern void ManagerLOG_stopGEOLOGIE(void) {
 
     TRACE("%sStop of GEOLOGIE%s%s", "\033[47m\033[30m", "\033[0m", "\n");
 
-    int8_t returnError = EXIT_FAILURE;
+    int8_t returnError = EXIT_SUCCESS;
 
     returnError = DispatcherLOG_stop();
     STOP_ON_ERROR(returnError < 0);

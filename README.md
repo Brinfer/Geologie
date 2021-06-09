@@ -8,10 +8,10 @@ cd path/vers/le/dossier/du/projet
 
 ## Auteurs
 
-* BRIENT Nathan
-* GAUTIER Pierre-Louis
-* LECENNE Gabriel
-* MOLARD Simon
+* [BRIENT Nathan](https://www.linkedin.com/in/nathan-brient/)
+* [GAUTIER Pierre-Louis](https://www.linkedin.com/in/pierre-louis-gautier-7b1b37165/)
+* [LECENNE Gabriel](https://www.linkedin.com/in/gabriel-lecenne-461724180/)
+* [MOLARD Simon](https://www.linkedin.com/in/simon-molard-071a55197/)
 
 ## Copyright
 
@@ -19,11 +19,11 @@ Voir [`LICENCE.md`](file://./LICENCE.md).
 
 ## Description Générale
 
-ST aimerait compléter son prototype de robot autonome avec un mécanisme robuste de indoor-positioning. Une étude de positionnement basée sur la technologie Wifi a démontré que cette technologie était trop imprécise et instable pour répondre à la demande. Cette année, ST cherche à implémenter et à qualifier une solution basée sur l’utilisation de Balises bluetooth afin qu’elle soit dans un second temps intégrée dans sa solution de robot autonome.
+ST aimerait compléter son prototype de robot autonome avec un mécanisme robuste de indoor-positioning. Une étude de positionnement basée sur la technologie Wifi a démontré que cette technologie était trop imprécise et instable pour répondre à la demande. Cette année, ST cherche à implémenter et à qualifier une solution basée sur l’utilisation de Balises bluetooth afin qu’elle soit dans un second temps intégrée dans sa solution de robot autonome.
 
-Notre projet est de créer une application permettant de tester la fiabilité de la technologie bluetooth. Elle n’est en aucun cas une technologie de positionnement.
+Notre projet est de créer une application permettant de tester la fiabilité de la technologie bluetooth. Elle n’est en aucun cas une technologie de positionnement.
 
-Pour pallier l’incapacité du robot à se situer dans un espace fermé, en récupérant sa position dans son environnement pour être en mesure d’interagir avec le robot en prenant compte de sa localisation.
+Pour pallier l’incapacité du robot à se situer dans un espace fermé, en récupérant sa position dans son environnement pour être en mesure d’interagir avec le robot en prenant compte de sa localisation.
 
 ## Installation
 
@@ -147,7 +147,7 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 #### Copie du fichier vers la cible
 
-Pour partager une copie de l'executable générer à l'aide de la commande précédente, il faut utiliser la commande suivante:
+Pour partager une copie de l'executable générer à l'aide de la commande précédente, il faut utiliser la commande `scp` :
 
 ```bash
 scp <fichierACopier> <utilisateurCible>@<adresseIP>:<cheminOuCopierLeFichier>
