@@ -29,6 +29,7 @@
 #include <mqueue.h>
 #include <errno.h>
 #include <pthread.h>
+#include <stdbool.h>
 
 #include "receiver.h"
 #include "../TranslatorBeacon/translatorBeacon.h"
@@ -53,11 +54,9 @@
 
 #define MQ_MAX_MESSAGES (5)
 
-static BeaconSignal beaconsSignal[NB_BEACONS_AVAILABLE];
+static BeaconSignal beaconsSignal[100];
 
-static BeaconsChannel * beaconsChannel[NB_BEACONS_AVAILABLE];
-
-static int index_channel = 0;
+static BeaconsChannel * beaconsChannel[100];
 
 static int channel_INDEX;
 
@@ -193,9 +192,9 @@ static void mqReceive(MqMsg* this) {
 
 static void Receiver_translateChannelToBeaconsSignal(){
     int i;
-	int index_signal = 0;
-	int index_channel = 0;
-	BeaconSignal signal;
+	int j;
+	/*int index_signal = 0;
+	int index_channel = 0;*/
 	printf("TRANSLATING\n");
 
 	/*signal = TranslatorBeacon_translateChannelToBeaconsSignal(beaconsChannel[0]);
@@ -206,25 +205,31 @@ static void Receiver_translateChannelToBeaconsSignal(){
 	printf("UUID : %d\n", signal.uuid[0]);
 	printf("RSSI : %d\n", signal.rssi);*/
 	
-
-
-
-	/*for (i = 0; i < sizeof(BeaconsChannel); i++)
+	for (i = 0; i < sizeof(BeaconsChannel); i++) //revoir sizeof
 	{
-		signal = TranslatorBeacon_translateChannelToBeaconsSignal(beaconsChannel[index_channel]);
-		printf("Index n° : %d\n", i);
+		BeaconSignal signal;
+		bool find = FALSE;
+		signal = TranslatorBeacon_translateChannelToBeaconsSignal(beaconsChannel[i]);
+		for(j = 0; j < sizeof(beaconsSignal); i++)
+		{
+			if(signal.name == beaconsSignal[j].name){
+				beaconsSignal[j] = signal;
+				find = TRUE;
+			}
+		}
+		if(find == FALSE){
+			beaconsSignal[i] = signal;
+		}
+		
+		 //Gérer le cas des balises déjà mémorisées -> update
+		/*printf("Index n° : %d\n", i);
 		printf("Name : %s\n", signal.name);
 		printf("X : %d\n", signal.position.X);
 		printf("Y : %d\n", signal.position.Y);
 		printf("UUID : %d\n", signal.uuid[0]);
-		printf("RSSI : %d\n", signal.rssi);
-		if(signal.uuid[0] == BEACONS_UUID){
-			beaconsSignal[index_signal] = signal;
-			index_signal ++;
-		}
-		index_channel ++;
+		printf("RSSI : %d\n", signal.rssi);*/
 	}
-	int k;
+	/*int k;
 	for(k = 0; k< sizeof(beaconsSignal); k ++){
 		printf("Index n° : %d\n", k);
 		printf("Name : %s\n", beaconsSignal[k].name);
@@ -323,6 +328,7 @@ static void Receiver_getAllBeaconsChannel(){
 	evt_le_meta_event * meta_event;
 	BeaconsChannel * info;
 	BeaconSignal bs;
+	static int index_channel = 0;
 	int uuid[2];
 	int len;
 
@@ -343,21 +349,9 @@ static void Receiver_getAllBeaconsChannel(){
 					memcpy(uuid, info->data + 21, 2); //cond pour le Name
 
 					if(uuid[0] == BEACONS_UUID_1 && uuid[1]==BEACONS_UUID_2){
-						beaconsChannel[0] = info;
+						beaconsChannel[index_channel] = info;
 						index_channel ++;
 					}
-
-					beaconsChannel[index_channel] = info;
-					
-					Receiver_translateChannelToBeaconsSignal();
-
-					//beaconsChannel[0] = info;
-					
-					/*if(index_channel == 100){
-						Receiver_translateChannelToBeaconsSignal();
-					}*/
-
-					//Receiver_translateChannelToBeaconsSignal();
 
 					offset = info->data + info->length + 2;
 				}
