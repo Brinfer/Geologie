@@ -13,6 +13,7 @@
 #include <pthread.h>
 #include <mqueue.h>
 #include <errno.h>
+#include <stdbool.h>
 
 #include "../common.h"
 #include "../Receiver/receiver.h"
@@ -25,6 +26,7 @@
 #define MAX_BEACONS_SIGNAL (10)
 #define MAX_BEACONS_COEFFICIENTS (10)
 #define MAX_BEACONS_DATA (10)
+#define MAX_BEACONS (5)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -41,7 +43,8 @@ static Position currentPosition;
 static ProcessorAndMemoryLoad currentProcessorAndMemoryLoad;
 static BeaconCoefficients * beaconsCoefficient;
 static BeaconSignal * beaconSignal;
-//static CalibrationData * calibrationData;
+static CalibrationData * calibrationData;
+static uint8_t beaconsIds[MAX_BEACONS];
 
 typedef enum{
     S_DEATH = 0,
@@ -166,22 +169,57 @@ static void mqReceive(MqMsg* this) {
 
 }
 
-static void translateBeaconsSignalToBeaconsData(BeaconSignal * beaconSignal, BeaconData * dest){
+static void translateBeaconsSignalToBeaconsData(BeaconSignal * beaconSignal, BeaconData * dest){ //check redondance : 1 beaconData / balise !!
 
     int i;
-
-    for (i = 0; i < sizeof(beaconSignal); i++)
+    int j;
+    for (i = 0; i < sizeof(beaconSignal); i++) //voir size
     {   
         BeaconData data;
-        memcpy(data.ID, beaconSignal[i].name, sizeof(beaconSignal[i].name));
+        memcpy(data.ID, beaconSignal[i].name, sizeof(beaconSignal[i].name)); //voir size
         data.position = beaconSignal[i].position;
         data.power = beaconSignal[i].rssi;
-        data.coefficientAverage = 0; //TODO
+        data.coefficientAverage = 0;
 
+        for (j = 0; j < sizeof(calibrationData); j++)   //voir size
+        {
+            if(data.ID == calibrationData[j].beaconId){
+                data.coefficientAverage = calibrationData[j].coefficientAverage;
+            }
+        }
+        
         dest[i] = data;
     }
     
 
+}
+
+
+static void sortBeaconsCoefficientId(BeaconCoefficients * beaconsCoefficient){
+    int index_beaconCoef;
+    int index_beaconsIds = 0;
+    int j;
+    bool idFind;
+    for(index_beaconCoef = 0; index_beaconCoef < sizeof(beaconsCoefficient); index_beaconCoef ++){ //check sizeOf
+        if(index_beaconCoef == 0){
+            beaconsIds[index_beaconsIds] = beaconsCoefficient[index_beaconCoef].beaconId[2];
+            index_beaconsIds ++;
+        }
+        else{
+            idFind = true;
+            for(j = 0; j < sizeof(index_beaconsIds); j++)   //check sizeOf
+            {
+                if(beaconsCoefficient[index_beaconCoef].beaconId[2] != beaconsIds[j]){
+                    idFind = false;
+                }
+            }
+            if(idFind == false)
+            {
+                beaconsIds[index_beaconsIds] = beaconsCoefficient[index_beaconCoef].beaconId[2];
+                index_beaconsIds ++;
+            }
+        }
+    }
 }
 
 
@@ -209,14 +247,14 @@ static void performAction(Action_SCANNER action, MqMsg * msg){
 
         case A_SET_CURRENT_POSITION:
             beaconSignal = msg->beaconsSignal;
-            translateBeaconsSignalToBeaconsData(msg->beaconsSignal, &(beaconsData));
+            translateBeaconsSignalToBeaconsData(msg->beaconsSignal, beaconsData);
             currentPosition = Mathematician_getCurrentPosition(beaconsData);
             Bookkeeper_ask4CurrentProcessorAndMemoryLoad();
             break;
 
         case A_SET_CURRENT_PROCESSOR_AND_MEMORY:
             currentProcessorAndMemoryLoad = msg->currentProcessorAndMemoryLoad;
-            Geographer_dateAndSendData(beaconsData, sizeof(BeaconData), &(currentPosition), &(currentProcessorAndMemoryLoad)); //revoir 2è arg
+            Geographer_dateAndSendData(beaconsData, sizeof(BeaconData), &(currentPosition), &(currentProcessorAndMemoryLoad)); //check sizeOf
             MqMsg message = { 
                         .event = E_ASK_BEACONS_SIGNAL
                         };
@@ -228,7 +266,7 @@ static void performAction(Action_SCANNER action, MqMsg * msg){
             for(int index = 0; index < sizeof(beaconsData); index++){
                 BeaconCoefficients coef;
                 memcpy(coef.beaconId, beaconsData[index].ID, sizeof(beaconsData[index].ID));
-                memcpy(coef.positionId, msg->calibrationPosition.id, sizeof(msg->calibrationPosition.id));
+                coef.positionId = msg->calibrationPosition.id;
                 coef.attenuationCoefficient = Mathematician_getAttenuationCoefficient(&(beaconsData[index].power), &(beaconsData[index].position), &(msg->calibrationPosition));
                 beaconsCoefficient[index] = coef;
             }
@@ -236,10 +274,25 @@ static void performAction(Action_SCANNER action, MqMsg * msg){
             break;
 
         case A_ASK_CALIBRATION_AVERAGE:
-            /*for(int index = 0; index < sizeof(beaconsCoefficient); index++){
-                Mathematician_getAverageCalcul(&(beaconsCoefficient[index])); //va dans calibrationData
+            sortBeaconsCoefficientId(beaconsCoefficient);
+            for(int index_balise = 0; index_balise < sizeof(beaconsIds); index_balise++){   //check sizeOf
+                BeaconCoefficients * coef;
+                CalibrationData cd;
+                int index_coef = 0;
+                for (int j = 0; j < sizeof(beaconsCoefficient); j++)    //check sizeOf
+                {
+                    if(beaconsCoefficient[j].beaconId[2] == beaconsIds[index_balise]){
+                        coef[index_coef] = beaconsCoefficient[j];   //check
+                        index_coef++;
+                        memcpy(cd.beaconId, beaconsCoefficient[j].beaconId, sizeof(beaconsCoefficient[j].beaconId));
+                    }
+                }
+                cd.beaconCoefficient = coef;
+                cd.nbCoefficient = index_coef;
+                cd.coefficientAverage = Mathematician_getAverageCalcul(coef);
+
             }
-            //Geographer_signalEndAverageCalcul(calibrationData, ); //TODO calibrationData et demander pour nbCalibration*/
+            Geographer_signalEndAverageCalcul(calibrationData, sizeof(calibrationData));    //check sizeOf
             break;
 
         default:
