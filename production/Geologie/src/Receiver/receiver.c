@@ -62,7 +62,8 @@ static int index_channel = 0;
 static int channel_INDEX;
 
 typedef enum{
-    S_SCANNING = 0,
+	S_BEGINNING = 0,
+    S_SCANNING,
     S_TRANSLATING,
     S_DEATH,
     NB_STATE
@@ -72,6 +73,7 @@ typedef enum {
     E_STOP = 0,
     E_ASK_BEACONS_SIGNAL,
     E_MAJ_BEACONS_CHANNEL,
+	E_TIME_OUT,
 	E_TRANSLATING_DONE,
     NB_EVENT_RECEIVER
 } Event_RECEIVER;
@@ -92,9 +94,9 @@ typedef struct {
 
 static Transition_RECEIVER stateMachine[NB_STATE - 1][NB_EVENT_RECEIVER] =
 {
+    [S_BEGINNING] [E_MAJ_BEACONS_CHANNEL] = {S_SCANNING, A_MAJ_BEACONS_CHANNELS},
     [S_SCANNING] [E_ASK_BEACONS_SIGNAL] = {S_SCANNING, A_SEND_BEACONS_SIGNAL},
-    [S_SCANNING] [E_MAJ_BEACONS_CHANNEL] = {S_SCANNING, A_MAJ_BEACONS_CHANNELS},
-    [S_TRANSLATING] [E_STOP] = {S_DEATH, A_STOP},
+	[S_SCANNING] [E_TIME_OUT] = {S_TRANSLATING, A_TRANSLATE},
     [S_TRANSLATING] [E_TRANSLATING_DONE] = {S_SCANNING, A_MAJ_BEACONS_CHANNELS}
 };
 
@@ -427,6 +429,13 @@ static void * run(){
    return 0;
 }
 
+static void timeOut(){
+    MqMsg msg = { 
+                .event = E_TIME_OUT
+                };
+    sendMsg(&msg);
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //
@@ -440,7 +449,7 @@ static void * run(){
 
 extern void Receiver_new(){
     myState = S_DEATH;
-	wtd_TScan = Watchdog_construct(1000000, &(Receiver_translateChannelToBeaconsSignal)); //CHANGER CALLBACK -> vers translating
+	wtd_TScan = Watchdog_construct(1000000, &(timeOut)); //CHANGER CALLBACK -> vers translating
 }
 
 extern void Receiver_ask4StartReceiver(){
@@ -468,11 +477,3 @@ extern void Receiver_ask4BeaconsSignal(){
                 };
     sendMsg(&msg);
 }
-
-/*int main(){
-    Receiver_getAllBeaconsChannel();
-    //sleep(10);
-    Receiver_translateChannelToBeaconsSignal(beaconsChannel);
-    //Receiver_ask4BeaconsSignal();
-    return 0;
-}*/
