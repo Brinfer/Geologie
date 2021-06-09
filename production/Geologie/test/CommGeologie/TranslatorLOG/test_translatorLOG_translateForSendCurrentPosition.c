@@ -35,13 +35,11 @@
 
 /**
  * @brief La taille d'une #Position en octet.
- *
  */
 #define SIZE_POSITION (8)
 
 /**
  * @brief La taille d'une #Date en octet.
- *
  */
 #define SIZE_TIMESTAMP (4)
 
@@ -123,7 +121,7 @@ static ParameterTestCurrentPosition parameterTest[] = {
 extern int test_TranslatorLOG_run_translateForSendCurrentPosition(void);
 
 /**
- * @brief La fonction test permettant de verifier le bon fonctionnement de TranslatorLOG_translateTrameToHeader.
+ * @brief La fonction test permettant de verifier le bon fonctionnement de TranslatorLOG_translateForSendCurrentPosition.
  *
  * @param state Les donnees de test #ParameterTestCurrentPosition.
  */

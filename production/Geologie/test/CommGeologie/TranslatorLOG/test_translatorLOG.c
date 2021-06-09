@@ -27,7 +27,7 @@
 /**
  * @brief Nombre de suites de tests a excuter.
  */
-#define NB_SUITE_TESTS_TRANSLATOR_LOG (3)
+#define NB_SUITE_TESTS_TRANSLATOR_LOG (4)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -56,6 +56,13 @@ extern int test_TranslatorLOG_run_translateForSendCurrentPosition(void);
  */
 extern int test_TranslatorLOG_run_translateForSendExperimentalPositions(void);
 
+/**
+ * @brief Execute les tests de TranslatorLOG_translateForSendMemoryAndProcessorLoad.
+ *
+ * @return int 0 en cas de succes, le numero du test qui a echoue sinon.
+ */
+extern int test_TranslatorLOG_run_translateForSendMemoryAndProcessorLoad(void);
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //                                              Fonctions
@@ -69,7 +76,8 @@ extern int test_TranslatorLOG_run_translateForSendExperimentalPositions(void);
 static int (*suite_tests[])(void) = {
    test_TranslatorLOG_run_translateTrameToHeader,
    test_TranslatorLOG_run_translateForSendCurrentPosition,
-   test_TranslatorLOG_run_translateForSendExperimentalPositions
+   test_TranslatorLOG_run_translateForSendExperimentalPositions,
+   test_TranslatorLOG_run_translateForSendMemoryAndProcessorLoad
 };
 
 /**
