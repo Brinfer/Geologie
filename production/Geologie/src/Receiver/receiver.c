@@ -32,6 +32,7 @@
 
 #include "receiver.h"
 #include "../TranslatorBeacon/translatorBeacon.h"
+#include "../Watchdog/watchdog.h"
 #include "../common.h"
 
 
@@ -71,7 +72,7 @@ typedef enum {
     E_STOP = 0,
     E_ASK_BEACONS_SIGNAL,
     E_MAJ_BEACONS_CHANNEL,
-	E_SCAN_DONE,
+	E_TRANSLATING_DONE,
     NB_EVENT_RECEIVER
 } Event_RECEIVER;
 
@@ -93,9 +94,8 @@ static Transition_RECEIVER stateMachine[NB_STATE - 1][NB_EVENT_RECEIVER] =
 {
     [S_SCANNING] [E_ASK_BEACONS_SIGNAL] = {S_SCANNING, A_SEND_BEACONS_SIGNAL},
     [S_SCANNING] [E_MAJ_BEACONS_CHANNEL] = {S_SCANNING, A_MAJ_BEACONS_CHANNELS},
-	[S_SCANNING] [E_SCAN_DONE] = {S_TRANSLATING, A_TRANSLATE},
     [S_TRANSLATING] [E_STOP] = {S_DEATH, A_STOP},
-    [S_TRANSLATING] [E_MAJ_BEACONS_CHANNEL] = {S_SCANNING, A_MAJ_BEACONS_CHANNELS}
+    [S_TRANSLATING] [E_TRANSLATING_DONE] = {S_SCANNING, A_MAJ_BEACONS_CHANNELS}
 };
 
 struct hci_request ble_hci_request(uint16_t ocf, int clen, void * status, void * cparam)
@@ -121,6 +121,8 @@ static struct mq_attr attr;
 typedef struct {
     Event_RECEIVER event;
 } MqMsg;
+
+Watchdog * wtd_TScan;
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -194,13 +196,13 @@ static void Receiver_translateChannelToBeaconsSignal(){
 	BeaconSignal signal;
 	printf("TRANSLATING\n");
 
-	signal = TranslatorBeacon_translateChannelToBeaconsSignal(beaconsChannel[0]);
+	/*signal = TranslatorBeacon_translateChannelToBeaconsSignal(beaconsChannel[0]);
 	printf("Index n° : %d\n", 0);
 	printf("Name : %s\n", signal.name);
 	printf("X : %d\n", signal.position.X);
 	printf("Y : %d\n", signal.position.Y);
 	printf("UUID : %d\n", signal.uuid[0]);
-	printf("RSSI : %d\n", signal.rssi);
+	printf("RSSI : %d\n", signal.rssi);*/
 	
 
 
@@ -214,13 +216,13 @@ static void Receiver_translateChannelToBeaconsSignal(){
 		printf("Y : %d\n", signal.position.Y);
 		printf("UUID : %d\n", signal.uuid[0]);
 		printf("RSSI : %d\n", signal.rssi);
-		/*if(signal.uuid[0] == BEACONS_UUID){
+		if(signal.uuid[0] == BEACONS_UUID){
 			beaconsSignal[index_signal] = signal;
 			index_signal ++;
 		}
-		index_channel ++;*/
-	//}*/
-	/*int k;
+		index_channel ++;
+	}
+	int k;
 	for(k = 0; k< sizeof(beaconsSignal); k ++){
 		printf("Index n° : %d\n", k);
 		printf("Name : %s\n", beaconsSignal[k].name);
@@ -230,7 +232,10 @@ static void Receiver_translateChannelToBeaconsSignal(){
 		printf("Name : %d\n", beaconsSignal[k].rssi);
 	}*/
 
-	//Mettre à l'etat SCANNING
+	MqMsg msg = { 
+                .event = E_TRANSLATING_DONE
+                };
+    sendMsg(&msg);
 	
 }
 
@@ -373,6 +378,27 @@ static void Receiver_getAllBeaconsChannel(){
 	hci_close_dev(device);
 }
 
+static void performAction(Action_RECEIVER action, MqMsg * msg){
+    switch (action) {
+
+        case A_SEND_BEACONS_SIGNAL:
+            Scanner_setAllBeaconsSignal(beaconsSignal);      
+            break;
+
+        case A_MAJ_BEACONS_CHANNELS:
+			Watchdog_start(wtd_TScan);
+            Receiver_getAllBeaconsChannel();
+            break;
+
+		case A_TRANSLATE:
+			Receiver_translateChannelToBeaconsSignal(beaconsChannel);
+
+        default:
+            break;
+    }
+
+}
+
 /**
 
  * @fn static void Receiver_performAction()
@@ -401,30 +427,6 @@ static void * run(){
    return 0;
 }
 
-static void Receiver_performAction(Action_RECEIVER action, MqMsg * msg){
-    switch (action) {
-
-        case A_SEND_BEACONS_SIGNAL:
-			//wtd(TScan)
-            Scanner_setAllBeaconsSignal(beaconsSignal);
-            //Thread getChannel() avec wtd(TMajBeacon)         
-            break;
-
-        case A_MAJ_BEACONS_CHANNELS:
-            //Receiver_getAllBeaconsChannel();
-            //Reset Timer TMAJ
-            //Reset Timer TScan
-            break;
-
-		case A_TRANSLATE:
-			Receiver_translateChannelToBeaconsSignal(beaconsChannel);
-
-        default:
-            break;
-    }
-
-}
-
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //
@@ -438,6 +440,7 @@ static void Receiver_performAction(Action_RECEIVER action, MqMsg * msg){
 
 extern void Receiver_new(){
     myState = S_DEATH;
+	wtd_TScan = Watchdog_construct(1000000, &(Receiver_translateChannelToBeaconsSignal)); //CHANGER CALLBACK -> vers translating
 }
 
 extern void Receiver_ask4StartReceiver(){
@@ -454,15 +457,16 @@ extern void Receiver_ask4StopReceiver(){
     pthread_join(myThread, NULL);
 }
 
+extern void Receiver_free(){
+	myState = S_DEATH;
+    Watchdog_destroy(wtd_TScan);
+}
+
 extern void Receiver_ask4BeaconsSignal(){
     MqMsg msg = { 
                 .event = E_ASK_BEACONS_SIGNAL
                 };
     sendMsg(&msg);
-}
-
-extern void Receiver_free(){
-    myState = S_DEATH;
 }
 
 /*int main(){

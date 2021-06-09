@@ -53,7 +53,7 @@ static Position currentPosition;
 static ProcessorAndMemoryLoad currentProcessorAndMemoryLoad;
 static BeaconCoefficients * beaconsCoefficient;
 static BeaconSignal * beaconSignal;
-static CalibrationData * calibrationData;
+//static CalibrationData * calibrationData;
 
 typedef enum{
     S_DEATH = 0,
@@ -240,17 +240,17 @@ static void performAction(Action_SCANNER action, MqMsg * msg){
             break;
 
         case A_ASK_CALIBRATION_FROM_POSITION:
-            for(int index = 0; index < sizeof(beaconsData); index++){
+            /*for(int index = 0; index < sizeof(beaconsData); index++){
                 Mathematician_getAttenuationCoefficient(&(beaconsData[index].power), &(beaconsData[index].position), &(msg->calibrationPosition)); //alimente beaconsCoeffcicient
             }
-            Geographer_signalEndUpdateAttenuation();
+            Geographer_signalEndUpdateAttenuation();*/
             break;
 
         case A_ASK_CALIBRATION_AVERAGE:
-            for(int index = 0; index < sizeof(beaconsCoefficient); index++){
+            /*for(int index = 0; index < sizeof(beaconsCoefficient); index++){
                 Mathematician_getAverageCalcul(&(beaconsCoefficient[index])); //va dans calibrationData
             }
-            //Geographer_signalEndAverageCalcul(calibrationData, ); //TODO calibrationData et demander pour nbCalibration
+            //Geographer_signalEndAverageCalcul(calibrationData, ); //TODO calibrationData et demander pour nbCalibration*/
             break;
 
         default:

@@ -67,33 +67,33 @@ extern int TranslatorBeacon_free() {
 }
 
 
-extern BeaconSignal TranslatorBeacon_translateChannelToBeaconsSignal(uint8_t * info) {
+extern BeaconSignal TranslatorBeacon_translateChannelToBeaconsSignal(BeaconsChannel * info) {
 
     BeaconSignal bs;
 
     char posX[POSITION_LENGTH];
 	char posY[POSITION_LENGTH];
 
-	memcpy(bs.name, info + DEVICE_NAME_FIRST_BYTE, DEVICE_NAME_LENGTH);
+	memcpy(bs.name, info->data + DEVICE_NAME_FIRST_BYTE, DEVICE_NAME_LENGTH);
 	bs.name[2] =  '\0';
 
-	bs.name[0] = (int32_t) info[DEVICE_NAME_FIRST_BYTE];
-	bs.name[1] = (int32_t) info[DEVICE_NAME_FIRST_BYTE + 1];
+	bs.name[0] = (int32_t) info->data[DEVICE_NAME_FIRST_BYTE];
+	bs.name[1] = (int32_t) info->data[DEVICE_NAME_FIRST_BYTE + 1];
 
 	//memcpy(bs.uuid, info + DEVICE_UUID_FIRST_BYTE, DEVICE_UUID_LENGTH);
 
-	bs.uuid[0] = (int32_t) info[DEVICE_UUID_FIRST_BYTE];
-	bs.uuid[1] = (int32_t) info[DEVICE_UUID_FIRST_BYTE + 1];
+	bs.uuid[0] = (int32_t) info->data[DEVICE_UUID_FIRST_BYTE];
+	bs.uuid[1] = (int32_t) info->data[DEVICE_UUID_FIRST_BYTE + 1];
 
-	memcpy(posX, info + DEVICE_POSITION_X_FIRST_BYTE, POSITION_LENGTH);
+	memcpy(posX, info->data + DEVICE_POSITION_X_FIRST_BYTE, POSITION_LENGTH);
 
 	sscanf(posX, "%d", &(bs.position.X));
 
-	memcpy(posY, info + DEVICE_POSITION_Y_FIRST_BYTE, POSITION_LENGTH);
+	memcpy(posY, info->data + DEVICE_POSITION_Y_FIRST_BYTE, POSITION_LENGTH);
 
 	sscanf(posY, "%d", &(bs.position.Y));
 
-	//bs.rssi = (int8_t) info[info->length];
+	bs.rssi = (int8_t) info->data[info->length];
 
     return bs;
 
@@ -109,7 +109,7 @@ extern BeaconSignal TranslatorBeacon_translateChannelToBeaconsSignal(uint8_t * i
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-int main(){
+/*int main(){
 
 	BeaconSignal bs;
 
@@ -161,4 +161,4 @@ int main(){
 		printf("%d", bs.position.Y);
 	}
 
-}
+}*/
