@@ -1,7 +1,7 @@
 /**
  * @file ui.h
  *
- * @brief Permet de faire le lien avec l’utilisateur  en lui indiquant l’état de GEOLOGIE (démarré ou éteint).
+ * @brief Permet de faire le lien avec l’utilisateur  en lui indiquant l’etat de GEOLOGIE (demarre ou eteint).
  *
  * @version 2.0
  * @date 03-06-2021
