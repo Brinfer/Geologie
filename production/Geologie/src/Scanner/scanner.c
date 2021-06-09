@@ -73,6 +73,7 @@ typedef enum {
     E_ASK_AVERAGE_CALCUL,
     E_SET_BEACONS_SIGNAL,
     E_SET_PROCESSOR_AND_MEMORY,
+    E_TIME_OUT,
     NB_EVENT_SCANNER
 } Event_SCANNER;
 
@@ -94,10 +95,10 @@ typedef struct {
 
 static Transition_SCANNER stateMachine[NB_STATE][NB_EVENT_SCANNER] =
 {
-    [S_BEGINNING] [E_ASK_BEACONS_SIGNAL] = {S_WAITING_DATA_BEACONS, A_ASK_BEACONS_SIGNAL},
+    [S_BEGINNING] [E_TIME_OUT] = {S_WAITING_DATA_BEACONS, A_ASK_BEACONS_SIGNAL},
     [S_WAITING_DATA_BEACONS] [E_SET_BEACONS_SIGNAL] = {S_COMPUTE_POSITION, A_SET_CURRENT_POSITION},
     [S_COMPUTE_POSITION] [E_SET_PROCESSOR_AND_MEMORY] = {S_COMPUTE_LOAD, A_SET_CURRENT_PROCESSOR_AND_MEMORY},
-    [S_COMPUTE_LOAD] [E_ASK_BEACONS_SIGNAL] = {S_WAITING_DATA_BEACONS, A_ASK_BEACONS_SIGNAL},
+    [S_COMPUTE_LOAD] [E_TIME_OUT] = {S_WAITING_DATA_BEACONS, A_ASK_BEACONS_SIGNAL},
     [S_WAITING_DATA_BEACONS] [E_ASK_UPDATE_COEF_FROM_POSITION] = {S_COMPUTE_CALIBRATION_POSITION, A_ASK_CALIBRATION_FROM_POSITION},
     [S_COMPUTE_POSITION] [E_ASK_UPDATE_COEF_FROM_POSITION] = {S_COMPUTE_CALIBRATION_POSITION, A_ASK_CALIBRATION_FROM_POSITION},
     [S_COMPUTE_LOAD] [E_ASK_UPDATE_COEF_FROM_POSITION] = {S_COMPUTE_CALIBRATION_POSITION, A_ASK_CALIBRATION_FROM_POSITION},   
@@ -219,7 +220,6 @@ static void performAction(Action_SCANNER action, MqMsg * msg){
             break;
 
         case A_ASK_BEACONS_SIGNAL:
-            Watchdog_start(wtd_TMaj);
             Receiver_ask4BeaconsSignal();
             break;
 
@@ -237,6 +237,7 @@ static void performAction(Action_SCANNER action, MqMsg * msg){
                         .event = E_ASK_BEACONS_SIGNAL
                         };
             sendMsg(&message);
+            Watchdog_start(wtd_TMaj);
             break;
 
         case A_ASK_CALIBRATION_FROM_POSITION:
@@ -287,6 +288,15 @@ static void * run(){
    return 0;
 }
 
+static void time_out(){
+
+    MqMsg msg = { 
+                .event = E_TIME_OUT
+                };
+
+    sendMsg(&msg);
+
+}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -299,7 +309,7 @@ static void * run(){
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 extern void Scanner_new(){
-    wtd_TMaj = Watchdog_construct(1000000, &(Receiver_ask4BeaconsSignal));
+    wtd_TMaj = Watchdog_construct(1000000, &(time_out));
     myState = S_BEGINNING;
     Receiver_new();
     Bookkeeper_new();
@@ -322,6 +332,7 @@ extern void Scanner_ask4StartScanner(){
                 .event = E_ASK_BEACONS_SIGNAL
                 };
     sendMsg(&msg);
+    Watchdog_start(wtd_TMaj);
     pthread_create(&myThread, NULL, &run, NULL);
 }
 
