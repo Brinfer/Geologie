@@ -1,23 +1,11 @@
 /**
 
-
  * @file scanner.c
-
-
  * @version 2.0
-
-
  * @date 7/06/2021
-
-
  * @author Gabriel LECENNE
-
-
  * @copyright Geo-Boot
-
-
  * @license BSD 2-clauses
-
 
  */
 
@@ -34,9 +22,9 @@
 #include "scanner.h"
 
 #define MQ_MAX_MESSAGES (5)
-#define MAX_BEACONS_SIGNAL 10
-#define MAX_BEACONS_COEFFICIENTS 10
-#define MAX_BEACONS_DATA 10
+#define MAX_BEACONS_SIGNAL (10)
+#define MAX_BEACONS_COEFFICIENTS (10)
+#define MAX_BEACONS_DATA (10)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -178,26 +166,22 @@ static void mqReceive(MqMsg* this) {
 
 }
 
-static BeaconData * translateBeaconsSignalToBeaconsData(BeaconSignal * beaconSignal){
-    /*BeaconData * bd;
-    BeaconData data[sizeof(beaconSignal)]; //revoir size of beaconSignal
-    int index;
+static void translateBeaconsSignalToBeaconsData(BeaconSignal * beaconSignal, BeaconData * dest){
+
     int i;
-    for (index = 0; index < sizeof(beaconSignal); index++) //revoir size of beaconSignal
-    {
-        data[index].ID = beaconSignal[index].name;
-        data[index].position = beaconSignal[index].position;
-        data[index].power = beaconSignal[index].rssi;
-        for (i = 0; i < sizeof(calibrationData); i++) //revoir calibrationData
-        {
-            if(calibrationData[i].beaconId == data[index].ID)
-            {
-                data[index].coefficientAverage = calibrationData[i].coefficientAverage;
-            }
-        }
-        bd = *(data);
-        return bd;*/
-        return 0;
+
+    for (i = 0; i < sizeof(beaconSignal); i++)
+    {   
+        BeaconData data;
+        memcpy(data.ID, beaconSignal[i].name, sizeof(beaconSignal[i].name));
+        data.position = beaconSignal[i].position;
+        data.power = beaconSignal[i].rssi;
+        data.coefficientAverage = 0; //TODO
+
+        dest[i] = data;
+    }
+    
+
 }
 
 
@@ -225,8 +209,8 @@ static void performAction(Action_SCANNER action, MqMsg * msg){
 
         case A_SET_CURRENT_POSITION:
             beaconSignal = msg->beaconsSignal;
-            beaconsData = translateBeaconsSignalToBeaconsData(msg->beaconsSignal);
-            Mathematician_getCurrentPosition(beaconsData);
+            translateBeaconsSignalToBeaconsData(msg->beaconsSignal, &(beaconsData));
+            currentPosition = Mathematician_getCurrentPosition(beaconsData);
             Bookkeeper_ask4CurrentProcessorAndMemoryLoad();
             break;
 
@@ -241,10 +225,14 @@ static void performAction(Action_SCANNER action, MqMsg * msg){
             break;
 
         case A_ASK_CALIBRATION_FROM_POSITION:
-            /*for(int index = 0; index < sizeof(beaconsData); index++){
-                Mathematician_getAttenuationCoefficient(&(beaconsData[index].power), &(beaconsData[index].position), &(msg->calibrationPosition)); //alimente beaconsCoeffcicient
+            for(int index = 0; index < sizeof(beaconsData); index++){
+                BeaconCoefficients coef;
+                memcpy(coef.beaconId, beaconsData[index].ID, sizeof(beaconsData[index].ID));
+                memcpy(coef.positionId, msg->calibrationPosition.id, sizeof(msg->calibrationPosition.id));
+                coef.attenuationCoefficient = Mathematician_getAttenuationCoefficient(&(beaconsData[index].power), &(beaconsData[index].position), &(msg->calibrationPosition));
+                beaconsCoefficient[index] = coef;
             }
-            Geographer_signalEndUpdateAttenuation();*/
+            Geographer_signalEndUpdateAttenuation();
             break;
 
         case A_ASK_CALIBRATION_AVERAGE:
