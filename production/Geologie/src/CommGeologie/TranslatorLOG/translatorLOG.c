@@ -270,15 +270,10 @@ extern void TranslatorLOG_translateForSendExperimentalPositions(uint8_t nbExperi
     /* Number of experimental position */
     dest[SIZE_HEADER] = nbExperimentalPositions;
 
-    Trame temp[TranslatorLOG_getTrameSize(SEND_EXPERIMENTAL_POSITIONS, nbExperimentalPositions)];
-
     /* Experimental position */
     for (uint8_t i = 0; i < nbExperimentalPositions; i++) {
-        dest[SIZE_HEADER + 1 + (SIZE_EXPERIMENTAL_POSITION * i - 1)] = experimentalPositions[i].id;
-        convertPositionToByte(&(experimentalPositions[i].position), &(dest[SIZE_HEADER + 1 + (i * SIZE_EXPERIMENTAL_POSITION)]));
-
-        temp[SIZE_HEADER + 1 + (SIZE_EXPERIMENTAL_POSITION * i - 1)] = experimentalPositions[i].id;
-        convertPositionToByte(&(experimentalPositions[i].position), &(temp[SIZE_HEADER + 1 + (i * SIZE_EXPERIMENTAL_POSITION)]));
+        dest[SIZE_HEADER + 1 + (SIZE_EXPERIMENTAL_POSITION * i)] = experimentalPositions[i].id;
+        convertPositionToByte(&(experimentalPositions[i].position), &(dest[SIZE_HEADER + 2 + (i * SIZE_EXPERIMENTAL_POSITION)]));
     }
 }
 

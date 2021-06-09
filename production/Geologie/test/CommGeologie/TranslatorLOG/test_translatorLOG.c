@@ -27,7 +27,7 @@
 /**
  * @brief Nombre de suites de tests a excuter.
  */
-#define NB_SUITE_TESTS_TRANSLATOR_LOG (2)
+#define NB_SUITE_TESTS_TRANSLATOR_LOG (3)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -36,19 +36,25 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * @brief Execute les tests de TranslatorLog_translateTrameToHeader.
+ * @brief Execute les tests de TranslatorLOG_translateTrameToHeader.
  *
  * @return int 0 en cas de succes, le numero du test qui a echoue sinon.
  */
 extern int test_TranslatorLOG_run_translateTrameToHeader(void);
 
 /**
- * @brief Execute les tests de TranslatorLog_translateForSendCurrentPosition.
+ * @brief Execute les tests de TranslatorLOG_translateForSendCurrentPosition.
  *
  * @return int 0 en cas de succes, le numero du test qui a echoue sinon.
  */
 extern int test_TranslatorLOG_run_translateForSendCurrentPosition(void);
 
+/**
+ * @brief Execute les tests de TranslatorLOG_translateForSendExperimentalPositions.
+ *
+ * @return int 0 en cas de succes, le numero du test qui a echoue sinon.
+ */
+extern int test_TranslatorLOG_run_translateForSendExperimentalPositions(void);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -63,6 +69,7 @@ extern int test_TranslatorLOG_run_translateForSendCurrentPosition(void);
 static int (*suite_tests[])(void) = {
    test_TranslatorLOG_run_translateTrameToHeader,
    test_TranslatorLOG_run_translateForSendCurrentPosition,
+   test_TranslatorLOG_run_translateForSendExperimentalPositions
 };
 
 /**
