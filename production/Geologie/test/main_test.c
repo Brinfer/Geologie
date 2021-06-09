@@ -7,12 +7,13 @@
 /** Nombre de suites de tests a excuter. */
 #define NB_SUITE_TESTS 2
 
-extern int translator_run_tests(void);
 extern int mathematician_run_tests(void);
+extern int geographer_run_tests(void);
 
 /** Liste des suites de tests a excuter. */
 int (*suite_tests[])(void) = {
-    mathematician_run_tests
+    mathematician_run_tests,
+    geographer_run_tests,
 };
 
 /**
