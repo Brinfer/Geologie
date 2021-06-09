@@ -13,7 +13,7 @@ GCDA = $(SRC:.c=.gcda)
 GCNO = $(SRC:.c=.gcno)
 
 # Inclusion depuis le niveau du package.
-CCFLAGS += -I.. -I../../$(SRC_DIR)
+CCFLAGS += -I../.. -I../../../$(SRC_DIR)
 
 #################################################################################
 #																				#

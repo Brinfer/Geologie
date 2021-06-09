@@ -4,25 +4,21 @@
 #include <stddef.h>
 #include <setjmp.h>
 
-#include "cmocka.h"
-
 /** Nombre de suites de tests a excuter. */
-#define NB_SUITE_TESTS (2)
+#define NB_SUITE_TESTS_TRANSLATOR_LOG (1)
 
-extern int translatorLOG_run_tests(void);
-extern int mathematician_run_tests(void);
+extern int test_TranslatorLOG_run_translateTrameToHeader(void);
 
 /** Liste des suites de tests a excuter. */
 static int (*suite_tests[])(void) = {
-    mathematician_run_tests,
-    translatorLOG_run_tests
+   test_TranslatorLOG_run_translateTrameToHeader
 };
 
 /**
  * Fonction principal du programme de test.
  */
-int main(int argc, char* argv[]) {
-    for (int i = 0; i < NB_SUITE_TESTS; i++) {
+extern int translatorLOG_run_tests() {
+    for (int i = 0; i < NB_SUITE_TESTS_TRANSLATOR_LOG; i++) {
         suite_tests[i]();
     }
 
