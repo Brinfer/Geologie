@@ -26,9 +26,12 @@
 #include <bluetooth/hci.h>
 #include <bluetooth/hci_lib.h>
 #include <inttypes.h>
+#include <mqueue.h>
+#include <errno.h>
+#include <pthread.h>
 
 #include "receiver.h"
-#include "../translatorBeacon/translatorBeacon.h"
+#include "../TranslatorBeacon/translatorBeacon.h"
 #include "../common.h"
 
 
@@ -44,7 +47,10 @@
 
 #define NB_BEACONS_AVAILABLE 3
 
-#define BEACONS_UUID 0x181A
+#define BEACONS_UUID_1 0x18
+#define BEACONS_UUID_2 0x1A
+
+#define MQ_MAX_MESSAGES (5)
 
 static BeaconSignal beaconsSignal[NB_BEACONS_AVAILABLE];
 
@@ -65,6 +71,7 @@ typedef enum {
     E_STOP = 0,
     E_ASK_BEACONS_SIGNAL,
     E_MAJ_BEACONS_CHANNEL,
+	E_SCAN_DONE,
     NB_EVENT_RECEIVER
 } Event_RECEIVER;
 
@@ -73,6 +80,7 @@ typedef enum {
     A_STOP,
     A_SEND_BEACONS_SIGNAL,
     A_MAJ_BEACONS_CHANNELS,
+	A_TRANSLATE,
     NB_ACTION_RECEIVER
 } Action_RECEIVER;
 
@@ -83,9 +91,9 @@ typedef struct {
 
 static Transition_RECEIVER stateMachine[NB_STATE - 1][NB_EVENT_RECEIVER] =
 {
-    [S_SCANNING] [E_STOP] = {S_DEATH, A_STOP},
     [S_SCANNING] [E_ASK_BEACONS_SIGNAL] = {S_SCANNING, A_SEND_BEACONS_SIGNAL},
     [S_SCANNING] [E_MAJ_BEACONS_CHANNEL] = {S_SCANNING, A_MAJ_BEACONS_CHANNELS},
+	[S_SCANNING] [E_SCAN_DONE] = {S_TRANSLATING, A_TRANSLATE},
     [S_TRANSLATING] [E_STOP] = {S_DEATH, A_STOP},
     [S_TRANSLATING] [E_MAJ_BEACONS_CHANNEL] = {S_SCANNING, A_MAJ_BEACONS_CHANNELS}
 };
@@ -104,6 +112,15 @@ struct hci_request ble_hci_request(uint16_t ocf, int clen, void * status, void *
 }
 
 State_RECEIVER myState;
+static pthread_t myThread;
+
+static const char BAL[] = "/BALReceiver";
+static mqd_t descripteur;
+static struct mq_attr attr;
+
+typedef struct {
+    Event_RECEIVER event;
+} MqMsg;
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -116,6 +133,48 @@ State_RECEIVER myState;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+static void mqInit(void) {
+
+    printf("On entre dans le Init\n");
+
+    attr.mq_flags = 0; //Flags de la file
+    attr.mq_maxmsg = MQ_MAX_MESSAGES; //Nombre maximum de messages dans la file
+    attr.mq_msgsize = sizeof(MqMsg); //Taille maximale de chaque message
+    attr.mq_curmsgs = 0; //Nombre de messages actuellement dans la file
+
+    /* destruction de la BAL si toutefois préexistante */
+
+    if (mq_unlink(BAL) == -1) {
+        if (errno != ENOENT) {
+            perror("Erreur Unlink : ");
+            exit(1);
+        }
+    }
+
+    /* création et ouverture de la BAL */
+
+    descripteur = mq_open(BAL, O_RDWR | O_CREAT, 0777, &attr);
+
+    /*On ouvre la BAL avec comme arguments : le nom de la BAL, un flag pour ouvrir la file en lecture et en ecriture (pour utiliser recEve et send) ou pour créer une MQ, le droit d'accès,l'attribut crée*/
+
+    if (descripteur == -1) {
+        perror("Erreur Open :\n");
+    } else {
+        printf("BAL ouverte\n");
+    }
+}
+
+static void sendMsg(MqMsg* msg) {
+
+    mq_send(descripteur, (char*) &msg, sizeof(msg), 0);
+
+}
+
+static void mqReceive(MqMsg* this) {
+
+    mq_receive(descripteur, (char*) this, sizeof(*this), NULL);
+
+}
 
 
 /**
@@ -170,6 +229,8 @@ static void Receiver_translateChannelToBeaconsSignal(){
 		printf("Name : %d\n", beaconsSignal[k].uuid[0]);
 		printf("Name : %d\n", beaconsSignal[k].rssi);
 	}*/
+
+	//Mettre à l'etat SCANNING
 	
 }
 
@@ -274,7 +335,7 @@ static void Receiver_getAllBeaconsChannel(){
 
 					memcpy(uuid, info->data + 21, 2); //cond pour le Name
 
-					if(uuid[0] == BEACONS_UUID){
+					if(uuid[0] == BEACONS_UUID_1 && uuid[1]==BEACONS_UUID_2){
 						beaconsChannel[0] = info;
 						index_channel ++;
 					}
@@ -322,40 +383,45 @@ static void Receiver_getAllBeaconsChannel(){
 
  */
 
-static void Receiver_performAction(Action_RECEIVER action){
+static void * run(){
+    
+    MqMsg msg;
+
+    Action_RECEIVER action;
+
+    while (myState != S_DEATH) {
+
+        mqReceive(&msg); 
+        action = stateMachine[myState][msg.event].action;
+        performAction(action, &msg);
+        myState =  stateMachine[myState][msg.event].destinationState;
+
+    }
+        
+   return 0;
+}
+
+static void Receiver_performAction(Action_RECEIVER action, MqMsg * msg){
     switch (action) {
-        case A_STOP:
-            Receiver_free();
-            break;
 
         case A_SEND_BEACONS_SIGNAL:
-            //Scanner_setAllBeaconsSignal();
-            //Thread getChannel()         
+			//wtd(TScan)
+            Scanner_setAllBeaconsSignal(beaconsSignal);
+            //Thread getChannel() avec wtd(TMajBeacon)         
             break;
 
         case A_MAJ_BEACONS_CHANNELS:
-            Receiver_getAllBeaconsChannel();
-            //Timer TMAJ
-            //Timer TScan
+            //Receiver_getAllBeaconsChannel();
+            //Reset Timer TMAJ
+            //Reset Timer TScan
             break;
+
+		case A_TRANSLATE:
+			Receiver_translateChannelToBeaconsSignal(beaconsChannel);
 
         default:
             break;
     }
-
-}
-
-/**
-
- * @fn static void Receiver_run() TODO
-
- */
-
-static void Receiver_run(Event_RECEIVER event){
-
-    Action_RECEIVER action = stateMachine[myState][event].action;
-	myState =  stateMachine[myState][event].destinationState;
-    Receiver_performAction(action);
 
 }
 
@@ -376,18 +442,23 @@ extern void Receiver_new(){
 
 extern void Receiver_ask4StartReceiver(){
     myState = S_SCANNING;
-    Event_RECEIVER myEvent = E_ASK_BEACONS_SIGNAL;
-    Receiver_run(myEvent);
+    mqInit();
+    MqMsg msg = { 
+                .event = E_MAJ_BEACONS_CHANNEL
+                };
+    sendMsg(&msg);
+    pthread_create(&myThread, NULL, &run, NULL);
 }
 
 extern void Receiver_ask4StopReceiver(){
-    Event_RECEIVER myEvent = E_STOP;
-    Receiver_run(myEvent);
+    pthread_join(myThread, NULL);
 }
 
 extern void Receiver_ask4BeaconsSignal(){
-    Event_RECEIVER myEvent = E_ASK_BEACONS_SIGNAL;
-    Receiver_run(myEvent);
+    MqMsg msg = { 
+                .event = E_ASK_BEACONS_SIGNAL
+                };
+    sendMsg(&msg);
 }
 
 extern void Receiver_free(){

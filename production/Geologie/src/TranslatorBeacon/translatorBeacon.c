@@ -5,13 +5,9 @@
  *
 
  * @version 1.0
-
  * @date 4 juin 2021
-
  * @author LECENNE Gabriel
-
  * @copyright Geo-Boot
-
  * @license BSD 2-clauses
 
  */
@@ -27,15 +23,10 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <stdint.h>
-
 #include <stdlib.h>
-
 #include <string.h>
-
 #include <arpa/inet.h>
-
 #include "translatorBeacon.h"
-
 #include "../Receiver/receiver.h"
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -84,9 +75,10 @@ extern BeaconSignal TranslatorBeacon_translateChannelToBeaconsSignal(uint8_t * i
 	char posY[POSITION_LENGTH];
 
 	memcpy(bs.name, info + DEVICE_NAME_FIRST_BYTE, DEVICE_NAME_LENGTH);
+	bs.name[2] =  '\0';
 
-	/*bs.name[0] = (int32_t) info[DEVICE_NAME_FIRST_BYTE];
-	bs.name[1] = (int32_t) info[DEVICE_NAME_FIRST_BYTE + 1];*/
+	bs.name[0] = (int32_t) info[DEVICE_NAME_FIRST_BYTE];
+	bs.name[1] = (int32_t) info[DEVICE_NAME_FIRST_BYTE + 1];
 
 	//memcpy(bs.uuid, info + DEVICE_UUID_FIRST_BYTE, DEVICE_UUID_LENGTH);
 
@@ -117,7 +109,7 @@ extern BeaconSignal TranslatorBeacon_translateChannelToBeaconsSignal(uint8_t * i
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-/*int main(){
+int main(){
 
 	BeaconSignal bs;
 
@@ -137,7 +129,7 @@ extern BeaconSignal TranslatorBeacon_translateChannelToBeaconsSignal(uint8_t * i
 	bs = TranslatorBeacon_translateChannelToBeaconsSignal(bc);
 
 	//uint8_t name[2] = {'b', '1'};
-	uint8_t name[2] = {98, 49};
+	uint8_t name[3] = {98, 49, '\0'};
 
 	int32_t uuid[2] = { 24, 26 };
 
@@ -169,4 +161,4 @@ extern BeaconSignal TranslatorBeacon_translateChannelToBeaconsSignal(uint8_t * i
 		printf("%d", bs.position.Y);
 	}
 
-}*/
+}

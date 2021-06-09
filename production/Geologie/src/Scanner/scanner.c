@@ -240,8 +240,8 @@ static void performAction(Action_SCANNER action, MqMsg * msg){
             break;
 
         case A_ASK_CALIBRATION_FROM_POSITION:
-            for(index = 0; index < sizeof(beaconsData); index++){
-                Mathematician_getAttenuationCoefficient(&(beaconsData[index].power), &(beaconsData[index].position), &(calibrationPosition)); //alimente beaconsCoeffcicient
+            for(int index = 0; index < sizeof(beaconsData); index++){
+                Mathematician_getAttenuationCoefficient(&(beaconsData[index].power), &(beaconsData[index].position), &(msg->calibrationPosition)); //alimente beaconsCoeffcicient
             }
             Geographer_signalEndUpdateAttenuation();
             break;
