@@ -1,19 +1,11 @@
 /**
-
  * @file receiver.c
-
  *
-
  * @version 2.0
-
  * @date 5/06/2021
-
  * @author Gabriel LECENNE
-
  * @copyright Geo-Boot
-
  * @license BSD 2-clauses
-
  */
 
 #include <stdlib.h>
@@ -48,16 +40,17 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#define NB_BEACONS_AVAILABLE 3
+#define NB_BEACONS_AVAILABLE (5)
+#define NB_MAX_ADVERTISING_CHANNEL (100)
 
-#define BEACONS_UUID_1 0x18
-#define BEACONS_UUID_2 0x1A
+#define BEACONS_UUID_1 (0x18)
+#define BEACONS_UUID_2 (0x1A)
 
 #define MQ_MAX_MESSAGES (5)
 
-static BeaconSignal beaconsSignal[100];
+static BeaconSignal beaconsSignal[NB_BEACONS_AVAILABLE];
 
-static BeaconsChannel * beaconsChannel[100];
+static BeaconsChannel * beaconsChannel[NB_MAX_ADVERTISING_CHANNEL];
 
 typedef enum{
 	S_BEGINNING = 0,
@@ -180,63 +173,33 @@ static void mqReceive(MqMsg* this) {
 
 
 /**
-
  * @fn static void Receiver_translateChannelToBeaconsSignal(BeaconsChannel channel[])()
-
  * @brief methode privee permettant traduire les trames memorisees dans beaconsChannel
-
  * @param Tableau de BeaconsChannel a traduire
-
  */
 
 static void Receiver_translateChannelToBeaconsSignal(){
-    int i;
-	int j;
-	/*int index_signal = 0;
-	int index_channel = 0;*/
-	printf("TRANSLATING\n");
-
-	/*signal = TranslatorBeacon_translateChannelToBeaconsSignal(beaconsChannel[0]);
-	printf("Index n° : %d\n", 0);
-	printf("Name : %s\n", signal.name);
-	printf("X : %d\n", signal.position.X);
-	printf("Y : %d\n", signal.position.Y);
-	printf("UUID : %d\n", signal.uuid[0]);
-	printf("RSSI : %d\n", signal.rssi);*/
+	int index_signal = 0;
+	int index_channel = 0;
 	
-	for (i = 0; i < sizeof(BeaconsChannel); i++) //revoir sizeof
+	for (index_channel = 0; index_channel < NB_MAX_ADVERTISING_CHANNEL; index_channel++)
 	{
 		BeaconSignal signal;
 		bool find = FALSE;
-		signal = TranslatorBeacon_translateChannelToBeaconsSignal(beaconsChannel[i]);
-		for(j = 0; j < sizeof(beaconsSignal); i++)
+		signal = TranslatorBeacon_translateChannelToBeaconsSignal(beaconsChannel[index_channel]);
+		for(index_signal = 0; index_signal < NB_BEACONS_AVAILABLE; index_signal++)
 		{
-			if(signal.name == beaconsSignal[j].name){
-				beaconsSignal[j] = signal;
+			if(signal.name == beaconsSignal[index_signal].name){
+				beaconsSignal[index_signal] = signal;
 				find = TRUE;
 			}
 		}
 		if(find == FALSE){
-			beaconsSignal[i] = signal;
+			beaconsSignal[index_signal] = signal;
+			index_signal++;
 		}
 		
-		 //Gérer le cas des balises déjà mémorisées -> update
-		/*printf("Index n° : %d\n", i);
-		printf("Name : %s\n", signal.name);
-		printf("X : %d\n", signal.position.X);
-		printf("Y : %d\n", signal.position.Y);
-		printf("UUID : %d\n", signal.uuid[0]);
-		printf("RSSI : %d\n", signal.rssi);*/
 	}
-	/*int k;
-	for(k = 0; k< sizeof(beaconsSignal); k ++){
-		printf("Index n° : %d\n", k);
-		printf("Name : %s\n", beaconsSignal[k].name);
-		printf("Name : %d\n", beaconsSignal[k].position.X);
-		printf("Name : %d\n", beaconsSignal[k].position.Y);
-		printf("Name : %d\n", beaconsSignal[k].uuid[0]);
-		printf("Name : %d\n", beaconsSignal[k].rssi);
-	}*/
 
 	MqMsg msg = { 
                 .event = E_TRANSLATING_DONE
@@ -246,11 +209,8 @@ static void Receiver_translateChannelToBeaconsSignal(){
 }
 
 /**
-
  * @fn static void Receiver_getAllBeaconsChannel()
-
  * @brief methode privee permettant de memoriser dans beaconsChannel l'ensemble des trames des balises
-
  */
 
 static void Receiver_getAllBeaconsChannel(){
@@ -330,7 +290,7 @@ static void Receiver_getAllBeaconsChannel(){
 	int uuid[2];
 	int len;
 
-	while(1){ //Thread pour la suite
+	while(1){
 		len = read(device, buf, sizeof(buf));
 		if ( len >= HCI_EVENT_HDR_SIZE ){
 			meta_event = (evt_le_meta_event*)(buf+HCI_EVENT_HDR_SIZE+1);
@@ -344,9 +304,9 @@ static void Receiver_getAllBeaconsChannel(){
 						perror("Failed to enable scan.");
 					}			
 
-					memcpy(uuid, info->data + 21, 2); //cond pour le Name
+					memcpy(uuid, info->data + 21, 2);
 
-					if(uuid[0] == BEACONS_UUID_1 && uuid[1]==BEACONS_UUID_2){
+					if(uuid[0] == BEACONS_UUID_1 && uuid[1 ]== BEACONS_UUID_2){
 						beaconsChannel[index_channel] = info;
 						index_channel ++;
 					}
@@ -394,13 +354,9 @@ static void performAction(Action_RECEIVER action, MqMsg * msg){
 }
 
 /**
-
  * @fn static void Receiver_performAction()
-
  * @brief methode privee permettant de definir les actions a effectuer
-
  * @param TODO
-
  */
 
 static void * run(){

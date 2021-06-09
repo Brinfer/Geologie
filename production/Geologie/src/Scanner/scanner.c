@@ -1,13 +1,16 @@
 /**
-
  * @file scanner.c
  * @version 2.0
  * @date 7/06/2021
  * @author Gabriel LECENNE
  * @copyright Geo-Boot
  * @license BSD 2-clauses
-
  */
+
+
+//TODO : METTRE DES FONCTIONS DANS LE PERFORMACTION
+//COMMENTER
+//GESTION DES ERREURS
 
 #include <stdlib.h>
 #include <pthread.h>
@@ -24,9 +27,9 @@
 
 #define MQ_MAX_MESSAGES (5)
 #define MAX_BEACONS_SIGNAL (10)
-#define MAX_BEACONS_COEFFICIENTS (10)
-#define MAX_BEACONS_DATA (10)
-#define MAX_BEACONS (5)
+#define MAX_BEACONS_COEFFICIENTS (30) //Check
+#define NB_BEACONS_AVAILABLE (5)
+#define BEACON_ID_LENGTH (3)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -44,7 +47,7 @@ static ProcessorAndMemoryLoad currentProcessorAndMemoryLoad;
 static BeaconCoefficients * beaconsCoefficient;
 static BeaconSignal * beaconSignal;
 static CalibrationData * calibrationData;
-static uint8_t beaconsIds[MAX_BEACONS];
+static uint8_t beaconsIds[NB_BEACONS_AVAILABLE];
 
 typedef enum{
     S_DEATH = 0,
@@ -169,19 +172,19 @@ static void mqReceive(MqMsg* this) {
 
 }
 
-static void translateBeaconsSignalToBeaconsData(BeaconSignal * beaconSignal, BeaconData * dest){ //check redondance : 1 beaconData / balise !!
+static void translateBeaconsSignalToBeaconsData(BeaconSignal * beaconSignal, BeaconData * dest){
 
     int i;
     int j;
-    for (i = 0; i < sizeof(beaconSignal); i++) //voir size
+    for (i = 0; i < NB_BEACONS_AVAILABLE; i++)
     {   
         BeaconData data;
-        memcpy(data.ID, beaconSignal[i].name, sizeof(beaconSignal[i].name)); //voir size
+        memcpy(data.ID, beaconSignal[i].name, BEACON_ID_LENGTH);
         data.position = beaconSignal[i].position;
         data.power = beaconSignal[i].rssi;
         data.coefficientAverage = 0;
 
-        for (j = 0; j < sizeof(calibrationData); j++)   //voir size
+        for (j = 0; j < NB_BEACONS_AVAILABLE; j++)
         {
             if(data.ID == calibrationData[j].beaconId){
                 data.coefficientAverage = calibrationData[j].coefficientAverage;
@@ -200,14 +203,14 @@ static void sortBeaconsCoefficientId(BeaconCoefficients * beaconsCoefficient){
     int index_beaconsIds = 0;
     int j;
     bool idFind;
-    for(index_beaconCoef = 0; index_beaconCoef < sizeof(beaconsCoefficient); index_beaconCoef ++){ //check sizeOf
+    for(index_beaconCoef = 0; index_beaconCoef < MAX_BEACONS_COEFFICIENTS; index_beaconCoef ++){
         if(index_beaconCoef == 0){
             beaconsIds[index_beaconsIds] = beaconsCoefficient[index_beaconCoef].beaconId[2];
             index_beaconsIds ++;
         }
         else{
             idFind = true;
-            for(j = 0; j < sizeof(index_beaconsIds); j++)   //check sizeOf
+            for(j = 0; j < NB_BEACONS_AVAILABLE; j++)
             {
                 if(beaconsCoefficient[index_beaconCoef].beaconId[2] != beaconsIds[j]){
                     idFind = false;
@@ -275,7 +278,7 @@ static void performAction(Action_SCANNER action, MqMsg * msg){
 
         case A_ASK_CALIBRATION_AVERAGE:
             sortBeaconsCoefficientId(beaconsCoefficient);
-            for(int index_balise = 0; index_balise < sizeof(beaconsIds); index_balise++){   //check sizeOf
+            for(int index_balise = 0; index_balise < NB_BEACONS_AVAILABLE; index_balise++){
                 BeaconCoefficients * coef;
                 CalibrationData cd;
                 int index_coef = 0;
