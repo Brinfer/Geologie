@@ -1,7 +1,7 @@
 /**
  * @file test_translatorLOG_translateTrameToHeader.c
  *
- * @brief Ensemble de test pour tester TranslatorLog_translateForSendCurrentPosition
+ * @brief Ensemble de test pour tester TranslatorLog_translateForSendCurrentPosition.
  *
  * @version 2.0
  * @date 09-06-2021
@@ -44,7 +44,7 @@
 #define SIZE_TIMESTAMP (4)
 
 /**
- * @brief Structure passee au fonction test.
+ * @brief Structure passee aux fonctions tests.
  */
 typedef struct {
     Trame trameExpected[SIZE_HEADER + SIZE_POSITION + SIZE_TIMESTAMP];  /**< La #Trame attendue en resultat de TranslatorLog_translateForSendCurrentPosition */

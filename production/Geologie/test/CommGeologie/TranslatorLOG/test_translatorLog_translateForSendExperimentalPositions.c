@@ -39,7 +39,7 @@
 #define SIZE_POSITION (8)
 
 /**
- * @brief Structure passee au fonction test.
+ * @brief Structure passee aux fonctions tests.
  */
 typedef struct {
     uint8_t nbExperimentalPositionInput;                /**< Le nombre de position experimentale passe a TranslatorLOG_translateForSendExperimentalPositions. */

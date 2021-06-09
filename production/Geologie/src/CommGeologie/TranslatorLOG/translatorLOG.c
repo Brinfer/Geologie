@@ -285,7 +285,7 @@ extern void TranslatorLOG_translateForSendAllBeaconsData(uint8_t nbBeacons, cons
     dest[SIZE_HEADER] = nbBeacons;
 
     /* TimeStamp */
-    convertUint32_tToBytes(currentDate, dest + 1);
+    convertUint32_tToBytes(currentDate, dest + SIZE_HEADER + 1);
 
     /* Current position */
     for (uint8_t i = 0; i < nbBeacons; i++) {
@@ -446,11 +446,11 @@ static void convertBeaconDataToByte(const BeaconData* beaconData, Trame* dest) {
     memcpy(dest, beaconData->ID, SIZE_BEACON_ID);
 
     /* Position */
-    convertPositionToByte(&(beaconData->position), dest + 1);
+    convertPositionToByte(&(beaconData->position), dest + SIZE_BEACON_ID);
 
     /* Power */
-    convertFloatToByte(beaconData->power, dest + 1 + SIZE_POSITION);
+    convertFloatToByte(beaconData->power, dest + SIZE_BEACON_ID + SIZE_POSITION);
 
     /* Attenuation Coefficient */
-    convertUint32_tToBytes(beaconData->coefficientAverage, dest + 1 + SIZE_POSITION + SIZE_POWER);
+    convertFloatToByte(beaconData->coefficientAverage, dest + SIZE_BEACON_ID + SIZE_POSITION + SIZE_POWER);
 }

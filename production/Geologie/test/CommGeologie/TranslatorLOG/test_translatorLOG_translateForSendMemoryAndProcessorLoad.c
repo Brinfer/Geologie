@@ -38,7 +38,7 @@
 #define SIZE_MEMORY_AND_PROCESSOR_LOAD (12)
 
 /**
- * @brief Structure passee au fonction test.
+ * @brief Structure passee aux fonctions tests.
  */
 typedef struct {
     ProcessorAndMemoryLoad processorAndMemoryLoadInput; /**< La charge processeur et memoire passee en entree. */
