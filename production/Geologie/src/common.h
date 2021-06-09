@@ -92,6 +92,7 @@ typedef float AttenuationCoefficient;
  *
  */
 typedef struct {
+    uint8_t beaconId[SIZE_BEACON_ID];
     uint8_t positionId;
     AttenuationCoefficient attenuationCoefficient;
 }BeaconCoefficients;

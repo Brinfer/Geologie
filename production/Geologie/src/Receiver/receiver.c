@@ -34,6 +34,7 @@
 #include "receiver.h"
 #include "../TranslatorBeacon/translatorBeacon.h"
 #include "../Watchdog/watchdog.h"
+#include "../Scanner/scanner.h"
 #include "../common.h"
 
 
@@ -57,8 +58,6 @@
 static BeaconSignal beaconsSignal[100];
 
 static BeaconsChannel * beaconsChannel[100];
-
-static int channel_INDEX;
 
 typedef enum{
 	S_BEGINNING = 0,
@@ -327,7 +326,6 @@ static void Receiver_getAllBeaconsChannel(){
 	uint8_t buf[HCI_MAX_EVENT_SIZE];
 	evt_le_meta_event * meta_event;
 	BeaconsChannel * info;
-	BeaconSignal bs;
 	static int index_channel = 0;
 	int uuid[2];
 	int len;
