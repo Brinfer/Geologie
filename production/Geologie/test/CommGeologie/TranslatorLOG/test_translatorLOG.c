@@ -1,7 +1,7 @@
 /**
  * @file test_translatorLOG.c
  *
- * @brief Permet de lancer l'ensemble des tests pour le module TranslatorLOG
+ * @brief Permet de lancer l'ensemble des tests pour le module TranslatorLOG.
  *
  * @version 2.0
  * @date 09-06-2021
@@ -27,7 +27,7 @@
 /**
  * @brief Nombre de suites de tests a excuter.
  */
-#define NB_SUITE_TESTS_TRANSLATOR_LOG (4)
+#define NB_SUITE_TESTS_TRANSLATOR_LOG (5)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -63,6 +63,14 @@ extern int test_TranslatorLOG_run_translateForSendExperimentalPositions(void);
  */
 extern int test_TranslatorLOG_run_translateForSendMemoryAndProcessorLoad(void);
 
+/**
+ * @brief Execute les tests de TranslatorLog_translateForSendAllBeaconsData.
+ *
+ * @return int 0 en cas de succes, le numero du test qui a echoue sinon.
+ */
+extern int test_TranslatorLOG_run_translateForSendAllBeaconsData(void);
+
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //                                              Fonctions
@@ -77,7 +85,8 @@ static int (*suite_tests[])(void) = {
    test_TranslatorLOG_run_translateTrameToHeader,
    test_TranslatorLOG_run_translateForSendCurrentPosition,
    test_TranslatorLOG_run_translateForSendExperimentalPositions,
-   test_TranslatorLOG_run_translateForSendMemoryAndProcessorLoad
+   test_TranslatorLOG_run_translateForSendMemoryAndProcessorLoad,
+   test_TranslatorLOG_run_translateForSendAllBeaconsData
 };
 
 /**

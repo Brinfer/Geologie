@@ -1,7 +1,7 @@
 /**
  * @file test_translatorLOG_translateTrameToHeader.c
  *
- * @brief Ensemble de test pour tester TranslatorLOG_translateTrameToHeader
+ * @brief Ensemble de test pour tester TranslatorLOG_translateTrameToHeader.
  *
  * @version 2.0
  * @date 09-06-2021
@@ -33,7 +33,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * @brief Structure passee au fonction test.
+ * @brief Structure passee aux fonctions tests.
  */
 typedef struct {
     Trame trameInput[SIZE_HEADER];  /**< La trame passee a TranslatorLOG_translateTrameToHeader */
