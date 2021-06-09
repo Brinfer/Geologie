@@ -35,7 +35,6 @@
 
 /**
  * @brief La taille d'une #Position en octet.
- *
  */
 #define SIZE_POSITION (8)
 
