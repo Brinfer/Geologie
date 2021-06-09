@@ -58,7 +58,7 @@ static double distanceCalculWithPower(const Power* power, const AttenuationCoeff
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-extern AttenuationCoefficient Mathematician_getAttenuationCoefficient(const Power* power, const Position* beaconPosition, const Position* calibrationPosition) {
+extern AttenuationCoefficient Mathematician_getAttenuationCoefficient(const Power* power, const Position* beaconPosition, const CalibrationPosition* calibrationPosition) {
     AttenuationCoefficient attenuationCoefficient;
     double distance = distanceCalculWithPosition(beaconPosition, calibrationPosition);
 

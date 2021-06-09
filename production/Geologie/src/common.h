@@ -120,7 +120,7 @@ typedef struct {
 } BeaconData;
 
 typedef struct {
-    uint8_t beaconId;
+    uint8_t beaconId[SIZE_BEACON_ID];
     BeaconCoefficients* beaconCoefficient;
     uint8_t nbCoefficient;
     AttenuationCoefficient coefficientAverage;
