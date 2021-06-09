@@ -102,7 +102,7 @@ static void dispatch(Trame* trame, Header* header) {
         break;
     case SIGNAL_CALIBRATION_POSITION:;
         /* code */
-        CalibrationPositionId calibrationPositionId= TranslatorLog_translateForSignalCalibrationPosition(trame);
+        CalibrationPositionId calibrationPositionId= TranslatorLOG_translateForSignalCalibrationPosition(trame);
         Geographer_validatePosition(calibrationPositionId);
         break;
     case SIGNAL_CALIRATION_END:
@@ -122,7 +122,7 @@ static void dispatch(Trame* trame, Header* header) {
 static void readHeader(Header* header) {
     Trame headerTrame[SIZE_HEADER];
     PostmanLOG_readMsg(headerTrame, SIZE_HEADER); //on lit la trame contenant le header
-    TranslatorLog_translateTrameToHeader(headerTrame, header); //on traduit la trame header en header
+    TranslatorLOG_translateTrameToHeader(headerTrame, header); //on traduit la trame header en header
 }
 
 

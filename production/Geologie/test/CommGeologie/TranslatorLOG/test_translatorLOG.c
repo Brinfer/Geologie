@@ -1,20 +1,72 @@
+/**
+ * @file test_translatorLOG.c
+ *
+ * @brief Permet de lancer l'ensemble des tests pour le module TranslatorLOG
+ *
+ * @version 2.0
+ * @date 09-06-2021
+ * @author GAUTIER Pierre-Louis
+ * @copyright Geo-Boot
+ * @license BSD 2-clauses
+ */
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//                                              Include
+//
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #include <stdlib.h>
 
-/** Nombre de suites de tests a excuter. */
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//                                              Define
+//
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * @brief Nombre de suites de tests a excuter.
+ */
 #define NB_SUITE_TESTS_TRANSLATOR_LOG (2)
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//                                              Prototypes de fonctions
+//
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * @brief Execute les tests de TranslatorLog_translateTrameToHeader.
+ *
+ * @return int 0 en cas de succes, le numero du test qui a echoue sinon.
+ */
 extern int test_TranslatorLOG_run_translateTrameToHeader(void);
+
+/**
+ * @brief Execute les tests de TranslatorLog_translateForSendCurrentPosition.
+ *
+ * @return int 0 en cas de succes, le numero du test qui a echoue sinon.
+ */
 extern int test_TranslatorLOG_run_translateForSendCurrentPosition(void);
 
-/** Liste des suites de tests a excuter. */
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//                                              Fonctions
+//
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * @brief Suite des tests a executer.
+ *
+ */
 static int (*suite_tests[])(void) = {
    test_TranslatorLOG_run_translateTrameToHeader,
-   test_TranslatorLOG_run_translateForSendCurrentPosition
+   test_TranslatorLOG_run_translateForSendCurrentPosition,
 };
 
 /**
- * Fonction principal du programme de test.
+ * Fonction lançant la suite des tests.
  */
 extern int translatorLOG_run_tests() {
     for (int i = 0; i < NB_SUITE_TESTS_TRANSLATOR_LOG; i++) {

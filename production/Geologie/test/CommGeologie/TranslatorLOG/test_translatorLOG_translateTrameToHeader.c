@@ -1,7 +1,7 @@
 /**
  * @file test_translatorLOG_translateTrameToHeader.c
  *
- * @brief Ensemble de test pour tester TranslatorLog_translateTrameToHeader
+ * @brief Ensemble de test pour tester TranslatorLOG_translateTrameToHeader
  *
  * @version 2.0
  * @date 09-06-2021
@@ -16,8 +16,6 @@
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <float.h>
-#include <limits.h>
 #include <setjmp.h>
 #include <stdarg.h>
 #include <stddef.h>
@@ -34,10 +32,13 @@
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/**
+ * @brief Structure passee au fonction test.
+ */
 typedef struct {
-    Trame trameInput[SIZE_HEADER];
-    Header headerExpected;
-} ParameterTest;
+    Trame trameInput[SIZE_HEADER];  /**< La trame passee a TranslatorLOG_translateTrameToHeader */
+    Header headerExpected;          /**< Le resultat attendue pars la fontion TranslatorLOG_translateTrameToHeader */
+} ParameterTestHeader;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -45,7 +46,10 @@ typedef struct {
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-static ParameterTest parameterTest[] = {
+/**
+ * @brief Ensemble des donnees de tests.
+ */
+static ParameterTestHeader parameterTest[] = {
     {
         .headerExpected = {.commande = ASK_CALIBRATION_POSITIONS, .size = 0},
         .trameInput = {
@@ -97,8 +101,18 @@ static ParameterTest parameterTest[] = {
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/**
+ * @brief Execute les tests de TranslatorLOG_translateTrameToHeader.
+ *
+ * @return int 0 en cas de succes, le numero du test qui a echoue sinon.
+ */
 extern int test_TranslatorLOG_run_translateTrameToHeader(void);
 
+/**
+ * @brief La fonction test permettant de verifier le bon fonctionnement de TranslatorLOG_translateTrameToHeader.
+ *
+ * @param state Les donnees de test #ParameterTestHeader.
+ */
 static void test_TranslatorLOG_translateTrameToHeader(void** state);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -107,6 +121,9 @@ static void test_TranslatorLOG_translateTrameToHeader(void** state);
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/**
+ * @brief Ensemble des tests a executer.
+ */
 static const struct CMUnitTest tests[] = {
     cmocka_unit_test_prestate(test_TranslatorLOG_translateTrameToHeader, &(parameterTest[0])),
     cmocka_unit_test_prestate(test_TranslatorLOG_translateTrameToHeader, &(parameterTest[1])),
@@ -118,14 +135,14 @@ static const struct CMUnitTest tests[] = {
 
 
 extern int test_TranslatorLOG_run_translateTrameToHeader(void) {
-    return cmocka_run_group_tests_name("Test of the module translatorLOG for function TranslatorLog_translateTrameToHeader", tests, NULL, NULL);
+    return cmocka_run_group_tests_name("Test of the module translatorLOG for function TranslatorLOG_translateTrameToHeader", tests, NULL, NULL);
 }
 
 static void test_TranslatorLOG_translateTrameToHeader(void** state) {
-    ParameterTest* parameter = (ParameterTest*) *state;
+    ParameterTestHeader* parameter = (ParameterTestHeader*) *state;
 
     Header currentResult;
-    TranslatorLog_translateTrameToHeader(parameter->trameInput, &currentResult);
+    TranslatorLOG_translateTrameToHeader(parameter->trameInput, &currentResult);
 
     /* CMD */
     assert_int_equal(parameter->headerExpected.commande, currentResult.commande);
