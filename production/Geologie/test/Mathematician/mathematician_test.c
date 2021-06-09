@@ -33,7 +33,9 @@
 
 #define EPSILON (0.0001)
 /**
- * @brief Structure des donnees passees en parametre des fonction de test pour la conversion des Position
+ * @struct ParametersTestCalculDistancePosition
+ * 
+ * @brief Structure des donnees passees en parametre des fonctions de test pour la conversion des Position
  * en tableau d'octet.
  */
 typedef struct {
@@ -44,7 +46,7 @@ typedef struct {
 /**
  * @struct ParametersTestCalculDistancePower
  *
- * @brief Structure des donnees passees en parametre des fonction de test pour la conversion des Puissances
+ * @brief Structure des donnees passees en parametre des fonctions de test pour la conversion des Puissances
  * en tableau d'octet.
  */
 typedef struct {
@@ -52,6 +54,17 @@ typedef struct {
     Power power;            /**< La Puissance a convertir */
     float expectedDistance;    /**< Le resultat de la conversion attendue */
 } ParametersTestCalculDistancePower;
+
+/**
+ * @struct ParametersTestGetAverageCalcul
+ *
+ * @brief Structure des donnees passees en parametre des fonctions de test pour le calcul des moyennes des coefficients d'atténuation. 
+ */
+typedef struct {
+    BeaconCoefficients *  beaconCoefficients;  /**< les coefficients des balises */
+    u_int8_t nbCoefficient;           /**< Le nombre de coefficient */
+    float expectedMoyenne;    /**< Le resultat de la conversion attendue */
+} ParametersTestGetAverageCalcul;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -100,7 +113,27 @@ ParametersTestCalculDistancePower parametersTestCalculDistancePower[] = {
     {.attenuationCoefficient = 5,.power = -70,   .expectedDistance = 2.511886},
     {.attenuationCoefficient = 5,.power = -100,   .expectedDistance = 10.000},
     {.attenuationCoefficient = 6,.power = -60,   .expectedDistance = 1.467799},
-    {.attenuationCoefficient = 6,.power = -80,   .expectedDistance = 3.162277},
+    {.attenuationCoefficient = 6,.power = -80,   .expectedDistance = 3.162277}
+};
+
+/**
+ * @brief Tableau contenant les donnees de test pour le calcul de la moyenne des coefficients d'atténuation.
+ *
+ */
+ParametersTestGetAverageCalcul parametersTestGetAverageCalcul[] = {
+
+    {.beaconCoefficients = {{.positionId = 0, .attenuationCoefficient = 2 },{.positionId = 1,.attenuationCoefficient = 2 }},    .expectedResult = 2},
+    {.beaconCoefficients = {{.positionId = 3, .attenuationCoefficient = 2 },{.positionId = 4,.attenuationCoefficient = 5 },{.positionId = 5,.attenuationCoefficient = 3 }}    .expectedResult = 3.333333},
+    {.beaconCoefficients = {{.positionId = 6, .attenuationCoefficient = 3 },{.positionId = 7,.attenuationCoefficient = 2 },{.positionId = 8,.attenuationCoefficient = 4 }},    .expectedResult = 3},
+    {.beaconCoefficients = {{.positionId = 9, .attenuationCoefficient = 3 },{.positionId = 10,.attenuationCoefficient = 4 }},    .expectedResult = 3.5},
+    {.beaconCoefficients = {{.positionId = 11, .attenuationCoefficient = 4 },{.positionId = 12,.attenuationCoefficient = 4 }},    .expectedResult = 4},
+    {.beaconCoefficients = {{.positionId = 12, .attenuationCoefficient = 3 },{.positionId = 13,.attenuationCoefficient = 3 },{.positionId = 14,.attenuationCoefficient = 3 }},    .expectedResult = 3},
+    {.beaconCoefficients = {{.positionId = 15, .attenuationCoefficient = 4 },{.positionId = 16,.attenuationCoefficient = 2 }},    .expectedResult = 3},
+    {.beaconCoefficients = {{.positionId = 17, .attenuationCoefficient = 4 },{.positionId = 18,.attenuationCoefficient = 2 },{.positionId = 18,.attenuationCoefficient = 2 }},    .expectedResult = 2.666666},
+    {.beaconCoefficients = {{.positionId = 19, .attenuationCoefficient = 3 },{.positionId = 20,.attenuationCoefficient = 2 }},    .expectedResult = 2.5},
+    {.beaconCoefficients = {{.positionId = 21, .attenuationCoefficient = 4 },{.positionId = 22,.attenuationCoefficient = 3 }},    .expectedResult = 3.5},
+    {.beaconCoefficients = {{.positionId = 23, .attenuationCoefficient = 3 },{.positionId = 24,.attenuationCoefficient = 4 }},    .expectedResult = 3.5},
+    {.beaconCoefficients = {{.positionId = 25, .attenuationCoefficient = 3 }},    .expectedResult = 3}
 };
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -130,7 +163,7 @@ static void test_distanceCalculWithPower(void** state);
  */
 static const struct CMUnitTest tests[] =
 {
-    // Calucl Distance with Position
+    // Calcul Distance avec la position
     cmocka_unit_test_prestate(test_distanceCalculWithPosition, &(parametersTestCalculDistancePosition[0])),
     cmocka_unit_test_prestate(test_distanceCalculWithPosition, &(parametersTestCalculDistancePosition[1])),
     cmocka_unit_test_prestate(test_distanceCalculWithPosition, &(parametersTestCalculDistancePosition[2])),
@@ -146,7 +179,7 @@ static const struct CMUnitTest tests[] =
     cmocka_unit_test_prestate(test_distanceCalculWithPosition, &(parametersTestCalculDistancePosition[12])),
 
 
-    // Calcul Distance with Power
+    // Calcul de la distance avec Puissance
     cmocka_unit_test_prestate(test_distanceCalculWithPower, &(parametersTestCalculDistancePower[0])),
     cmocka_unit_test_prestate(test_distanceCalculWithPower, &(parametersTestCalculDistancePower[1])),
     cmocka_unit_test_prestate(test_distanceCalculWithPower, &(parametersTestCalculDistancePower[2])),
@@ -162,6 +195,21 @@ static const struct CMUnitTest tests[] =
     cmocka_unit_test_prestate(test_distanceCalculWithPower, &(parametersTestCalculDistancePower[12])),
     cmocka_unit_test_prestate(test_distanceCalculWithPower, &(parametersTestCalculDistancePower[13])),
     cmocka_unit_test_prestate(test_distanceCalculWithPower, &(parametersTestCalculDistancePower[14])),
+
+        // Calcul de la moyenne des coefficients
+
+    cmocka_unit_test_prestate(test_distanceCalculWithPower, &(parametersTestGetAverageCalcul[0])),
+    cmocka_unit_test_prestate(test_distanceCalculWithPower, &(parametersTestGetAverageCalcul[1])),
+    cmocka_unit_test_prestate(test_distanceCalculWithPower, &(parametersTestGetAverageCalcul[2])),
+    cmocka_unit_test_prestate(test_distanceCalculWithPower, &(parametersTestGetAverageCalcul[3])),
+    cmocka_unit_test_prestate(test_distanceCalculWithPower, &(parametersTestGetAverageCalcul[4])),
+    cmocka_unit_test_prestate(test_distanceCalculWithPower, &(parametersTestGetAverageCalcul[5])),
+    cmocka_unit_test_prestate(test_distanceCalculWithPower, &(parametersTestGetAverageCalcul[6])),
+    cmocka_unit_test_prestate(test_distanceCalculWithPower, &(parametersTestGetAverageCalcul[7])),
+    cmocka_unit_test_prestate(test_distanceCalculWithPower, &(parametersTestGetAverageCalcul[8])),
+    cmocka_unit_test_prestate(test_distanceCalculWithPower, &(parametersTestGetAverageCalcul[9])),
+    cmocka_unit_test_prestate(test_distanceCalculWithPower, &(parametersTestGetAverageCalcul[10])),
+    cmocka_unit_test_prestate(test_distanceCalculWithPower, &(parametersTestGetAverageCalcul[11])),
 };
 
 /**
@@ -188,3 +236,12 @@ static void test_distanceCalculWithPower(void** state) {
     result = distanceCalculWithPower(&param->power, &param->attenuationCoefficient);
     assert_float_equal(result, param->expectedDistance, EPSILON);
 }
+
+static void test_getAverageCalcul(void** state) {
+    ParametersTestGetAverageCalcul* param = (ParametersTestGetAverageCalcul*) *state;
+    float result; 
+    float expectedMoyenne;
+    result = distanceCalculWithPower(&param->beaconCoefficients, &param->nbCoefficient);
+    assert_float_equal(result, param->expectedMoyenne, EPSILON);
+}
+
