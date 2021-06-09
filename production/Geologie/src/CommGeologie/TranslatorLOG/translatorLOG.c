@@ -226,7 +226,7 @@ extern uint16_t TranslatorLog_getTrameSize(Commande cmd, uint8_t nbElements) {
             returnValue = SIZE_HEADER + 1 + SIZE_TIMESTAMP + nbElements * SIZE_BEACON_DATA;
             break;
         case SEND_CURRENT_POSITION:
-            returnValue = SIZE_HEADER + SIZE_POSITION;
+            returnValue = SIZE_HEADER + SIZE_POSITION + SIZE_TIMESTAMP;
             break;
         case REP_CALIBRATION_POSITIONS:
             returnValue = SIZE_HEADER + 1 + nbElements * SIZE_CALIBRATION_POSITION;
@@ -393,7 +393,7 @@ extern void Translator_translateForSendCalibrationData(const CalibrationData* ca
 
 static void composeHeader(Commande cmd, uint8_t nbElements, Trame* dest) {
     STOP_ON_ERROR(cmd == SEND_EXPERIMENTAL_TRAJECTS); // Should use
-    uint16_t size = TranslatorLog_getTrameSize(cmd, nbElements);
+    uint16_t size = TranslatorLog_getTrameSize(cmd, nbElements) - SIZE_HEADER;
 
     /* CMD */
     dest[0] = cmd;
@@ -417,15 +417,19 @@ static uint16_t convertBytesToUint16_t(const Trame* bytes) {
 }
 
 static void convertUint16_tToBytes(uint16_t value, Trame* dest) {
-    uint32_t bigEndian = htons(value);
+    uint16_t bigEndian = htons(value);
 
-    dest = (Trame*) &bigEndian;
+    for (uint8_t i = 0; i < 2; i++) {
+        dest[i] = (value >> (8 - (8 * i))) & 0xFF;
+    }
 }
 
 static void convertUint32_tToBytes(uint32_t value, Trame* dest) {
     uint32_t bigEndian = htonl(value);
 
-    dest = (Trame*) &bigEndian;
+    for (uint8_t i = 0; i < 4; i++) {
+        dest[i] = (value >> (24 - (8 * i))) & 0xFF;
+    }
 }
 
 static void convertFloatToByte(float value, Trame* dest) {
@@ -434,7 +438,7 @@ static void convertFloatToByte(float value, Trame* dest) {
 
 static void convertPositionToByte(const Position* position, Trame* dest) {
     convertUint32_tToBytes(position->X, dest);
-    convertUint32_tToBytes(position->Y, dest + (SIZE_POSITION % 2));
+    convertUint32_tToBytes(position->Y, dest + (SIZE_POSITION / 2));
 }
 
 static void convertBeaconDataToByte(const BeaconData* beaconData, Trame* dest) {

@@ -1,7 +1,7 @@
 /**
  * @file test_translatorLOG_translateTrameToHeader.c
  *
- * @brief  TODO
+ * @brief Ensemble de test pour tester TranslatorLog_translateTrameToHeader
  *
  * @version 2.0
  * @date 09-06-2021
@@ -45,7 +45,7 @@ typedef struct {
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-ParameterTest parameterTest[] = {
+static ParameterTest parameterTest[] = {
     {
         .headerExpected = {.commande = ASK_CALIBRATION_POSITIONS, .size = 0},
         .trameInput = {
@@ -118,7 +118,7 @@ static const struct CMUnitTest tests[] = {
 
 
 extern int test_TranslatorLOG_run_translateTrameToHeader(void) {
-    return cmocka_run_group_tests_name("Test of the module translatorLOG", tests, NULL, NULL);
+    return cmocka_run_group_tests_name("Test of the module translatorLOG for function TranslatorLog_translateTrameToHeader", tests, NULL, NULL);
 }
 
 static void test_TranslatorLOG_translateTrameToHeader(void** state) {
