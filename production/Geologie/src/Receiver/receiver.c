@@ -280,7 +280,7 @@ static void Receiver_getAllBeaconsChannel(){
 
 	// Get HCI device.
 
-	const uint32_t device = hci_open_dev(hci_get_route(NULL));
+	const int32_t device = hci_open_dev(hci_get_route(NULL));
 	if ( device < 0 ) {
 		perror("Failed to open HCI device.");
 	}
