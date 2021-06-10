@@ -83,7 +83,7 @@ static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
  * @return int 0
  */
 int main() {
-    TRACE("%s", "\033[2J\033[;H");
+    LOG("%s", "\033[2J\033[;H");
     setUp();
 
     ManagerLOG_startGEOLOGIE();

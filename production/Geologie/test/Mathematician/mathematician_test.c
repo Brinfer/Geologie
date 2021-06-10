@@ -60,10 +60,11 @@ typedef struct {
  *
  * @brief Structure des donnees passees en parametre des fonctions de test pour le calcul des moyennes des coefficients d'atténuation. 
  */
+
 typedef struct {
     BeaconCoefficients *  beaconCoefficients;  /**< les coefficients des balises */
     u_int8_t nbCoefficient;           /**< Le nombre de coefficient */
-    float expectedMoyenne;    /**< Le resultat de la conversion attendue */
+    float expectedAverage;    /**< Le resultat de la conversion attendue */
 } ParametersTestGetAverageCalcul;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -122,18 +123,18 @@ ParametersTestCalculDistancePower parametersTestCalculDistancePower[] = {
  */
 ParametersTestGetAverageCalcul parametersTestGetAverageCalcul[] = {
 
-    {.beaconCoefficients = {{.positionId = 0, .attenuationCoefficient = 2 },{.positionId = 1,.attenuationCoefficient = 2 }},    .expectedResult = 2},
-    {.beaconCoefficients = {{.positionId = 3, .attenuationCoefficient = 2 },{.positionId = 4,.attenuationCoefficient = 5 },{.positionId = 5,.attenuationCoefficient = 3 }}    .expectedResult = 3.333333},
-    {.beaconCoefficients = {{.positionId = 6, .attenuationCoefficient = 3 },{.positionId = 7,.attenuationCoefficient = 2 },{.positionId = 8,.attenuationCoefficient = 4 }},    .expectedResult = 3},
-    {.beaconCoefficients = {{.positionId = 9, .attenuationCoefficient = 3 },{.positionId = 10,.attenuationCoefficient = 4 }},    .expectedResult = 3.5},
-    {.beaconCoefficients = {{.positionId = 11, .attenuationCoefficient = 4 },{.positionId = 12,.attenuationCoefficient = 4 }},    .expectedResult = 4},
-    {.beaconCoefficients = {{.positionId = 12, .attenuationCoefficient = 3 },{.positionId = 13,.attenuationCoefficient = 3 },{.positionId = 14,.attenuationCoefficient = 3 }},    .expectedResult = 3},
-    {.beaconCoefficients = {{.positionId = 15, .attenuationCoefficient = 4 },{.positionId = 16,.attenuationCoefficient = 2 }},    .expectedResult = 3},
-    {.beaconCoefficients = {{.positionId = 17, .attenuationCoefficient = 4 },{.positionId = 18,.attenuationCoefficient = 2 },{.positionId = 18,.attenuationCoefficient = 2 }},    .expectedResult = 2.666666},
-    {.beaconCoefficients = {{.positionId = 19, .attenuationCoefficient = 3 },{.positionId = 20,.attenuationCoefficient = 2 }},    .expectedResult = 2.5},
-    {.beaconCoefficients = {{.positionId = 21, .attenuationCoefficient = 4 },{.positionId = 22,.attenuationCoefficient = 3 }},    .expectedResult = 3.5},
-    {.beaconCoefficients = {{.positionId = 23, .attenuationCoefficient = 3 },{.positionId = 24,.attenuationCoefficient = 4 }},    .expectedResult = 3.5},
-    {.beaconCoefficients = {{.positionId = 25, .attenuationCoefficient = 3 }},    .expectedResult = 3}
+    {.beaconCoefficients = {{.positionId = 0, .attenuationCoefficient = 2 },{.positionId = 1,.attenuationCoefficient = 2 }},    .expectedAverage = 2},
+    {.beaconCoefficients = {{.positionId = 3, .attenuationCoefficient = 2 },{.positionId = 4,.attenuationCoefficient = 5 },{.positionId = 5,.attenuationCoefficient = 3 }}    .expectedAverage = 3.333333},
+    {.beaconCoefficients = {{.positionId = 6, .attenuationCoefficient = 3 },{.positionId = 7,.attenuationCoefficient = 2 },{.positionId = 8,.attenuationCoefficient = 4 }},    .expectedAverage = 3},
+    {.beaconCoefficients = {{.positionId = 9, .attenuationCoefficient = 3 },{.positionId = 10,.attenuationCoefficient = 4 }},    .expectedAverage = 3.5},
+    {.beaconCoefficients = {{.positionId = 11, .attenuationCoefficient = 4 },{.positionId = 12,.attenuationCoefficient = 4 }},    .expectedAverage = 4},
+    {.beaconCoefficients = {{.positionId = 12, .attenuationCoefficient = 3 },{.positionId = 13,.attenuationCoefficient = 3 },{.positionId = 14,.attenuationCoefficient = 3 }},    .expectedAverage = 3},
+    {.beaconCoefficients = {{.positionId = 15, .attenuationCoefficient = 4 },{.positionId = 16,.attenuationCoefficient = 2 }},    .expectedAverage = 3},
+    {.beaconCoefficients = {{.positionId = 17, .attenuationCoefficient = 4 },{.positionId = 18,.attenuationCoefficient = 2 },{.positionId = 18,.attenuationCoefficient = 2 }},    .expectedAverage = 2.666666},
+    {.beaconCoefficients = {{.positionId = 19, .attenuationCoefficient = 3 },{.positionId = 20,.attenuationCoefficient = 2 }},    .expectedAverage = 2.5},
+    {.beaconCoefficients = {{.positionId = 21, .attenuationCoefficient = 4 },{.positionId = 22,.attenuationCoefficient = 3 }},    .expectedAverage = 3.5},
+    {.beaconCoefficients = {{.positionId = 23, .attenuationCoefficient = 3 },{.positionId = 24,.attenuationCoefficient = 4 }},    .expectedAverage = 3.5},
+    {.beaconCoefficients = {{.positionId = 25, .attenuationCoefficient = 3 }},    .expectedAverage = 3}
 };
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -141,6 +142,7 @@ ParametersTestGetAverageCalcul parametersTestGetAverageCalcul[] = {
 //                                              Fonctions static
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 /**
  * @brief Teste le calcul d'une distance avec deux position
@@ -235,13 +237,5 @@ static void test_distanceCalculWithPower(void** state) {
     float result;
     result = distanceCalculWithPower(&param->power, &param->attenuationCoefficient);
     assert_float_equal(result, param->expectedDistance, EPSILON);
-}
-
-static void test_getAverageCalcul(void** state) {
-    ParametersTestGetAverageCalcul* param = (ParametersTestGetAverageCalcul*) *state;
-    float result; 
-    float expectedMoyenne;
-    result = distanceCalculWithPower(&param->beaconCoefficients, &param->nbCoefficient);
-    assert_float_equal(result, param->expectedMoyenne, EPSILON);
 }
 

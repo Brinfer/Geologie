@@ -106,7 +106,7 @@ static Transition_SCANNER stateMachine[NB_STATE][NB_EVENT_SCANNER] =
     [S_COMPUTE_LOAD] [E_TIME_OUT] = {S_WAITING_DATA_BEACONS, A_ASK_BEACONS_SIGNAL},
     [S_WAITING_DATA_BEACONS] [E_ASK_UPDATE_COEF_FROM_POSITION] = {S_COMPUTE_CALIBRATION_POSITION, A_ASK_CALIBRATION_FROM_POSITION},
     [S_COMPUTE_POSITION] [E_ASK_UPDATE_COEF_FROM_POSITION] = {S_COMPUTE_CALIBRATION_POSITION, A_ASK_CALIBRATION_FROM_POSITION},
-    [S_COMPUTE_LOAD] [E_ASK_UPDATE_COEF_FROM_POSITION] = {S_COMPUTE_CALIBRATION_POSITION, A_ASK_CALIBRATION_FROM_POSITION},   
+    [S_COMPUTE_LOAD] [E_ASK_UPDATE_COEF_FROM_POSITION] = {S_COMPUTE_CALIBRATION_POSITION, A_ASK_CALIBRATION_FROM_POSITION},
     [S_WAITING_DATA_BEACONS] [E_ASK_AVERAGE_CALCUL] = {S_COMPUTE_CALIBRATION_AVERAGE, A_ASK_CALIBRATION_AVERAGE},
     [S_COMPUTE_POSITION] [E_ASK_AVERAGE_CALCUL] = {S_COMPUTE_CALIBRATION_AVERAGE, A_ASK_CALIBRATION_AVERAGE},
     [S_COMPUTE_LOAD] [E_ASK_AVERAGE_CALCUL] = {S_COMPUTE_CALIBRATION_AVERAGE, A_ASK_CALIBRATION_AVERAGE}
@@ -144,7 +144,7 @@ static uint32_t NbBeaconsAvailable;
 /**
  * @fn static void mqInit()
  * @brief Initialise la boite aux lettres
- * 
+ *
  * @return renvoie 1 si une erreur est detectee, sinon 0
 */
 static void mqInit();
@@ -152,7 +152,7 @@ static void mqInit();
 /**
  * @fn static void sendMsg(MqMsg* this)
  * @brief Envoie des messages a la BAL
- * 
+ *
  * @param this structure du message envoye a la BAL
  * @return renvoie 1 si une erreur est detectee, sinon 0
 */
@@ -161,7 +161,7 @@ static void sendMsg(MqMsg* this);
 /**
  * @fn static void mqReceive(MqMsg* this)
  * @brief Va chercher les messages dans la BAL
- * 
+ *
  * @param msg structure du message a recuperer
  * @return renvoie 1 si une erreur est detectee, sinon 0
 */
@@ -170,7 +170,7 @@ static void mqReceive(MqMsg* this);
 /**
  * @fn translateBeaconsSignalToBeaconsData(BeaconSignal * beaconSignal, BeaconData * dest)
  * @brief Traduit un tableau de BeaconSignal en un tableau de BeaconData
- * 
+ *
  * @param beaconSignal pointeur vers le tableau de beaconSignal
  * @param dest pointeur du tableau de BeaconData
 */
@@ -179,7 +179,7 @@ static void translateBeaconsSignalToBeaconsData(BeaconSignal * beaconSignal, Bea
 /**
  * @fn static void sortBeaconsCoefficientId(BeaconCoefficients * beaconsCoefficient)
  * @brief recupère l'ensemble des identifiants des balises scannees
- * 
+ *
  * @param beaconsCoefficient pointeur vers un tableau de beaconCoefficient a partir duquel seront extraits les identifiants
 */
 static void sortBeaconsCoefficientId(BeaconCoefficients * beaconsCoefficient);
@@ -187,7 +187,7 @@ static void sortBeaconsCoefficientId(BeaconCoefficients * beaconsCoefficient);
 /**
  * @fn static void perform_setCurrentPosition(MqMsg * msg)
  * @brief perform_action dans le cas de A_SET_CURRENT_POSITION
- * 
+ *
  * @param msg message qui contient les donnees necessaire a l'execution de la fonction
 */
 static void perform_setCurrentPosition(MqMsg * msg);
@@ -195,7 +195,7 @@ static void perform_setCurrentPosition(MqMsg * msg);
 /**
  * @fn perform_setCurrentProcessorAndMemoryLoad(MqMsg * msg)
  * @brief perform_action dans le cas de A_SET_CURRENT_PROCESSOR_AND_MEMORY
- * 
+ *
  * @param msg message qui contient les donnees necessaire a l'execution de la fonction
 */
 static void perform_setCurrentProcessorAndMemoryLoad(MqMsg * msg);
@@ -203,7 +203,7 @@ static void perform_setCurrentProcessorAndMemoryLoad(MqMsg * msg);
 /**
  * @fn static void perform_askCalibrationFromPosition(MqMsg * msg)
  * @brief perform_action dans le cas de A_ASK_CALIBRATION_FROM_POSITION
- * 
+ *
  * @param msg message qui contient les donnees necessaire a l'execution de la fonction
 */
 static void perform_askCalibrationFromPosition(MqMsg * msg);
@@ -211,7 +211,7 @@ static void perform_askCalibrationFromPosition(MqMsg * msg);
 /**
  * @fn static void perform_askCalibrationAverage(MqMsg * msg)
  * @brief perform_action dans le cas de A_ASK_CALIBRATION_AVERAGE
- * 
+ *
  * @param msg message qui contient les donnees necessaire a l'execution de la fonction
 */
 static void perform_askCalibrationAverage(MqMsg * msg);
@@ -219,7 +219,7 @@ static void perform_askCalibrationAverage(MqMsg * msg);
 /**
  * @fn static void performAction(Action_SCANNER action, MqMsg * msg)
  * @brief execute les fonctions a realiser en fonction du parametre action
- * 
+ *
  * @param action action a executer
  * @param msg message qui contient les donnees necessaire a l'execution de la fonction
 */
@@ -262,13 +262,11 @@ static void mqInit() {
 
     if (descripteur == -1) {
         perror("Erreur Open :\n");
-    } else {
-        printf("BAL ouverte\n");
     }
 }
 
 static void sendMsg(MqMsg* msg) {
-    mq_send(descripteur, (char*) &msg, sizeof(msg), 0);
+    mq_send(descripteur, (char*) msg, sizeof(msg), 0);
 }
 
 static void mqReceive(MqMsg* this) {
@@ -292,7 +290,7 @@ static void translateBeaconsSignalToBeaconsData(BeaconSignal * beaconSignal, Bea
                 data.coefficientAverage = calibrationData[j].coefficientAverage;
             }
         }
-        
+
         dest[i] = data;
     }
 }
@@ -335,7 +333,7 @@ static void perform_setCurrentProcessorAndMemoryLoad(MqMsg * msg){
         NbBeaconsAvailable = msg->NbBeaconsAvailable;
         currentProcessorAndMemoryLoad = msg->currentProcessorAndMemoryLoad;
         Geographer_dateAndSendData(beaconsData, sizeof(BeaconData), &(currentPosition), &(currentProcessorAndMemoryLoad)); //check sizeOf
-        MqMsg message = { 
+        MqMsg message = {
                     .event = E_ASK_BEACONS_SIGNAL
                     };
         sendMsg(&message);
@@ -412,7 +410,7 @@ static void * run(){
 
     while (myState != S_DEATH) {
 
-        mqReceive(&msg); 
+        mqReceive(&msg);
         action = stateMachine[myState][msg.event].action;
         performAction(action, &msg);
         myState =  stateMachine[myState][msg.event].destinationState;
@@ -422,7 +420,7 @@ static void * run(){
 }
 
 static void time_out(){
-    MqMsg msg = { 
+    MqMsg msg = {
                 .event = E_TIME_OUT
                 };
 
@@ -455,11 +453,10 @@ extern void Scanner_free(){
 
 
 extern void Scanner_ask4StartScanner(){
-    printf("start\n");
     Receiver_ask4StartReceiver();
     Bookkeeper_askStartBookkeeper();
     mqInit();
-    MqMsg msg = { 
+    MqMsg msg = {
                 .event = E_ASK_BEACONS_SIGNAL
                 };
     sendMsg(&msg);
@@ -475,7 +472,7 @@ extern void Scanner_ask4StopScanner(){
 
 
 extern void Scanner_ask4UpdateAttenuationCoefficientFromPosition(CalibrationPosition calibrationPosition){
-    MqMsg msg = { 
+    MqMsg msg = {
                 .event = E_ASK_UPDATE_COEF_FROM_POSITION,
                 .calibrationPosition = calibrationPosition
                 };
@@ -485,7 +482,7 @@ extern void Scanner_ask4UpdateAttenuationCoefficientFromPosition(CalibrationPosi
 
 
 extern void Scanner_ask4AverageCalcul(){
-    MqMsg msg = { 
+    MqMsg msg = {
                 .event = E_ASK_AVERAGE_CALCUL
                 };
 
@@ -505,7 +502,7 @@ extern void Scanner_setAllBeaconsSignal(BeaconSignal * beaconsSignal, uint32_t N
 
 
 extern void Scanner_setCurrentProcessorAndMemoryLoad(ProcessorAndMemoryLoad currentPAndMLoad){
-    MqMsg msg = { 
+    MqMsg msg = {
                 .event = E_SET_PROCESSOR_AND_MEMORY,
                 .currentProcessorAndMemoryLoad = currentPAndMLoad
                 };
