@@ -41,7 +41,6 @@
  */
 #define SIZE_BEACON_ID (3)
 
-#define NB_CALIBRATION_POSITIONS (10) // TODO move
 
 /**
  * @brief  TODO

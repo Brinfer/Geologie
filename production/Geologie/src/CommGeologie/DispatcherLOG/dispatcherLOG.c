@@ -84,6 +84,29 @@ static void* readMsg();
  */
 static void dispatch(Trame* trame, Header* Header);
 
+/**
+ * @brief Retourne l'indication du thread de dispatcherLOG s'il doit continuer ou non sa routine.
+ *
+ * @return true Le thread de dispatcherLOG doit continuer sa routine.
+ * @return false Le thread de dispatcherLOG doit arreter sa routine.
+ */
+static bool getKeepGoing(void);
+
+/**
+ * @brief Modifie l'indication du thread de dispatcherLOG s'il doit continuer ou non sa routine.
+ *
+ * @param newValue
+ */
+static void setKeepGoing(bool newValue);
+
+/**
+ * @brief Lis la trame contenant, la traduit et la met dans header
+ *
+ * @param header variable ou on mettra le header une fois lu et exporté
+ */
+static int16_t readHeader(Header* header);
+
+
 static bool getKeepGoing(void) {
     bool returnValue;
     pthread_mutex_lock(&myMutex);
