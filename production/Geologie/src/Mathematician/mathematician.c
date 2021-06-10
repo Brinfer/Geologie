@@ -67,7 +67,7 @@ extern AttenuationCoefficient Mathematician_getAttenuationCoefficient(const Powe
     return attenuationCoefficient;
 }
 
-extern AttenuationCoefficient Mathematician_getAverageCalcul(const BeaconCoefficients *  beaconCoefficients, u_int8_t nbCoefficient) {
+extern AttenuationCoefficient Mathematician_getAverageCalcul(const BeaconCoefficients *  beaconCoefficients,  uint8_t nbCoefficient) {
     AttenuationCoefficient somme = 0;
     AttenuationCoefficient attenuationCoefficient = 0;
     for (int i = 0; i < nbCoefficient; i++) {
@@ -78,7 +78,7 @@ extern AttenuationCoefficient Mathematician_getAverageCalcul(const BeaconCoeffic
 }
 
 
-extern Position Mathematician_getCurrentPosition(const BeaconData * beaconsData, u_int16_t nbBeacons) {
+extern Position Mathematician_getCurrentPosition(const BeaconData * beaconsData,  uint8_t nbBeacon) {
     Position M;
     M.X = 3;
     M.Y = 3;

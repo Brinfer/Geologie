@@ -56,7 +56,7 @@ fd_set l_env;
  * @brief Le numero de port que le serveur ecoute.
  *
  */
-#define ROBOT_PORT (12345)
+#define ROBOT_PORT (1234)
 
 /**
  * @brief Le type de transmission des messages
@@ -318,7 +318,7 @@ extern int8_t PostmanLOG_readMsg(Trame* destTrame, uint8_t nbToRead) {
 
     returnError = socketReadMessage(destTrame, nbToRead);
     STOP_ON_ERROR(returnError < 0);
-
+    TRACE("on est ici %s", "\n");
     return returnError;
 }
 
@@ -328,10 +328,11 @@ extern int8_t PostmanLOG_stop(void) {
     int8_t returnError = EXIT_SUCCESS;
 
     setKeepGoing(false);
-    setConnectionState(DISCONNECTED);
+    if (connectionState == CONNECTED) {
+        returnError = disconnectClient();
+        STOP_ON_ERROR(returnError < 0);
 
-    returnError = disconnectClient();
-    STOP_ON_ERROR(returnError < 0);
+    }
 
     returnError = shutdown(myServerSocket, SHUT_RDWR); // wake up accept and recv, do not destroy the socket
     STOP_ON_ERROR(returnError < 0);
@@ -341,6 +342,7 @@ extern int8_t PostmanLOG_stop(void) {
     STOP_ON_ERROR(returnError < 0);
 
     pthread_join(myThread, NULL);
+    TRACE("arret thread postman %s ", "\n");
 
     return 0;
 }
@@ -411,15 +413,23 @@ static int8_t socketReadMessage(Trame* destTrame, uint8_t nbToRead) {
 
     if (connectionState == true) {
         quantityReaddean = recv(myClientSocket, &destTrame + quantityReaddean, nbToRead, RECV_FLAGS);
-
         if (quantityReaddean < 0) {
             LOG("Error when receiving the message%s", "\n");
+            if (errno == ECONNRESET) {
+                TRACE("%s Client is disconnect%s", "\033[43m\033[37m", "\033[0m\n");
+                disconnectClient();
+                MqMsg msg = { .size = 0, .trame = NULL, .flag = STOP };
+                int8_t returnError = mqSendMessage(&msg); // wake up the PostmanLOG's thread to stop him
+                STOP_ON_ERROR(returnError < 0);
+                quantityReaddean = nbToRead + 1;
+            }
         } else if (quantityReaddean == 0) {
             TRACE("%s Client is disconnect%s", "\033[43m\033[37m", "\033[0m\n");
             disconnectClient();
             MqMsg msg = { .size = 0, .trame = NULL, .flag = STOP };
             int8_t returnError = mqSendMessage(&msg); // wake up the PostmanLOG's thread to stop him
             STOP_ON_ERROR(returnError < 0);
+            quantityReaddean = nbToRead + 1;
         }
     }
     return (quantityReaddean - nbToRead);
@@ -464,6 +474,7 @@ static int8_t connectClient(void) {
     } else {
         setConnectionState(CONNECTED);
         DispatcherLOG_setConnectionState(CONNECTED);
+        DispatcherLOG_start();
     }
 
     return returnError;
@@ -479,6 +490,8 @@ static int8_t disconnectClient(void) {
     } else {
         setConnectionState(DISCONNECTED);
         DispatcherLOG_setConnectionState(DISCONNECTED);
+
+        DispatcherLOG_stop();
     }
 
     return returnError;
@@ -487,7 +500,7 @@ static int8_t disconnectClient(void) {
 static int8_t mqSendMessage(MqMsg* message) {
     int8_t returnError = EXIT_SUCCESS;
 
-    returnError = mq_send(myMq, (char*) &message, sizeof(MqMsg), 0); // put char to avoid a warning
+    returnError = mq_send(myMq, (char*) message, sizeof(MqMsg), 0); // put char to avoid a warning
     STOP_ON_ERROR(returnError < 0);
 
     return returnError;
@@ -536,6 +549,8 @@ static void* run(void* _) {
         MqMsg msg;
 
         if (getConnectionState() == DISCONNECTED) {
+            TRACE("On retente de se connecter %s", "\n");
+
             returnError = connectClient();
             STOP_ON_ERROR(returnError);
         }
