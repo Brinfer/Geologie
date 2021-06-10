@@ -11,6 +11,13 @@
 
 #ifndef COMMON_
 #define COMMON_
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//                                              Include
+//
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#include <stdint.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -33,19 +40,40 @@
  *
  */
 #define SIZE_BEACON_ID (3)
+#define NB_CALIBRATION_POSITIONS (10)
+#define ATT_COEFF_1_METER (6)
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//                                              include
+//
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#define NB_CALIBRATION_POSITIONS (10) // TODO move
+#include <stdint.h>
+/**
+ * @brief  TODO
+ *
+ */
 
 /**
  * @brief  TODO
  *
  */
-#define ATT_COEFF_1_METER (6) // TODO move
-
-
 typedef uint8_t ExperimentalPositionId;
 
+/**
+ * @brief  TODO
+ *
+ */
 typedef uint8_t ExperimentalTrajectId;
+typedef struct {
+    uint32_t X;
+    uint32_t Y;
+}Position;
+
+/**
+ * @brief Id d'une balise
+ */
+typedef uint8_t CalibrationPositionId;
 
 /**
  * @typedef type Power
@@ -60,63 +88,56 @@ typedef float Power;
 typedef float AttenuationCoefficient;
 
 /**
- * @brief  TODO
+  *  @brief  TODO
  *
  */
-typedef float BeaconCoefficients[NB_BEACONS];
+typedef struct {
+    uint8_t beaconId[SIZE_BEACON_ID];
+    uint8_t positionId;
+    AttenuationCoefficient attenuationCoefficient;
+}BeaconCoefficients;
 
 /**
  * @brief  TODO
  *
  */
-typedef short NbCoefficient;
-
-/**
- * @brief  TODO
- *
- */
-typedef int CalibrationPositionId;
+typedef uint8_t NbCoefficient;
 
 /**
  * @brief creation d'une structure qui va prendre les differentes donnees d'une balise
  */
 typedef uint64_t Date;
 
-/**
- * @brief structure qui va prendre les coordonnees d'un point (X et Y seront des entiers et seront en cm)
- */
-typedef struct {
-    uint32_t X;
-    uint32_t Y;
-} Position;
 
 /**
  * @brief creation d'une structure qui va prendre les differentes donnees d'une balise
  */
 typedef struct {
-    char ID[SIZE_BEACON_ID];
+    uint8_t ID[SIZE_BEACON_ID];
     Position position;
     Power power;
-    AttenuationCoefficient attenuationCoefficient;
-    unsigned char nbCoefficientAttenuations;
-    AttenuationCoefficient attenuationCoefficientsArray[NB_CALIBRATION_POSITIONS];
+    AttenuationCoefficient coefficientAverage;
 } BeaconData;
 
 typedef struct {
-    uint8_t TODO;
+    uint8_t beaconId[SIZE_BEACON_ID];
+    BeaconCoefficients* beaconCoefficient;
+    uint8_t nbCoefficient;
+    AttenuationCoefficient coefficientAverage;
 } CalibrationData;
 
 typedef struct {
     CalibrationPositionId id;
     Position position;
-} CalibrationPosition;
+}CalibrationPosition;
 
-/**
- * @brief  TODO
+
+/** * @brief  TODO
  *
  */
 typedef struct {
     ExperimentalTrajectId id;
+    uint8_t nbPosition;
     Position* traject;
 } ExperimentalTraject;
 
@@ -124,6 +145,17 @@ typedef struct {
     ExperimentalPositionId id;
     Position position;
 } ExperimentalPosition;
+
+/**
+ * @brief  TODO
+ *
+ */
+typedef struct {
+    uint8_t name[SIZE_BEACON_ID];
+    uint32_t uuid[2];
+    int8_t rssi;
+    Position position;
+} BeaconSignal;
 
 /**
  * @brief  TODO

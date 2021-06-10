@@ -5,7 +5,7 @@
 #################################################################################
 
 # Packages.
-PACKAGES = Geographer ManagerLOG UI Mathematician Scanner CommGeologie Led
+PACKAGES = Geographer ManagerLOG UI Mathematician Scanner CommGeologie Led TranslatorBeacon
 
 #################################################################################
 #																				#
@@ -49,7 +49,7 @@ CCFLAGS += -fprofile-arcs -ftest-coverage -fprofile-abs-path
 #																				#
 #################################################################################
 
-SRC  = $(wildcard */*.c)
+SRC  = $(wildcard */*.c) $(wildcard */**/*.c)
 OBJ = $(SRC:.c=.o)
 
 # Point d'entre du programme
@@ -96,7 +96,7 @@ clean: coverage_clean
 
 # Nettoyage du rapport de couverture
 coverage_clean:
-	@rm -f $(GCOVR_DIR)/*.html
+	@rm -rf $(GCOVR_DIR)/
 
 -include $(DEP)
 

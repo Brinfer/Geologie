@@ -4,8 +4,12 @@
 #																				#
 #################################################################################
 
-# Packages
-PACKAGES = PostmanLOG DispatcherLOG ProxyGUI ProxyLoggerMOB TranslatorLOG
+SRC = $(wildcard *.c)
+OBJ = $(SRC:.c=.o)
+DEP = $(SRC:.c=.d)
+
+# Inclusion depuis le niveau du package.
+CCFLAGS += -I..
 
 #################################################################################
 #																				#
@@ -13,14 +17,18 @@ PACKAGES = PostmanLOG DispatcherLOG ProxyGUI ProxyLoggerMOB TranslatorLOG
 #																				#
 #################################################################################
 
-all: test
+all: prod
 
 # Compilation
-test: $(OBJ)
-	@for p in $(PACKAGES); do (cd $$p && $(MAKE) $@); done
+prod: $(OBJ)
+
+.c.o:
+	$(CC) -c $(CCFLAGS) $< -o $@
 
 # Nettoyage
 .PHONY: clean
 
 clean:
-	@for p in $(PACKAGES); do (cd $$p && $(MAKE) $@); done
+	@rm -f $(OBJ) $(DEP)
+
+-include $(DEP)

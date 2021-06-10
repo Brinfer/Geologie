@@ -32,6 +32,7 @@ export CCFLAGS += -D_REENTRANT					# define a macro
 export LDFLAGS += -lm							# Include math library
 export LDFLAGS += -pthread -lpthread			# Include pthread library
 export LDFLAGS += -lbluetooth					# Include bluetooth library
+export LDFLAGS += -lrt					        # Include mqueue library
 
 all : prod test
 
@@ -40,7 +41,7 @@ prod:
 	[ -d $(BIN_DIR) ] || mkdir -p $(BIN_DIR)
 	@cd $(SRC_DIR) && $(MAKE) $@
 
-test:
+test: prod
 	[ -d $(BIN_DIR) ] || mkdir -p $(BIN_DIR)
 	@cd $(TST_DIR) && $(MAKE) $@
 
@@ -60,18 +61,18 @@ doc:
 # Nettoyage
 clean:
 	@for i in $(SUB_DIR); do (cd $$i; make $@); done
-	@rm -f $(BIN_DIR)/*
+	@rm -rf $(BIN_DIR)/
 
 check_clean:
-	@rm -f $(CHECK_DIR)/*
+	@rm -rf $(CHECK_DIR)/
 
 # Nettoyage du rapport de couverture
 coverage_clean:
 	@cd $(TST_DIR) && $(MAKE) $@
-	@rm -f $(COVERAGE_DIR)/*
+	@rm -rf $(COVERAGE_DIR)/
 
 doc_clean:
-	rm -rf $(DOC_DIR)/*
+	rm -rf $(DOC_DIR)/
 
 clean_all : clean coverage_clean doc_clean check_clean
 

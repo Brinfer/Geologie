@@ -21,6 +21,7 @@
 
 #include "managerLOG.h"
 
+#include <assert.h>
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -39,71 +40,66 @@
 extern void ManagerLOG_startGEOLOGIE(void) {
     /* New */
 
-    TRACE("%sInitialization of GEOLOGIE%s%s", "\033[47m\033[30m", "\033[0m", "\n");
+    LOG("Initialization of GEOLOGIE%s", "\n");
 
     int8_t returnError = EXIT_SUCCESS;
 
     returnError = UI_new();
-    STOP_ON_ERROR(returnError < 0);
+    assert(returnError >= 0);
 
     returnError = PostmanLOG_new();
-    STOP_ON_ERROR(returnError < 0);
+    assert(returnError >= 0);
 
     returnError = Geographer_new();
-    STOP_ON_ERROR(returnError < 0);
+    assert(returnError >= 0);
 
     returnError = DispatcherLOG_new();
-    STOP_ON_ERROR(returnError < 0);
+    assert(returnError >= 0);
 
     /* Start */
 
-    TRACE("%sStart of GEOLOGIE%s%s", "\033[47m\033[30m", "\033[0m", "\n");
+    LOG("Start of GEOLOGIE%s", "\n");
 
     returnError = PostmanLOG_start();
-    STOP_ON_ERROR(returnError < 0);
+    assert(returnError >= 0);
 
     returnError = Geographer_askSignalStartGeographer();
-    STOP_ON_ERROR(returnError < 0);
+    assert(returnError >= 0);
 
-    returnError = DispatcherLOG_start();
-    STOP_ON_ERROR(returnError < 0);
 
     returnError = UI_askSignalBeginningGEOLOGIE();
-    STOP_ON_ERROR(returnError < 0);
+    assert(returnError >= 0);
 }
 
 extern void ManagerLOG_stopGEOLOGIE(void) {
     /* Stop */
 
-    TRACE("%sStop of GEOLOGIE%s%s", "\033[47m\033[30m", "\033[0m", "\n");
+    LOG("Stop of GEOLOGIE%s", "\n");
 
     int8_t returnError = EXIT_SUCCESS;
 
-    returnError = DispatcherLOG_stop();
-    STOP_ON_ERROR(returnError < 0);
+    returnError = PostmanLOG_stop();
+    assert(returnError >= 0);
 
     returnError = Geographer_askSignalStopGeographer();
-    STOP_ON_ERROR(returnError < 0);
-
-    returnError = PostmanLOG_stop();
-    STOP_ON_ERROR(returnError < 0);
+    assert(returnError >= 0);
 
     returnError = UI_askSignalEndingGEOLOGIE();
-    STOP_ON_ERROR(returnError < 0);
+    assert(returnError >= 0);
 
     /* Free */
 
-    TRACE("%sDestruction of GEOLOGIE%s%s", "\033[47m\033[30m", "\033[0m", "\n");
+    LOG("Destruction of GEOLOGIE%s", "\n");
 
     returnError = DispatcherLOG_free();
-    STOP_ON_ERROR(returnError < 0);
+    assert(returnError >= 0);
 
     returnError = Geographer_free();
-    STOP_ON_ERROR(returnError < 0);
+    assert(returnError >= 0);
 
     returnError = PostmanLOG_free();
-    STOP_ON_ERROR(returnError < 0);
+    assert(returnError >= 0);
 
     returnError = UI_free();
-    STOP_ON_ERROR(returnError < 0);
+    assert(returnError >= 0);
 }

@@ -53,7 +53,7 @@
  * @return le coefficient d'attenuation calcule
  *
  */
-extern AttenuationCoefficient Mathematician_getAttenuationCoefficient(const Power* power, const Position* beaconPosition, const Position* calibrationPosition);
+extern AttenuationCoefficient Mathematician_getAttenuationCoefficient(const Power* power, const Position* beaconPosition, const CalibrationPosition* calibrationPosition);
 
 /**
 * @fn extern AttenuationCoefficient Mathematician_getAverageCalcul(const BeaconCoefficients beaconCoefficients)
@@ -62,17 +62,8 @@ extern AttenuationCoefficient Mathematician_getAttenuationCoefficient(const Powe
 * @param  beaconCoefficients tableau contenant les coefficients d'attenuations pour une balise
 * @return la moyenne des coefficients d'attenuations
 */
-extern AttenuationCoefficient Mathematician_getAverageCalcul(const BeaconCoefficients beaconCoefficients);
+extern AttenuationCoefficient Mathematician_getAverageCalcul(const BeaconCoefficients *  beaconCoefficients, uint8_t nbCoefficient);
 
-
-/**
-* @fn extern AttenuationCoefficient Mathematician_getAverageCalcul(const BeaconCoefficients beaconCoefficients)
-* @brief calcul la moyenne des coefficients d'attenuations
-*
-* @param  beaconCoefficients tableau contenant les coefficients d'attenuations pour une balise
-* @return la moyenne des coefficients d'attenuations
-*/
-extern AttenuationCoefficient Mathematician_getAverageCalcul(const BeaconCoefficients beaconCoefficients);
 
 /**
 * @fn extern AttenuationCoefficient Mathematician_getCurrentPosition(const BeaconCoefficients beaconCoefficients)
@@ -81,6 +72,6 @@ extern AttenuationCoefficient Mathematician_getAverageCalcul(const BeaconCoeffic
 * @param  beaconsData tableau contenant les informations des balises
 * @return la position actuelle de la carte
 */
-extern Position Mathematician_getCurrentPosition(const BeaconData beaconsData[]);
+extern Position Mathematician_getCurrentPosition(const BeaconData * beaconsData,  uint8_t nbBeacon);
 
 #endif

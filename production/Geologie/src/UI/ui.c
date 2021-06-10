@@ -18,8 +18,9 @@
 
 #include "ui.h"
 
-#include <stdlib.h>
+#include <assert.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 #include "tools.h"
 #include "Led/led.h"
@@ -55,7 +56,7 @@ extern int8_t UI_new(void) {
     int8_t returnError = EXIT_SUCCESS;
 
     returnError = Led_new();
-    STOP_ON_ERROR(returnError < 0);
+    assert(returnError >= 0);
 
     return returnError;
 }
@@ -64,7 +65,7 @@ extern int8_t UI_askSignalBeginningGEOLOGIE(void) {
     int8_t returnError = EXIT_SUCCESS;
 
     returnError = signalBeginningGEOLOGIE();
-    STOP_ON_ERROR(returnError < 0);
+    assert(returnError >= 0);
 
     return returnError;
 }
@@ -73,7 +74,7 @@ extern int8_t UI_askSignalEndingGEOLOGIE(void) {
     int8_t returnError = EXIT_SUCCESS;
 
     returnError = signalEndingGEOLOGIE();
-    STOP_ON_ERROR(returnError < 0);
+    assert(returnError >= 0);
 
     return returnError;
 }
@@ -82,7 +83,7 @@ extern int8_t UI_free(void) {
     int8_t returnError = EXIT_SUCCESS;
 
     returnError = Led_free();
-    STOP_ON_ERROR(returnError < 0);
+    assert(returnError >= 0);
 
     return returnError;
 }
@@ -97,7 +98,7 @@ static int8_t signalBeginningGEOLOGIE(void) {
     int8_t returnError = EXIT_SUCCESS;
 
     returnError = Led_ledOn();
-    STOP_ON_ERROR(returnError < 0);
+    assert(returnError >= 0);
 
     return returnError;
 }
@@ -106,7 +107,7 @@ static int8_t signalEndingGEOLOGIE(void) {
     int8_t returnError = EXIT_SUCCESS;
 
     returnError = Led_ledOff();
-    STOP_ON_ERROR(returnError < 0);
+    assert(returnError >= 0);
 
     return returnError;
 }
