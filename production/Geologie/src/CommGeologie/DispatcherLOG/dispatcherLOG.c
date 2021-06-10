@@ -41,13 +41,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-
-
-
 static pthread_t myThreadListen;
-
-
 
 /**
  * @brief variable static pour la boucle while dans le thread
@@ -66,9 +60,7 @@ static pthread_mutex_t myMutex = PTHREAD_MUTEX_INITIALIZER;
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
 /**
- * @fn static void* readMsg();
  * @brief methode appelee par un thread pour recevoir les action a faire
  *
  * cette metode lira la socket et effectuera les actions
@@ -76,7 +68,6 @@ static pthread_mutex_t myMutex = PTHREAD_MUTEX_INITIALIZER;
 static void* readMsg();
 
 /**
- * @fn static void dispatch(Action_GEOGRAPHER action, MqMsg* msg);
  * @brief methode appelee par order pour executer les actions
  *
  * @param action action a effectuee
@@ -106,7 +97,6 @@ static void setKeepGoing(bool newValue);
  */
 static int16_t readHeader(Header* header);
 
-
 static bool getKeepGoing(void) {
     bool returnValue;
     pthread_mutex_lock(&myMutex);
@@ -125,45 +115,26 @@ static void setKeepGoing(bool newValue) {
 static void dispatch(Trame* trame, Header* header) {
     switch (header->commande) {
         case ASK_CALIBRATION_POSITIONS:
-            /* code */
             Geographer_askCalibrationPositions();
             break;
-        case SEND_EXPERIMENTAL_POSITIONS:
-            /* code */
-            break;
-        case SEND_EXPERIMENTAL_TRAJECTS:
-            /* code */
-            break;
-        case SEND_MEMORY_PROCESSOR_LOAD:
-            /* code */
-            break;
-        case SEND_ALL_BEACONS_DATA:
-            /* code */
-            break;
-        case SEND_CURRENT_POSITION:
-            /* code */
-            break;
-        case REP_CALIBRATION_POSITIONS:
-            /* code */
-            break;
         case SIGNAL_CALIBRATION_POSITION:;
-            /* code */
             CalibrationPositionId calibrationPositionId = TranslatorLOG_translateForSignalCalibrationPosition(trame);
             Geographer_validatePosition(calibrationPositionId);
             break;
-        case SIGNAL_CALIRATION_END:
-            /* code */
-            break;
         default:
+        case SEND_EXPERIMENTAL_TRAJECTS:
+        case SEND_MEMORY_PROCESSOR_LOAD:
+        case SEND_ALL_BEACONS_DATA:
+        case SEND_CURRENT_POSITION:
+        case REP_CALIBRATION_POSITIONS:
+        case SEND_EXPERIMENTAL_POSITIONS:
+        case SIGNAL_CALIRATION_END:
             break;
     }
 
-
     free(trame);
-    //free(header);
+    free(header);
 }
-
-
 
 static int16_t readHeader(Header* header) {
     Trame* headerTrame;
@@ -177,8 +148,6 @@ static int16_t readHeader(Header* header) {
 
     return returnError;
 }
-
-
 
 static void* readMsg() {
     TRACE("readMsg%s", "\n");
@@ -204,7 +173,6 @@ static void* readMsg() {
     return 0;
 }
 
-
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //                                              Fonctions publiques
@@ -221,7 +189,6 @@ extern int8_t DispatcherLOG_new() {
     return returnError;
 }
 
-
 extern int8_t DispatcherLOG_free() {
     /* Nothing to do */
     return EXIT_SUCCESS;
@@ -237,7 +204,6 @@ extern int8_t DispatcherLOG_start() {
         setKeepGoing(false);
     }
 
-
     return returnError;
 }
 
@@ -246,8 +212,6 @@ extern int8_t DispatcherLOG_stop() {
     setKeepGoing(false);
 
     returnError = pthread_join(myThreadListen, NULL);
-
-    TRACE("dispatcher joined %s", "\n");
 
     return returnError;
 }

@@ -243,7 +243,7 @@ extern uint16_t TranslatorLOG_getTrameSize(Commande cmd, uint8_t nbElements) {
             returnValue = SIZE_HEADER + 1 + SIZE_BEACON_ID + SIZE_ATTENUATION_COEFFICIENT + 1 + nbElements * (SIZE_CALIBRATION_POSITION_ID + SIZE_ATTENUATION_COEFFICIENT);
             break;
         case SEND_EXPERIMENTAL_TRAJECTS:
-            STOP_ON_ERROR(1); // should use TranslatorLOG_getTrameSizeExperimentalTraject
+            // should use TranslatorLOG_getTrameSizeExperimentalTraject
             break;
     }
 
@@ -406,7 +406,6 @@ extern void TranslatorLOG_translateForSendCalibrationData(const CalibrationData*
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 static void composeHeader(Commande cmd, uint8_t nbElements, Trame* dest) {
-    STOP_ON_ERROR(cmd == SEND_EXPERIMENTAL_TRAJECTS); // Should use
     uint16_t size = TranslatorLOG_getTrameSize(cmd, nbElements) - SIZE_HEADER;
 
     /* CMD */

@@ -270,7 +270,7 @@ extern int8_t PostmanLOG_new(void) {
 
     /* Init Socket */
     returnError = setUpSocket();
-    STOP_ON_ERROR(returnError < 0);
+    assert(returnError >= 0);
 
     /* Init Mq */
     mq_unlink(MQ_LABEL);
@@ -280,11 +280,11 @@ extern int8_t PostmanLOG_new(void) {
     attr.mq_msgsize = sizeof(MqMsg);
     attr.mq_curmsgs = 0;
     myMq = mq_open(MQ_LABEL, MQ_FLAGS, MQ_MODE, &attr);
-    STOP_ON_ERROR(myMq < 0);
+    assert(myMq > 0);
 
     /* Init mutex */
     returnError = pthread_mutex_init(&myMutex, NULL);
-    STOP_ON_ERROR(returnError < 0);
+    assert(returnError >= 0);
 
     /* Set value */
     setKeepGoing(false);
@@ -302,7 +302,7 @@ extern int8_t PostmanLOG_start(void) {
     setConnectionState(DISCONNECTED);
 
     returnError = pthread_create(&myThread, NULL, &run, NULL);
-    STOP_ON_ERROR(returnError < 0);
+    assert(returnError >= 0);
 
     return 0;
 }
@@ -313,7 +313,6 @@ extern int8_t PostmanLOG_sendMsg(Trame* trame, uint16_t size) {
     MqMsg msg = { .size = size, .trame = trame, .flag = SEND };
 
     returnError = mqSendMessage(&msg);
-    STOP_ON_ERROR(returnError < 0);
 
     return returnError;
 }
@@ -329,41 +328,41 @@ extern int8_t PostmanLOG_readMsg(Trame* destTrame, uint8_t nbToRead) {
 extern int8_t PostmanLOG_stop(void) {
     TRACE("%sStop the server%s", "\033[44m\033[37m", "\033[0m\n");
 
-    int8_t returnError = EXIT_SUCCESS;
+    int8_t returnError;
 
     setKeepGoing(false);
-    if (connectionState == CONNECTED) {
-        returnError = disconnectClient();
-        STOP_ON_ERROR(returnError < 0);
+    if (getConnectionState() == CONNECTED) {
+        disconnectClient();
     }
 
     returnError = shutdown(myServerSocket, SHUT_RDWR); // wake up accept and recv, do not destroy the socket
-    STOP_ON_ERROR(returnError < 0);
 
-    MqMsg msg = { .size = 0, .trame = NULL, .flag = STOP };
-    returnError = mqSendMessage(&msg); // wake up the PostmanLOG's thread to stop him
-    STOP_ON_ERROR(returnError < 0);
+    if (returnError >= 0) {
+        MqMsg msg = { .size = 0, .trame = NULL, .flag = STOP };
+        returnError = mqSendMessage(&msg); // wake up the PostmanLOG's thread to stop him
 
-    pthread_join(myThread, NULL);
-    TRACE("arret thread postman %s ", "\n");
+        pthread_join(myThread, NULL);
+    }
 
-    return 0;
+    return returnError;
 }
 
 extern int8_t PostmanLOG_free(void) {
     int8_t returnError = EXIT_SUCCESS;
 
     returnError = tearDownSocket();
-    STOP_ON_ERROR(returnError < 0);
 
-    returnError = mq_unlink(MQ_LABEL);
-    STOP_ON_ERROR(returnError < 0);
+    if (returnError >= 0) {
+        returnError = mq_unlink(MQ_LABEL);
 
-    returnError = mq_close(myMq);
-    STOP_ON_ERROR(returnError < 0);
+        if (returnError >= 0) {
+            returnError = mq_close(myMq);
 
-    returnError = pthread_mutex_destroy(&myMutex);
-    STOP_ON_ERROR(returnError < 0);
+            if (returnError >= 0) {
+                returnError = pthread_mutex_destroy(&myMutex);
+            }
+        }
+    }
 
     return returnError;
 }
@@ -463,21 +462,22 @@ static int8_t connectClient(void) {
     int8_t returnError = EXIT_SUCCESS;
 
     returnError = listen(myServerSocket, MAX_PENDING_CONNECTIONS);
-    STOP_ON_ERROR(returnError < 0);
 
-    myClientSocket = accept(myServerSocket, NULL, 0);
+    if (returnError >= 0) {
+        myClientSocket = accept(myServerSocket, NULL, 0);
 
-    if (myClientSocket < 0) {
-        if (errno == EINVAL) {
-            // Socket no more accept any connection
-            LOG("Connection aborted by the server%s", "\n");
+        if (myClientSocket < 0) {
+            if (errno == EINVAL) {
+                // Socket no more accept any connection
+                LOG("Connection aborted by the server%s", "\n");
+            } else {
+                LOG("Error when connecting the client%s", "\n");
+                returnError = -1;
+            }
         } else {
-            LOG("Error when connecting the client%s", "\n");
-            returnError = -1;
+            setConnectionState(CONNECTED);
+            DispatcherLOG_setConnectionState(CONNECTED);
         }
-    } else {
-        setConnectionState(CONNECTED);
-        DispatcherLOG_setConnectionState(CONNECTED);
     }
 
     return returnError;
@@ -555,18 +555,22 @@ static void* run(void* _) {
             TRACE("On retente de se connecter %s", "\n");
 
             returnError = connectClient();
-            STOP_ON_ERROR(returnError);
+            if (returnError < 0) {
+                break;
+            }
         }
 
-        returnError = mqReadMessage(&msg);
-        STOP_ON_ERROR(returnError < 0);
+        mqReadMessage(&msg);
 
         if (msg.flag == SEND) {
             if (getConnectionState() == CONNECTED && getKeepGoing() == true) {
                 returnError = socketSendMessage(msg.trame, msg.size);
-                STOP_ON_ERROR(returnError);
             }
             free(msg.trame);
+
+            if (returnError < 0) {
+                break;
+            }
         }
     }
     return NULL;
