@@ -65,13 +65,6 @@ extern Watchdog *Watchdog_construct(uint32_t delay, WatchdogCallback callback);
 extern void Watchdog_start(Watchdog * this);
 
 /**
- * Arms the watchdog, and execute his callback periodically
- *
- * @param this watchdog's instance
- */
-extern void Watchdog_startPeriodic(Watchdog * this);
-
-/**
  * Disarms the watchdog.
  *
  * @param this watchdog's instance

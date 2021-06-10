@@ -89,21 +89,6 @@ void Watchdog_start(Watchdog *this)
     timer_settime(this->timerId, 0, &spec, NULL);
 }
 
-void Watchdog_startPeriodic(Watchdog *this)
-{
-    struct itimerspec spec;
-
-    /* Period of the timer */
-    spec.it_interval.tv_sec = this->myDelay / 1000000; // The callback function is executed once every <n> seconde
-    spec.it_interval.tv_nsec = (this->myDelay % 1000000) * 1000;
-
-    /* the timer is reloaded from the value specified in it_interval */
-    spec.it_value.tv_sec = this->myDelay / 1000000;
-    spec.it_value.tv_nsec = (this->myDelay % 1000000) * 1000;
-
-    timer_settime(this->timerId, 0, &spec, NULL);
-}
-
 void Watchdog_cancel(Watchdog *this)
 {
     if (this != NULL)
