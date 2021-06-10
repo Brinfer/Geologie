@@ -152,7 +152,7 @@ typedef struct {
  */
 typedef struct {
     uint8_t name[SIZE_BEACON_ID];
-    int32_t uuid[2];
+    uint32_t uuid[2];
     int8_t rssi;
     Position position;
 } BeaconSignal;

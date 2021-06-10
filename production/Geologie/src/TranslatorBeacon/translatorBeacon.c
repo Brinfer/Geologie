@@ -77,8 +77,8 @@ extern BeaconSignal TranslatorBeacon_translateChannelToBeaconsSignal(BeaconsChan
 	memcpy(bs.name, info->data + DEVICE_NAME_FIRST_BYTE, DEVICE_NAME_LENGTH);
 	bs.name[2] =  '\0';
 
-	bs.uuid[0] = (int32_t) info->data[DEVICE_UUID_FIRST_BYTE];
-	bs.uuid[1] = (int32_t) info->data[DEVICE_UUID_FIRST_BYTE + 1];
+	bs.uuid[0] = (uint32_t) info->data[DEVICE_UUID_FIRST_BYTE];
+	bs.uuid[1] = (uint32_t) info->data[DEVICE_UUID_FIRST_BYTE + 1];
 
 	memcpy(posX, info->data + DEVICE_POSITION_X_FIRST_BYTE, POSITION_LENGTH);
 
