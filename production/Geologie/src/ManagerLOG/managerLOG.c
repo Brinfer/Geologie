@@ -69,7 +69,7 @@ extern void ManagerLOG_startGEOLOGIE(void) {
     returnError = UI_askSignalBeginningGEOLOGIE();
     STOP_ON_ERROR(returnError < 0);
 
-    //returnError = DispatcherLOG_start();
+    returnError = DispatcherLOG_start();
     STOP_ON_ERROR(returnError < 0);
 }
 

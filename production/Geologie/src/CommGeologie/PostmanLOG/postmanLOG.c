@@ -56,7 +56,7 @@ fd_set l_env;
  * @brief Le numero de port que le serveur ecoute.
  *
  */
-#define ROBOT_PORT (1234)
+#define ROBOT_PORT (12345)
 
 /**
  * @brief Le type de transmission des messages
@@ -317,8 +317,7 @@ extern int8_t PostmanLOG_readMsg(Trame* destTrame, uint8_t nbToRead) {
     int8_t returnError = EXIT_SUCCESS;
 
     returnError = socketReadMessage(destTrame, nbToRead);
-    STOP_ON_ERROR(returnError < 0);
-    TRACE("on est ici %s", "\n");
+
     return returnError;
 }
 
@@ -411,7 +410,7 @@ static int8_t socketReadMessage(Trame* destTrame, uint8_t nbToRead) {
 
     int16_t quantityReaddean = 0;
 
-    if (connectionState == true) {
+    if (getConnectionState() == CONNECTED) {
         quantityReaddean = recv(myClientSocket, &destTrame + quantityReaddean, nbToRead, RECV_FLAGS);
         if (quantityReaddean < 0) {
             LOG("Error when receiving the message%s", "\n");
@@ -431,6 +430,8 @@ static int8_t socketReadMessage(Trame* destTrame, uint8_t nbToRead) {
             STOP_ON_ERROR(returnError < 0);
             quantityReaddean = nbToRead + 1;
         }
+    } else {
+        DispatcherLOG_setConnectionState(DISCONNECTED);
     }
     return (quantityReaddean - nbToRead);
 }
@@ -474,7 +475,7 @@ static int8_t connectClient(void) {
     } else {
         setConnectionState(CONNECTED);
         DispatcherLOG_setConnectionState(CONNECTED);
-        DispatcherLOG_start();
+        //DispatcherLOG_start();
     }
 
     return returnError;
