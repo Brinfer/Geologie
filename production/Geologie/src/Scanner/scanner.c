@@ -265,7 +265,7 @@ static void mqInit() {
 }
 
 static void sendMsg(MqMsg* msg) {
-    mq_send(descripteur, (char*) &msg, sizeof(msg), 0);
+    mq_send(descripteur, (char*) msg, sizeof(msg), 0);
 }
 
 static void mqReceive(MqMsg* this) {
