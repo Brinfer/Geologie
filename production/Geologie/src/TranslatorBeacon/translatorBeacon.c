@@ -82,11 +82,11 @@ extern BeaconSignal TranslatorBeacon_translateChannelToBeaconsSignal(BeaconsChan
 
 	memcpy(posX, info->data + DEVICE_POSITION_X_FIRST_BYTE, POSITION_LENGTH);
 
-	sscanf(posX, "%d", &(bs.position.X));
+	sscanf(posX, "%d", (int32_t*) &(bs.position.X));
 
 	memcpy(posY, info->data + DEVICE_POSITION_Y_FIRST_BYTE, POSITION_LENGTH);
 
-	sscanf(posY, "%d", &(bs.position.Y));
+	sscanf(posY, "%d", (int32_t*) &(bs.position.Y));
 
 	bs.rssi = (int8_t) info->data[info->length];
 
@@ -109,7 +109,7 @@ extern BeaconSignal TranslatorBeacon_translateChannelToBeaconsSignal(BeaconsChan
 	BeaconSignal bs;
 
 	uint8_t * bc;
-	
+
 	uint8_t inputData[27] = {
             0x02, 0x01, 0x06, 0x0F, 0x09,              // Not used
             0x62, 0x31, 0x78, 0x33, 0x30, 0x30, 0x30, 0x30, 0x79, 0x34, 0x30, 0x30, 0x30, 0x30,
