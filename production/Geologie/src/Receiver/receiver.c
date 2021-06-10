@@ -115,7 +115,9 @@ typedef struct {
     Event_RECEIVER event;
 } MqMsg;
 
-Watchdog * wtd_TScan;
+static Watchdog * wtd_TScan;
+
+static uint32_t  nbSignalAvailable;
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -275,11 +277,11 @@ static void reset_beaconsChannelAndSignal(){
 }
 
 static void Receiver_getAllBeaconsChannel(){
-    uint8_t ret, status;
+    uint32_t ret, status;
 
 	// Get HCI device.
 
-	const uint8_t device = hci_open_dev(hci_get_route(NULL));
+	const uint32_t device = hci_open_dev(hci_get_route(NULL));
 	if ( device < 0 ) { 
 		perror("Failed to open HCI device.");
 	}
@@ -347,9 +349,9 @@ static void Receiver_getAllBeaconsChannel(){
 	uint8_t buf[HCI_MAX_EVENT_SIZE];
 	evt_le_meta_event * meta_event;
 	BeaconsChannel * info;
-	static uint8_t index_channel = 0;
-	uint8_t uuid[2];
-	uint8_t len;
+	static uint32_t index_channel = 0;
+	uint32_t uuid[2];
+	uint32_t len;
 
 	while(1){
 		len = read(device, buf, sizeof(buf));
@@ -397,7 +399,7 @@ static void performAction(Action_RECEIVER action, MqMsg * msg){
     switch (action) {
 
         case A_SEND_BEACONS_SIGNAL:
-            Scanner_setAllBeaconsSignal(beaconsSignal);      
+            Scanner_setAllBeaconsSignal(beaconsSignal, nbSignalAvailable);      
             break;
 
         case A_MAJ_BEACONS_CHANNELS:

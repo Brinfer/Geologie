@@ -37,9 +37,8 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #define MQ_MAX_MESSAGES (5)
-#define MAX_BEACONS_SIGNAL (10)
 #define MAX_BEACONS_COEFFICIENTS (30) //Check
-#define NB_BEACONS_AVAILABLE (5)
+#define NB_BEACONS_MAX (10)
 #define BEACON_ID_LENGTH (3)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -58,7 +57,8 @@ static ProcessorAndMemoryLoad currentProcessorAndMemoryLoad;
 static BeaconCoefficients * beaconsCoefficient;
 static BeaconSignal * beaconSignal;
 static CalibrationData * calibrationData;
-static uint8_t beaconsIds[NB_BEACONS_AVAILABLE];
+static uint32_t beaconsIds[NB_BEACONS_MAX];
+static uint32_t NbBeaconsCoefficients;
 
 typedef enum{
     S_DEATH = 0,
@@ -117,6 +117,7 @@ typedef struct {
     BeaconSignal * beaconsSignal;
     ProcessorAndMemoryLoad currentProcessorAndMemoryLoad;
     CalibrationPosition calibrationPosition;
+    uint32_t NbBeaconsAvailable;
 } MqMsg;
 
 static State_SCANNER myState;
@@ -127,6 +128,8 @@ static mqd_t descripteur;
 static struct mq_attr attr;
 
 Watchdog * wtd_TMaj;
+
+static uint32_t NbBeaconsAvailable;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -273,9 +276,9 @@ static void mqReceive(MqMsg* this) {
 }
 
 static void translateBeaconsSignalToBeaconsData(BeaconSignal * beaconSignal, BeaconData * dest){
-    uint8_t i;
-    uint8_t j;
-    for (i = 0; i < NB_BEACONS_AVAILABLE; i++)
+    uint32_t i;
+    uint32_t j;
+    for (i = 0; i < NbBeaconsAvailable; i++)
     {   
         BeaconData data;
         memcpy(data.ID, beaconSignal[i].name, BEACON_ID_LENGTH);
@@ -283,7 +286,7 @@ static void translateBeaconsSignalToBeaconsData(BeaconSignal * beaconSignal, Bea
         data.power = beaconSignal[i].rssi;
         data.coefficientAverage = 0;
 
-        for (j = 0; j < NB_BEACONS_AVAILABLE; j++)
+        for (j = 0; j < NbBeaconsAvailable; j++)
         {
             if(data.ID == calibrationData[j].beaconId){
                 data.coefficientAverage = calibrationData[j].coefficientAverage;
@@ -295,18 +298,18 @@ static void translateBeaconsSignalToBeaconsData(BeaconSignal * beaconSignal, Bea
 }
 
 static void sortBeaconsCoefficientId(BeaconCoefficients * beaconsCoefficient){
-    uint8_t index_beaconCoef;
-    uint8_t index_beaconsIds = 0;
-    uint8_t j;
+    uint32_t index_beaconCoef;
+    uint32_t index_beaconsIds = 0;
+    uint32_t j;
     bool idFind;
-    for(index_beaconCoef = 0; index_beaconCoef < MAX_BEACONS_COEFFICIENTS; index_beaconCoef ++){
+    for(index_beaconCoef = 0; index_beaconCoef < NbBeaconsCoefficients; index_beaconCoef ++){
         if(index_beaconCoef == 0){
             beaconsIds[index_beaconsIds] = beaconsCoefficient[index_beaconCoef].beaconId[2];
             index_beaconsIds ++;
         }
         else{
             idFind = true;
-            for(j = 0; j < NB_BEACONS_AVAILABLE; j++)
+            for(j = 0; j < NbBeaconsAvailable; j++)
             {
                 if(beaconsCoefficient[index_beaconCoef].beaconId[2] != beaconsIds[j]){
                     idFind = false;
@@ -324,11 +327,12 @@ static void sortBeaconsCoefficientId(BeaconCoefficients * beaconsCoefficient){
 static void perform_setCurrentPosition(MqMsg * msg){
         beaconSignal = msg->beaconsSignal;
         translateBeaconsSignalToBeaconsData(msg->beaconsSignal, beaconsData);
-        currentPosition = Mathematician_getCurrentPosition(beaconsData, sizeof(BeaconData)); //check
+        currentPosition = Mathematician_getCurrentPosition(beaconsData, sizeof(BeaconData)); //check nb balises recup de receiver
         Bookkeeper_ask4CurrentProcessorAndMemoryLoad();
 }
 
 static void perform_setCurrentProcessorAndMemoryLoad(MqMsg * msg){
+        NbBeaconsAvailable = msg->NbBeaconsAvailable;
         currentProcessorAndMemoryLoad = msg->currentProcessorAndMemoryLoad;
         Geographer_dateAndSendData(beaconsData, sizeof(BeaconData), &(currentPosition), &(currentProcessorAndMemoryLoad)); //check sizeOf
         MqMsg message = { 
@@ -339,23 +343,24 @@ static void perform_setCurrentProcessorAndMemoryLoad(MqMsg * msg){
 }
 
 static void perform_askCalibrationFromPosition(MqMsg * msg){
-        for(uint8_t index = 0; index < sizeof(beaconsData); index++){
+        for(uint32_t index = 0; index < sizeof(beaconsData); index++){
             BeaconCoefficients coef;
             memcpy(coef.beaconId, beaconsData[index].ID, sizeof(beaconsData[index].ID));
             coef.positionId = msg->calibrationPosition.id;
             coef.attenuationCoefficient = Mathematician_getAttenuationCoefficient(&(beaconsData[index].power), &(beaconsData[index].position), &(msg->calibrationPosition));
             beaconsCoefficient[index] = coef;
+            NbBeaconsCoefficients++;
         }
         Geographer_signalEndUpdateAttenuation();
 }
 
 static void perform_askCalibrationAverage(MqMsg * msg){
         sortBeaconsCoefficientId(beaconsCoefficient);
-        for(uint8_t index_balise = 0; index_balise < NB_BEACONS_AVAILABLE; index_balise++){
+        for(uint32_t index_balise = 0; index_balise < NbBeaconsAvailable; index_balise++){
             BeaconCoefficients * coef;
             CalibrationData cd;
-            uint8_t index_coef = 0;
-            for (uint8_t j = 0; j < sizeof(beaconsCoefficient); j++)    //check sizeOf
+            uint32_t index_coef = 0;
+            for (uint32_t j = 0; j < sizeof(beaconsCoefficient); j++)    //check sizeOf
             {
                 if(beaconsCoefficient[j].beaconId[2] == beaconsIds[index_balise]){
                     coef[index_coef] = beaconsCoefficient[j];   //check
@@ -488,10 +493,11 @@ extern void Scanner_ask4AverageCalcul(){
 }
 
 
-extern void Scanner_setAllBeaconsSignal(BeaconSignal * beaconsSignal){
+extern void Scanner_setAllBeaconsSignal(BeaconSignal * beaconsSignal, uint32_t NbBeaconsAvailable){
     MqMsg msg = { 
                 .event = E_SET_BEACONS_SIGNAL,
-                .beaconsSignal = beaconsSignal
+                .beaconsSignal = beaconsSignal,
+                .NbBeaconsAvailable = NbBeaconsAvailable
                 };
 
     sendMsg(&msg);
