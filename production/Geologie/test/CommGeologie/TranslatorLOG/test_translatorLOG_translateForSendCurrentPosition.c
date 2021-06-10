@@ -1,7 +1,7 @@
 /**
  * @file test_translatorLOG_translateTrameToHeader.c
  *
- * @brief Ensemble de test pour tester TranslatorLog_translateForSendCurrentPosition.
+ * @brief Ensemble de test pour tester TranslatorLOG_translateForSendCurrentPosition.
  *
  * @version 2.0
  * @date 09-06-2021
@@ -47,9 +47,9 @@
  * @brief Structure passee aux fonctions tests.
  */
 typedef struct {
-    Trame trameExpected[SIZE_HEADER + SIZE_POSITION + SIZE_TIMESTAMP];  /**< La #Trame attendue en resultat de TranslatorLog_translateForSendCurrentPosition */
-    Position positionInput;                                             /**< La #Position passee a TranslatorLog_translateForSendCurrentPosition */
-    Date dateInput;                                                     /**< La #Date passee a TranslatorLog_translateForSendCurrentPosition */
+    Trame trameExpected[SIZE_HEADER + SIZE_POSITION + SIZE_TIMESTAMP];  /**< La #Trame attendue en resultat de TranslatorLOG_translateForSendCurrentPosition */
+    Position positionInput;                                             /**< La #Position passee a TranslatorLOG_translateForSendCurrentPosition */
+    Date dateInput;                                                     /**< La #Date passee a TranslatorLOG_translateForSendCurrentPosition */
 } ParameterTestCurrentPosition;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -114,7 +114,7 @@ static ParameterTestCurrentPosition parameterTest[] = {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * @brief Execute les tests de TranslatorLog_translateForSendCurrentPosition.
+ * @brief Execute les tests de TranslatorLOG_translateForSendCurrentPosition.
  *
  * @return int 0 en cas de succes, le numero du test qui a echoue sinon.
  */
