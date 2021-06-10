@@ -46,8 +46,6 @@ struct Watchdog_t
  */
 static void mainHandler(union sigval info)
 {
-    // TRACE("%s!!!!!!!!!!!!!!!!!!!! TIME EXPIRED  !!!!!!!!!!!!!!!!!!!!%s", "\t", "\n");
-
     Watchdog *theWatchdog = info.sival_ptr;
 
     theWatchdog->myCallback(theWatchdog->timerId); // Obligation de passer un argument à l'appel
@@ -61,7 +59,7 @@ Watchdog *Watchdog_construct(uint32_t thisDelay, WatchdogCallback callback)
 
     // allocates and initializes the watchdog's attributes
     watchdog = (Watchdog *)malloc(sizeof(Watchdog));
-    //STOP_ON_ERROR(watchdog == NULL);
+
     watchdog->myDelay = thisDelay;
     watchdog->myCallback = callback;
 
@@ -71,8 +69,7 @@ Watchdog *Watchdog_construct(uint32_t thisDelay, WatchdogCallback callback)
     event.sigev_notify_function = &mainHandler;
     event.sigev_notify_attributes = 0;
 
-    int l_ret = timer_create(CLOCK_REALTIME, &event, &(watchdog->timerId));
-    //STOP_ON_ERROR(l_ret < 0);
+    timer_create(CLOCK_REALTIME, &event, &(watchdog->timerId));
 
     return watchdog;
 }
@@ -89,11 +86,7 @@ void Watchdog_start(Watchdog *this)
     spec.it_value.tv_sec = this->myDelay / 1000000;
     spec.it_value.tv_nsec = (this->myDelay % 1000000) * 1000;
 
-    int l_ret = timer_settime(this->timerId, 0, &spec, NULL);
-    //STOP_ON_ERROR(l_ret < 0);
-
-    // Valeur ovalue (NULL ici) => valeur représentant la durée précédente avant
-    // l'expiration du timer (avant execution de mainHandler).
+    timer_settime(this->timerId, 0, &spec, NULL);
 }
 
 void Watchdog_startPeriodic(Watchdog *this)
@@ -108,10 +101,7 @@ void Watchdog_startPeriodic(Watchdog *this)
     spec.it_value.tv_sec = this->myDelay / 1000000;
     spec.it_value.tv_nsec = (this->myDelay % 1000000) * 1000;
 
-    int l_ret = timer_settime(this->timerId, 0, &spec, NULL);
-    //STOP_ON_ERROR(l_ret < 0);
-    // Valeur ovalue (NULL ici) => valeur représentant la durée précédente avant
-    // l'expiration du timer (avant execution de mainHandler).
+    timer_settime(this->timerId, 0, &spec, NULL);
 }
 
 void Watchdog_cancel(Watchdog *this)
@@ -120,7 +110,7 @@ void Watchdog_cancel(Watchdog *this)
     {
         struct itimerspec spec;
 
-        /**
+    /**
      * If the it_value member of value is zero, the timer shall be disarmed.
      * extrait de la man page => mettre le timer à zero revient donc à le désarmer
     */
@@ -133,8 +123,7 @@ void Watchdog_cancel(Watchdog *this)
         spec.it_value.tv_sec = 0;
         spec.it_value.tv_nsec = 0;
 
-        int l_ret = timer_settime(this->timerId, 0, &spec, NULL);
-        //STOP_ON_ERROR(l_ret < 0);
+        timer_settime(this->timerId, 0, &spec, NULL);
     }
 }
 
@@ -142,8 +131,7 @@ void Watchdog_destroy(Watchdog *this)
 {
     Watchdog_cancel(this); // Fermeture complete de la structure si celle si évolue dans le futur
 
-    int l_ret = timer_delete(this->timerId);
-    //STOP_ON_ERROR(l_ret < 0);
+    timer_delete(this->timerId);
 
     // then we can free memory
     free(this);
