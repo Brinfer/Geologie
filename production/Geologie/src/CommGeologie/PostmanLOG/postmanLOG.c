@@ -56,7 +56,7 @@ fd_set l_env;
  * @brief Le numero de port que le serveur ecoute.
  *
  */
-#define ROBOT_PORT (12345)
+#define ROBOT_PORT (1234)
 
 /**
  * @brief Le type de transmission des messages
@@ -413,9 +413,16 @@ static int8_t socketReadMessage(Trame* destTrame, uint8_t nbToRead) {
 
     if (connectionState == true) {
         quantityReaddean = recv(myClientSocket, &destTrame + quantityReaddean, nbToRead, RECV_FLAGS);
-
         if (quantityReaddean < 0) {
             LOG("Error when receiving the message%s", "\n");
+            if (errno == ECONNRESET) {
+                TRACE("%s Client is disconnect%s", "\033[43m\033[37m", "\033[0m\n");
+                disconnectClient();
+                MqMsg msg = { .size = 0, .trame = NULL, .flag = STOP };
+                int8_t returnError = mqSendMessage(&msg); // wake up the PostmanLOG's thread to stop him
+                STOP_ON_ERROR(returnError < 0);
+                quantityReaddean = nbToRead + 1;
+            }
         } else if (quantityReaddean == 0) {
             TRACE("%s Client is disconnect%s", "\033[43m\033[37m", "\033[0m\n");
             disconnectClient();
