@@ -11,6 +11,7 @@
 
 extern int translatorLOG_run_tests(void);
 extern int mathematician_run_tests(void);
+extern int geographer_run_tests(void);
 
 /** Liste des suites de tests a excuter. */
 static int (*suite_tests[])(void) = {
