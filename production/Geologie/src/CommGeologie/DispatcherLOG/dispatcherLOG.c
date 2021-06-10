@@ -173,10 +173,10 @@ static int16_t readHeader(Header* header) {
     if (returnError == 1) {
         TRACE("deconnexion %s", "\n");
 
-    } else {
+    } else if (returnError > 0) {
         TranslatorLOG_translateTrameToHeader(headerTrame, header); //on traduit la trame header en header
 
-    } //TODO gerer le cas ou on a  pas tout recu
+    }
     return returnError;
 }
 
@@ -192,13 +192,17 @@ static void* readMsg() {
         if (returnError == 1) {
             TRACE("deconnexion, on  ne fait rien %s", "\n");
             //Geographer_askSignalStopGeographer();
-        } else {
+        } else if (returnError == 0) {
             Trame* trame;
             trame = malloc(header.size);
             TRACE("on lit la trame %s", "\n");
 
             PostmanLOG_readMsg(trame, header.size); //on lit ensuite toute la trame //TODO mettre un mutex sur lecture/ecriture de trame et header
+
             dispatch(trame, &header);
+        } else {
+            LOG("Error on reading communication%s", "\n");
+            
         }
 
 
@@ -238,7 +242,7 @@ extern int8_t DispatcherLOG_start() {
     returnError = pthread_create(&myThreadListen, NULL, &readMsg, NULL);
         // premier thread pour recevoir
     if (returnError != EXIT_SUCCESS) {
-    setKeepGoing(false);
+        setKeepGoing(false);
     }
 
 
@@ -260,8 +264,12 @@ extern int8_t DispatcherLOG_setConnectionState(ConnectionState connectionState) 
 
     if (connectionState == CONNECTED) {
         Geographer_signalConnectionEstablished();
+        DispatcherLOG_start();
+
     } else {
         Geographer_signalConnectionDown();
+        DispatcherLOG_stop();
+
     }
 
     return 0;
