@@ -15,7 +15,8 @@ extern int mathematician_run_tests(void);
 /** Liste des suites de tests a excuter. */
 static int (*suite_tests[])(void) = {
     mathematician_run_tests,
-    translatorLOG_run_tests
+    translatorLOG_run_tests,
+    translatorBeacon_run_tests
 };
 
 /**

@@ -60,9 +60,9 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// #include "../Receiver/receiver.h"
+#include "../Receiver/receiver.h"
 
-// #include "../Bookkeeper/bookkeeper.h"
+#include "../Bookkeeper/bookkeeper.h"
 
 #include "../Mathematician/mathematician.h"
 
@@ -100,7 +100,7 @@
 
 */
 
-extern int Scanner_new();
+extern void Scanner_new();
 
 /**
 
@@ -116,11 +116,11 @@ extern int Scanner_new();
 
 */
 
-extern int Scanner_free();
+extern void Scanner_free();
 
 /**
 
- * @fn extern int Scanner_askStartScanner()
+ * @fn extern int Scanner_ask4StartScanner()
 
  * @brief Demande le démarrage de Scanner
 
@@ -130,11 +130,11 @@ extern int Scanner_free();
 
 */
 
-extern int Scanner_askStartScanner();
+extern void Scanner_ask4StartScanner();
 
 /**
 
- * @fn extern int Scanner_askStopScanner()
+ * @fn extern int Scanner_ask4StopScanner()
 
  * @brief Demande l'arret de Scanner
 
@@ -144,11 +144,11 @@ extern int Scanner_askStartScanner();
 
 */
 
-extern int Scanner_askStopScanner();
+extern void Scanner_ask4StopScanner();
 
 /**
 
- * @fn extern int Scanner_askUpdateAttenuationCoefficientFromPosition(Position calibrationPosition)
+ * @fn extern int Scanner_ask4UpdateAttenuationCoefficientFromPosition(Position calibrationPosition)
 
  * @brief Demande la mise à jour du coefficient d'atténuation pour la position passee en parametre
 
@@ -164,11 +164,11 @@ extern int Scanner_askStopScanner();
 
 */
 
-extern int Scanner_askUpdateAttenuationCoefficientFromPosition(CalibrationPosition calibrationPosition);
+extern void Scanner_ask4UpdateAttenuationCoefficientFromPosition(CalibrationPosition calibrationPosition);
 
 /**
 
- * @fn extern int Scanner_askAverageCalcul()
+ * @fn extern int Scanner_ask4AverageCalcul()
 
  * 
 
@@ -182,7 +182,7 @@ extern int Scanner_askUpdateAttenuationCoefficientFromPosition(CalibrationPositi
 
 */
 
-extern int Scanner_askAverageCalcul();
+extern void Scanner_ask4AverageCalcul();
 
 /**
 
@@ -204,7 +204,7 @@ extern int Scanner_askAverageCalcul();
 
 */
 
-extern int Scanner_setAllBeaconsSignal(BeaconSignal beaconsSignal);
+extern void Scanner_setAllBeaconsSignal(BeaconSignal beaconsSignal[]);
 
 /**
 
@@ -226,7 +226,7 @@ extern int Scanner_setAllBeaconsSignal(BeaconSignal beaconsSignal);
 
 */
 
-extern int Scanner_setCurrentProcessorAndMemoryLoad(ProcessorAndMemoryLoad currentProcessorAndMemoryLoad);
+extern void setCurrentProcessorAndMemoryLoad(ProcessorAndMemoryLoad currentProcessorAndMemoryLoad);
 
 
 #endif /* SCANNER_H */
