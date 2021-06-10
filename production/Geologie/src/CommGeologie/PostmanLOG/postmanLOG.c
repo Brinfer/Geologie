@@ -29,7 +29,6 @@
 #include <netinet/in.h>
 #include <pthread.h>
 #include <stdbool.h>
-fd_set l_env;
 
 #include <errno.h>
 #include <stdint.h>
@@ -398,12 +397,10 @@ static int8_t tearDownSocket(void) {
     int8_t returnError = EXIT_SUCCESS;
 
     if (myClientSocket > 0) {
-        returnError = close(myClientSocket);
-        assert(returnError >= 0);
+        close(myClientSocket);
     }
 
-    returnError = close(myServerSocket);
-    assert(returnError >= 0);
+    close(myServerSocket);
 
     return returnError;
 }

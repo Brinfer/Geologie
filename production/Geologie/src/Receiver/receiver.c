@@ -397,7 +397,7 @@ static void performAction(Action_RECEIVER action, MqMsg * msg){
     switch (action) {
 
         case A_SEND_BEACONS_SIGNAL:
-            Scanner_setAllBeaconsSignal(beaconsSignal, NbBeaconsSignal);      
+            Scanner_setAllBeaconsSignal(beaconsSignal, NbBeaconsSignal);
             break;
 
         case A_MAJ_BEACONS_CHANNELS:
