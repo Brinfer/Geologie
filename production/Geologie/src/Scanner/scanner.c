@@ -277,7 +277,7 @@ static void translateBeaconsSignalToBeaconsData(BeaconSignal * beaconSignal, Bea
     uint32_t i;
     uint32_t j;
     for (i = 0; i < NbBeaconsAvailable; i++)
-    {   
+    {
         BeaconData data;
         memcpy(data.ID, beaconSignal[i].name, BEACON_ID_LENGTH);
         data.position = beaconSignal[i].position;
@@ -355,17 +355,26 @@ static void perform_askCalibrationFromPosition(MqMsg * msg){
 static void perform_askCalibrationAverage(MqMsg * msg){
         sortBeaconsCoefficientId(beaconsCoefficient);
         for(uint32_t index_balise = 0; index_balise < NbBeaconsAvailable; index_balise++){
-            BeaconCoefficients * coef;
             CalibrationData cd;
             uint32_t index_coef = 0;
+
+            for (uint32_t j = 0; j < sizeof(beaconsCoefficient); j++)    //check sizeOf
+            {
+                if(beaconsCoefficient[j].beaconId[2] == beaconsIds[index_balise]){
+                    index_coef++;
+                }
+            }
+
+            BeaconCoefficients * coef = calloc(1, index_coef);
+
             for (uint32_t j = 0; j < sizeof(beaconsCoefficient); j++)    //check sizeOf
             {
                 if(beaconsCoefficient[j].beaconId[2] == beaconsIds[index_balise]){
                     coef[index_coef] = beaconsCoefficient[j];   //check
-                    index_coef++;
                     memcpy(cd.beaconId, beaconsCoefficient[j].beaconId, sizeof(beaconsCoefficient[j].beaconId));
                 }
             }
+
             cd.beaconCoefficient = coef;
             cd.nbCoefficient = index_coef;
             cd.coefficientAverage = Mathematician_getAverageCalcul(coef, cd.nbCoefficient);
@@ -491,7 +500,7 @@ extern void Scanner_ask4AverageCalcul(){
 
 
 extern void Scanner_setAllBeaconsSignal(BeaconSignal * beaconsSignal, uint32_t NbBeaconsAvailable){
-    MqMsg msg = { 
+    MqMsg msg = {
                 .event = E_SET_BEACONS_SIGNAL,
                 .beaconsSignal = beaconsSignal,
                 .NbBeaconsAvailable = NbBeaconsAvailable
