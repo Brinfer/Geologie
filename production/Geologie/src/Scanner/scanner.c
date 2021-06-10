@@ -324,7 +324,7 @@ static void sortBeaconsCoefficientId(BeaconCoefficients * beaconsCoefficient){
 static void perform_setCurrentPosition(MqMsg * msg){
         beaconSignal = msg->beaconsSignal;
         translateBeaconsSignalToBeaconsData(msg->beaconsSignal, beaconsData);
-        currentPosition = Mathematician_getCurrentPosition(beaconsData);
+        currentPosition = Mathematician_getCurrentPosition(beaconsData, sizeof(BeaconData)); //check
         Bookkeeper_ask4CurrentProcessorAndMemoryLoad();
 }
 
@@ -365,7 +365,7 @@ static void perform_askCalibrationAverage(MqMsg * msg){
             }
             cd.beaconCoefficient = coef;
             cd.nbCoefficient = index_coef;
-            cd.coefficientAverage = Mathematician_getAverageCalcul(coef);
+            cd.coefficientAverage = Mathematician_getAverageCalcul(coef, cd.nbCoefficient);
         }
         Geographer_signalEndAverageCalcul(calibrationData, sizeof(calibrationData));    //check sizeOf
 }
