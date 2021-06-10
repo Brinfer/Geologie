@@ -198,6 +198,11 @@ static int8_t connectClient(void);
 static int8_t disconnectClient(void);
 
 /**
+ * @brief Arrete le processus de PostmanLOG.
+ */
+static void stopAll(void);
+
+/**
  * @brief Ecrit la #MqMsg dans la boite aux lettres de PostmanLOG.
  *
  * @param message Le message a ecrire.
@@ -330,7 +335,6 @@ extern int8_t PostmanLOG_stop(void) {
     if (connectionState == CONNECTED) {
         returnError = disconnectClient();
         STOP_ON_ERROR(returnError < 0);
-
     }
 
     returnError = shutdown(myServerSocket, SHUT_RDWR); // wake up accept and recv, do not destroy the socket
@@ -368,7 +372,7 @@ extern int8_t PostmanLOG_free(void) {
 //
 //                                              Fonctions static
 //
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////>=////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 static int8_t setUpSocket(void) {
     TRACE("%sSet up the server%s", "\033[44m\033[37m", "\033[0m\n");
@@ -412,23 +416,17 @@ static int8_t socketReadMessage(Trame* destTrame, uint8_t nbToRead) {
 
     if (getConnectionState() == CONNECTED) {
         quantityReaddean = recv(myClientSocket, &destTrame + quantityReaddean, nbToRead, RECV_FLAGS);
+
         if (quantityReaddean < 0) {
             LOG("Error when receiving the message%s", "\n");
             if (errno == ECONNRESET) {
-                TRACE("%s Client is disconnect%s", "\033[43m\033[37m", "\033[0m\n");
-                disconnectClient();
-                MqMsg msg = { .size = 0, .trame = NULL, .flag = STOP };
-                int8_t returnError = mqSendMessage(&msg); // wake up the PostmanLOG's thread to stop him
-                STOP_ON_ERROR(returnError < 0);
-                quantityReaddean = nbToRead + 1;
+                LOG("Connection aborted by the server%s", "\n");
+                stopAll();
+                quantityReaddean = 0;
             }
         } else if (quantityReaddean == 0) {
-            TRACE("%s Client is disconnect%s", "\033[43m\033[37m", "\033[0m\n");
-            disconnectClient();
-            MqMsg msg = { .size = 0, .trame = NULL, .flag = STOP };
-            int8_t returnError = mqSendMessage(&msg); // wake up the PostmanLOG's thread to stop him
-            STOP_ON_ERROR(returnError < 0);
-            quantityReaddean = nbToRead + 1;
+            LOG("Client is disconnect%s", "\n");
+            stopAll();
         }
     } else {
         DispatcherLOG_setConnectionState(DISCONNECTED);
@@ -455,6 +453,12 @@ static int8_t socketSendMessage(Trame* trame, uint8_t size) {
     return (quantityWritten - size);
 }
 
+static void stopAll(void) {
+    disconnectClient();
+    MqMsg msg = { .size = 0, .trame = NULL, .flag = STOP };
+    mqSendMessage(&msg); // wake up the PostmanLOG's thread to stop him
+}
+
 static int8_t connectClient(void) {
     int8_t returnError = EXIT_SUCCESS;
 
@@ -464,7 +468,6 @@ static int8_t connectClient(void) {
     myClientSocket = accept(myServerSocket, NULL, 0);
 
     if (myClientSocket < 0) {
-        printf("%d", errno);
         if (errno == EINVAL) {
             // Socket no more accept any connection
             LOG("Connection aborted by the server%s", "\n");
@@ -475,7 +478,6 @@ static int8_t connectClient(void) {
     } else {
         setConnectionState(CONNECTED);
         DispatcherLOG_setConnectionState(CONNECTED);
-        //DispatcherLOG_start();
     }
 
     return returnError;
@@ -491,8 +493,6 @@ static int8_t disconnectClient(void) {
     } else {
         setConnectionState(DISCONNECTED);
         DispatcherLOG_setConnectionState(DISCONNECTED);
-
-        DispatcherLOG_stop();
     }
 
     return returnError;
@@ -502,15 +502,17 @@ static int8_t mqSendMessage(MqMsg* message) {
     int8_t returnError = EXIT_SUCCESS;
 
     returnError = mq_send(myMq, (char*) message, sizeof(MqMsg), 0); // put char to avoid a warning
-    STOP_ON_ERROR(returnError < 0);
+    assert(returnError >= 0);
 
     return returnError;
 }
 
 static int8_t mqReadMessage(MqMsg* dest) {
     int8_t returnError = EXIT_SUCCESS;
+
     returnError = mq_receive(myMq, (char*) dest, sizeof(MqMsg), NULL); // put char to avoid a warning
-    STOP_ON_ERROR(returnError < 0);
+    assert(returnError >= 0);
+
     return returnError;
 }
 

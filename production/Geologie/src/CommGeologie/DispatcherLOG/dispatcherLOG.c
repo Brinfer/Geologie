@@ -124,38 +124,38 @@ static void setKeepGoing(bool newValue) {
 
 static void dispatch(Trame* trame, Header* header) {
     switch (header->commande) {
-    case ASK_CALIBRATION_POSITIONS:
-        /* code */
-        Geographer_askCalibrationPositions();
-        break;
-    case SEND_EXPERIMENTAL_POSITIONS:
-        /* code */
-        break;
-    case SEND_EXPERIMENTAL_TRAJECTS:
-        /* code */
-        break;
-    case SEND_MEMORY_PROCESSOR_LOAD:
-        /* code */
-        break;
-    case SEND_ALL_BEACONS_DATA:
-        /* code */
-        break;
-    case SEND_CURRENT_POSITION:
-        /* code */
-        break;
-    case REP_CALIBRATION_POSITIONS:
-        /* code */
-        break;
-    case SIGNAL_CALIBRATION_POSITION:;
-        /* code */
-        CalibrationPositionId calibrationPositionId = TranslatorLOG_translateForSignalCalibrationPosition(trame);
-        Geographer_validatePosition(calibrationPositionId);
-        break;
-    case SIGNAL_CALIRATION_END:
-        /* code */
-        break;
-    default:
-        break;
+        case ASK_CALIBRATION_POSITIONS:
+            /* code */
+            Geographer_askCalibrationPositions();
+            break;
+        case SEND_EXPERIMENTAL_POSITIONS:
+            /* code */
+            break;
+        case SEND_EXPERIMENTAL_TRAJECTS:
+            /* code */
+            break;
+        case SEND_MEMORY_PROCESSOR_LOAD:
+            /* code */
+            break;
+        case SEND_ALL_BEACONS_DATA:
+            /* code */
+            break;
+        case SEND_CURRENT_POSITION:
+            /* code */
+            break;
+        case REP_CALIBRATION_POSITIONS:
+            /* code */
+            break;
+        case SIGNAL_CALIBRATION_POSITION:;
+            /* code */
+            CalibrationPositionId calibrationPositionId = TranslatorLOG_translateForSignalCalibrationPosition(trame);
+            Geographer_validatePosition(calibrationPositionId);
+            break;
+        case SIGNAL_CALIRATION_END:
+            /* code */
+            break;
+        default:
+            break;
     }
 
 
@@ -170,13 +170,11 @@ static int16_t readHeader(Header* header) {
     headerTrame = malloc(SIZE_HEADER);
     int16_t returnError;
     returnError = PostmanLOG_readMsg(headerTrame, SIZE_HEADER);//on lit la trame contenant le header
-    if (returnError == 1) {
-        TRACE("deconnexion %s", "\n");
 
-    } else if (returnError > 0) {
+    if (returnError == 0) {
         TranslatorLOG_translateTrameToHeader(headerTrame, header); //on traduit la trame header en header
-
     }
+
     return returnError;
 }
 
@@ -189,25 +187,20 @@ static void* readMsg() {
         int16_t returnError;
 
         returnError = readHeader(&header); //on lit d'abord le header et on le traduit
-        if (returnError == 1) {
-            TRACE("deconnexion, on  ne fait rien %s", "\n");
-            //Geographer_askSignalStopGeographer();
-        } else if (returnError == 0) {
+
+        if (returnError < 0) {
+            LOG("Error on reading communication%s", "\n");
+            DispatcherLOG_stop();
+        } else {
             Trame* trame;
             trame = malloc(header.size);
-            TRACE("on lit la trame %s", "\n");
 
             PostmanLOG_readMsg(trame, header.size); //on lit ensuite toute la trame //TODO mettre un mutex sur lecture/ecriture de trame et header
 
             dispatch(trame, &header);
-        } else {
-            LOG("Error on reading communication%s", "\n");
-            
         }
-
-
-
     }
+
     return 0;
 }
 
@@ -269,7 +262,6 @@ extern int8_t DispatcherLOG_setConnectionState(ConnectionState connectionState) 
     } else {
         Geographer_signalConnectionDown();
         DispatcherLOG_stop();
-
     }
 
     return 0;
