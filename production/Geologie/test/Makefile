@@ -96,7 +96,7 @@ clean: coverage_clean
 
 # Nettoyage du rapport de couverture
 coverage_clean:
-	@rm -f $(GCOVR_DIR)/*.html
+	@rm -rf $(GCOVR_DIR)/
 
 -include $(DEP)
 

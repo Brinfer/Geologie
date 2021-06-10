@@ -73,6 +73,11 @@
 #define SIZE_EXPERIMENTAL_POSITION_ID (1)
 
 /**
+ * @brief La taille en octet de l'identifiant d'un trajet d'experimentation
+ */
+#define SIZE_EXPERIMENTAL_TRAJECT_ID (1)
+
+/**
  * @brief La taille en octet des informations d'une position experimental.
  */
 #define SIZE_EXPERIMENTAL_POSITION (SIZE_EXPERIMENTAL_POSITION_ID + SIZE_POSITION)
@@ -246,10 +251,10 @@ extern uint16_t TranslatorLOG_getTrameSize(Commande cmd, uint8_t nbElements) {
 }
 
 extern uint16_t TranslatorLOG_getTrameSizeExperimentalTraject(const ExperimentalTraject* experimentalTrajects, uint8_t nbExperimentalTrajects) {
-    uint16_t returnValue = SIZE_HEADER;
+    uint16_t returnValue = SIZE_HEADER + 1;
 
     for (uint8_t i = 0; i < nbExperimentalTrajects; i++) {
-        returnValue += experimentalTrajects[i].nbPosition * SIZE_POSITION;
+        returnValue += SIZE_EXPERIMENTAL_TRAJECT_ID + 1 + (experimentalTrajects[i].nbPosition * SIZE_POSITION);
     }
 
     return returnValue;
@@ -336,15 +341,24 @@ extern CalibrationPositionId TranslatorLOG_translateForSignalCalibrationPosition
     return trame[SIZE_HEADER];
 }
 
-extern void TranslatorLOG_translateForExperimentalTrajects(const ExperimentalTraject* experimentalTrajects, uint8_t nbTraject, Trame* dest) {
+extern void TranslatorLOG_translateForSendExperimentalTrajects(const ExperimentalTraject* experimentalTrajects, uint8_t nbTraject, Trame* dest) {
     composeHeaderExperimentalTraject(experimentalTrajects, nbTraject, dest);
+    uint16_t previousSize = SIZE_HEADER;
+
+    dest[previousSize] = nbTraject;
+    previousSize++;
+
 
     for (uint8_t i = 0; i < nbTraject; i++) {
-        dest[SIZE_HEADER + i] = experimentalTrajects[i].id;
-        dest[SIZE_HEADER + i + 1] = experimentalTrajects[i].nbPosition;
+        dest[previousSize] = experimentalTrajects[i].id;
+        previousSize += SIZE_EXPERIMENTAL_TRAJECT_ID;
+
+        dest[previousSize] = experimentalTrajects[i].nbPosition;
+        previousSize++;
 
         for (uint8_t j = 0; j < experimentalTrajects[i].nbPosition; j++) {
-            convertPositionToByte(&(experimentalTrajects[i].traject[j]), &(dest[SIZE_HEADER + i + 2 + j]));
+            convertPositionToByte(&(experimentalTrajects[i].traject[j]), &(dest[previousSize]));
+            previousSize += SIZE_POSITION;
         }
     }
 }
@@ -403,7 +417,7 @@ static void composeHeader(Commande cmd, uint8_t nbElements, Trame* dest) {
 }
 
 static void composeHeaderExperimentalTraject(const ExperimentalTraject* experimentalTrajects, uint8_t nbExperimentalTraject, Trame* dest) {
-    uint16_t size = TranslatorLOG_getTrameSizeExperimentalTraject(experimentalTrajects, nbExperimentalTraject);
+    uint16_t size = TranslatorLOG_getTrameSizeExperimentalTraject(experimentalTrajects, nbExperimentalTraject) - SIZE_HEADER;
 
     /* CMD */
     dest[0] = SEND_EXPERIMENTAL_TRAJECTS;

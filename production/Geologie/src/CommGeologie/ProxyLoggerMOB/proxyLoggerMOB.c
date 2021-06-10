@@ -60,7 +60,7 @@ extern int8_t ProxyLoggerMOB_setExperimentalTrajects(const ExperimentalTraject* 
     uint16_t size = TranslatorLOG_getTrameSizeExperimentalTraject(experimentalTrajects, nbExperimentalTraject);
     Trame* trame = calloc(1, size);
 
-    TranslatorLOG_translateForExperimentalTrajects(experimentalTrajects, nbExperimentalTraject, trame);
+    TranslatorLOG_translateForSendExperimentalTrajects(experimentalTrajects, nbExperimentalTraject, trame);
     returnError = PostmanLOG_sendMsg(trame, size);
 
     return returnError;
