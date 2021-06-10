@@ -42,15 +42,17 @@
 
 #define NB_BEACONS_AVAILABLE (5)
 #define NB_MAX_ADVERTISING_CHANNEL (100)
+#define NB_MAX_BEACONS_AVAILABLE (10)
 
 #define BEACONS_UUID_1 (0x18)
 #define BEACONS_UUID_2 (0x1A)
 
 #define MQ_MAX_MESSAGES (5)
 
-static BeaconSignal beaconsSignal[NB_BEACONS_AVAILABLE];
-
+static BeaconSignal beaconsSignal[NB_MAX_BEACONS_AVAILABLE];
 static BeaconsChannel * beaconsChannel[NB_MAX_ADVERTISING_CHANNEL];
+static uint32_t NbBeaconsChannel;
+static uint32_t NbBeaconsSignal;
 
 typedef enum{
 	S_BEGINNING = 0,
@@ -116,8 +118,6 @@ typedef struct {
 } MqMsg;
 
 static Watchdog * wtd_TScan;
-
-static uint32_t  nbSignalAvailable;
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -241,12 +241,12 @@ static void Receiver_translateChannelToBeaconsSignal(){
 	uint8_t index_signal = 0;
 	uint8_t index_channel = 0;
 
-	for (index_channel = 0; index_channel < NB_MAX_ADVERTISING_CHANNEL; index_channel++)
+	for (index_channel = 0; index_channel < NbBeaconsChannel; index_channel++)
 	{
 		BeaconSignal signal;
 		bool find = FALSE;
 		signal = TranslatorBeacon_translateChannelToBeaconsSignal(beaconsChannel[index_channel]);
-		for(index_signal = 0; index_signal < NB_BEACONS_AVAILABLE; index_signal++)
+		for(index_signal = 0; index_signal < NbBeaconsSignal; index_signal++)
 		{
 			if(signal.name == beaconsSignal[index_signal].name){
 				beaconsSignal[index_signal] = signal;
@@ -256,6 +256,7 @@ static void Receiver_translateChannelToBeaconsSignal(){
 		if(find == FALSE){
 			beaconsSignal[index_signal] = signal;
 			index_signal++;
+			NbBeaconsSignal++;
 		}
 	}
 
@@ -365,6 +366,7 @@ static void Receiver_getAllBeaconsChannel(){
 					if(uuid[0] == BEACONS_UUID_1 && uuid[1 ]== BEACONS_UUID_2){
 						beaconsChannel[index_channel] = info;
 						index_channel ++;
+						NbBeaconsChannel++;
 					}
 
 					offset = info->data + info->length + 2;
@@ -392,7 +394,7 @@ static void performAction(Action_RECEIVER action, MqMsg * msg){
     switch (action) {
 
         case A_SEND_BEACONS_SIGNAL:
-            Scanner_setAllBeaconsSignal(beaconsSignal, nbSignalAvailable);
+            Scanner_setAllBeaconsSignal(beaconsSignal, NbBeaconsSignal);      
             break;
 
         case A_MAJ_BEACONS_CHANNELS:
