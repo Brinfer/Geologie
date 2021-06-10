@@ -63,42 +63,42 @@ extern AttenuationCoefficient Mathematician_getAttenuationCoefficient(const Powe
     double distance = distanceCalculWithPosition(beaconPosition, calibrationPosition);
 
 
-    attenuationCoefficient = ((*power) - ATT_COEFF_1_METER) / (-10 * log10f(distance)); //TODO revoir le calcuul, pas sur
+    attenuationCoefficient = ((*power) - ATT_COEFF_1_METER) / (-10 * log10f(distance)); //TODO revoir le calcul, pas sur
     return attenuationCoefficient;
 }
 
-extern AttenuationCoefficient Mathematician_getAverageCalcul(const BeaconCoefficients *  beaconCoefficients) {
+extern AttenuationCoefficient Mathematician_getAverageCalcul(const BeaconCoefficients *  beaconCoefficients, u_int8_t nbCoefficient) {
     AttenuationCoefficient somme = 0;
     AttenuationCoefficient attenuationCoefficient = 0;
-    for (int i = 0; i < NB_CALIBRATION_POSITIONS; i++) {
+    for (int i = 0; i < nbCoefficient; i++) {
         somme = somme + beaconCoefficients[i].attenuationCoefficient;
     }
-    attenuationCoefficient = somme / NB_CALIBRATION_POSITIONS;
+    attenuationCoefficient = somme / nbCoefficient;
     return attenuationCoefficient;
 }
 
 
-extern Position Mathematician_getCurrentPosition(const BeaconData beaconsData[NB_BEACONS]) {
+extern Position Mathematician_getCurrentPosition(const BeaconData * beaconsData, u_int16_t nbBeacons) {
     Position M;
     M.X = 3;
     M.Y = 3;
     Position A = beaconsData[0].position;
     double Ax=(double)beaconsData[0].position.X;
     double Ay=(double)beaconsData[0].position.Y;
-    //double dA = distanceCalculWithPower(&beaconsData[0].power, &beaconsData[0].attenuationCoefficient);
-    double dA = distanceCalculWithPosition(&M, &A);
+    double dA = distanceCalculWithPower(&beaconsData[0].power, &beaconsData[0].coefficientAverage);
+    //double dA = distanceCalculWithPosition(&M, &A);
     printf("distance avec A :%f\n", dA);
 
     Position B = beaconsData[1].position;
-    //double dB = distanceCalculWithPower(&beaconsData[1].power, &beaconsData[1].attenuationCoefficient);
-    double dB = distanceCalculWithPosition(&M, &B);
+    double dB = distanceCalculWithPower(&beaconsData[1].power, &beaconsData[1].coefficientAverage);
+    //double dB = distanceCalculWithPosition(&M, &B);
     printf("distance avec B :%f\n", dB);
     double Bx=(double)beaconsData[1].position.X;
     double By=(double)beaconsData[1].position.Y;  
 
     Position C = beaconsData[2].position;
-    //double dC = distanceCalculWithPower(&beaconsData[2].power, &beaconsData[2].attenuationCoefficient);
-    double dC = distanceCalculWithPosition(&M, &C);
+    double dC = distanceCalculWithPower(&beaconsData[2].power, &beaconsData[2].coefficientAverage);
+    //double dC = distanceCalculWithPosition(&M, &C);
     printf("distance avec C :%f\n", dC);
     double Cx=(double)beaconsData[2].position.X;
     double Cy=(double)beaconsData[2].position.Y;

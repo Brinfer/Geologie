@@ -443,7 +443,7 @@ static void performAction(Action_GEOGRAPHER anAction, MqMsg* msg) {
 
     case A_SET_CALIBRATION_POSITIONS:
         calibrationCounter = 0;
-        ProxyGUI_setCalibrationPositions(calibrationPositions,NB_CALIBRATION_POSITIONS);
+        ProxyGUI_setCalibrationPositions(calibrationPositions,CALIBRATION_POSITION_NUMBER);
         break;
 
     case A_ASK_4_UPDATE_ATTENUATION_COEFFICIENT:

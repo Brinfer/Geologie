@@ -80,7 +80,7 @@ extern int8_t ProxyGUI_setCalibrationPositions(CalibrationPosition * calibration
     int8_t returnError=EXIT_FAILURE;
     Trame * trame;
     Commande commande=REP_CALIBRATION_POSITIONS;
-    uint16_t sizeTrame = TranslatorLOG_getTrameSize(commande, NB_CALIBRATION_POSITIONS);
+    uint16_t sizeTrame = TranslatorLog_getTrameSize(commande, size);
     trame=malloc(sizeTrame);
     TranslatorLOG_translateForRepCalibrationPosition(size,calibrationPositions,trame);
     returnError = PostmanLOG_sendMsg(trame,sizeTrame);
