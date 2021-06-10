@@ -4,8 +4,16 @@
 #																				#
 #################################################################################
 
-# Packages
-PACKAGES = PostmanLOG DispatcherLOG ProxyGUI ProxyLoggerMOB TranslatorLOG
+SRC = $(wildcard *.c)
+OBJ = $(SRC:.c=.o)
+DEP = $(SRC:.c=.d)
+
+# Gcov informations
+GCDA = $(SRC:.c=.gcda)
+GCNO = $(SRC:.c=.gcno)
+
+# Inclusion depuis le niveau du package.
+CCFLAGS += -I.. -I../../$(SRC_DIR)
 
 #################################################################################
 #																				#
@@ -17,10 +25,15 @@ all: test
 
 # Compilation
 test: $(OBJ)
-	@for p in $(PACKAGES); do (cd $$p && $(MAKE) $@); done
+
+.c.o:
+	$(CC) -c $(CCFLAGS) $< -o $@
+
+clean:
+	@rm -f $(OBJ) $(DEP) $(GCDA) $(GCNO)
+
+-include $(DEP)
 
 # Nettoyage
 .PHONY: clean
-
-clean:
-	@for p in $(PACKAGES); do (cd $$p && $(MAKE) $@); done
+.PHONY: test

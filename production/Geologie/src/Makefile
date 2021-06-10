@@ -5,7 +5,7 @@
 #################################################################################
 
 # Packages.
-PACKAGES = Geographer ManagerLOG UI Mathematician Scanner CommGeologie Led
+PACKAGES = Geographer ManagerLOG UI Mathematician Scanner CommGeologie Led TranslatorBeacon Receiver
 
 SRC = $(wildcard */*.c) $(wildcard */**/*.c)
 OBJ = $(SRC:.c=.o)

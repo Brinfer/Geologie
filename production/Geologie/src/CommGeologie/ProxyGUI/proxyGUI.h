@@ -19,16 +19,11 @@
 //                                              Include
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #include "../PostmanLOG/postmanLOG.h"
 #include "../TranslatorLOG/translatorLOG.h"
-
 #include "../com_common.h"
 #include "../../common.h"
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-//                                              Variable et structure extern
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -44,7 +39,7 @@
  * @return retourne 1 s'il y a une erreur dans l'execution de la methode
  *
 */
-extern int ProxyGUI_new();
+extern int8_t ProxyGUI_new();
 
 /**
  * @fn extern int ProxyGUI_free()
@@ -53,7 +48,7 @@ extern int ProxyGUI_new();
  * @return retourne 1 s'il y a une erreur dans l'execution de la methode
  *
 */
-extern int ProxyGUI_free();
+extern int8_t ProxyGUI_free();
 
 /**
  * @fn extern int askSignalStartProxyGUI()
@@ -64,7 +59,7 @@ extern int ProxyGUI_free();
  * @return retourne 1 s'il y a une erreur dans l'execution de la methode
  *
 */
-extern int ProxyGUI_start();
+extern int8_t ProxyGUI_start();
 
 /**
  * @fn extern int askSignalSStopProxyGUI()
@@ -75,7 +70,7 @@ extern int ProxyGUI_start();
  * @return retourne 1 s'il y a une erreur dans l'execution de la methode
  *
 */
-extern int ProxyGUI_stop();
+extern int8_t ProxyGUI_stop();
 
 /**
  * @fn extern int setCalibrationPositions(CalibrationPosition calibrationPositions[]);
@@ -85,7 +80,7 @@ extern int ProxyGUI_stop();
  * @return retourne 1 s'il y a une erreur dans l'execution de la methode
  *
 */
-extern int ProxyGUI_setCalibrationPositions(CalibrationPosition calibrationPositions[]);
+extern int8_t ProxyGUI_setCalibrationPositions(CalibrationPosition * calibrationPositions, uint16_t size);
 
 /**
  * @fn extern int ProxyGUI_signalEndCalibrationPosition();
@@ -95,7 +90,7 @@ extern int ProxyGUI_setCalibrationPositions(CalibrationPosition calibrationPosit
  * @return retourne 1 s'il y a une erreur dans l'execution de la methode
  *
 */
-extern int ProxyGUI_signalEndCalibrationPosition();
+extern int8_t ProxyGUI_signalEndCalibrationPosition();
 
 /**
  * @fn extern int ProxyGUI_signalEndCalibration();
@@ -105,6 +100,6 @@ extern int ProxyGUI_signalEndCalibrationPosition();
  * @return retourne 1 s'il y a une erreur dans l'execution de la methode
  *
 */
-extern int ProxyGUI_signalEndCalibration();
+extern int8_t ProxyGUI_signalEndCalibration();
 
 #endif // PROXYGUI_H

@@ -20,7 +20,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * @fn static float distanceCalculWithPosition(Position p1, Position p2)
+ * @fn static double distanceCalculWithPosition(Position p1, Position p2)
  * @brief methode privee permettant de calculer la distance entre deux positions
  *
  * @param p1 position du premier point
@@ -28,14 +28,14 @@
  * @return la distance entre ces deux points
  *
  */
-static float distanceCalculWithPosition(const Position* p1, const Position* p2) { //const pour pas modifier adresse
-    float distance = 0;
+static double distanceCalculWithPosition(const Position* p1, const Position* p2) { //const pour pas modifier adresse
+    double distance = 0;
     distance = sqrtf((p1->X - p2->X) * (p1->X - p2->X) + (p1->Y - p2->Y) * (p1->Y - p2->Y));
     return distance;
 }
 
 /**
- * @fn static float distanceCalculWithPosition(Position p1, Position p2)
+ * @fn static double distanceCalculWithPosition(Position p1, Position p2)
  * @brief methode privee permettant de calculer la distance entre deux positions
  *
  * @param p1 position du premier point
@@ -43,9 +43,9 @@ static float distanceCalculWithPosition(const Position* p1, const Position* p2) 
  * @return la distance entre ces deux points
  *
  */
-static float distanceCalculWithPower(const Power* power, const AttenuationCoefficient* attenuationCoefficient) {
-    float distance = 0;
-    float A = 0; ///correspond a ce qui est dans la puissance
+static double distanceCalculWithPower(const Power* power, const AttenuationCoefficient* attenuationCoefficient) {
+    double distance = 0;
+    double A = 0;
     A = ((*power) - ATT_COEFF_1_METER) / (-10 * (*attenuationCoefficient));
     distance = pow(10, A);
     return distance;
@@ -58,30 +58,76 @@ static float distanceCalculWithPower(const Power* power, const AttenuationCoeffi
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-extern AttenuationCoefficient Mathematician_getAttenuationCoefficient(const Power* power, const Position* beaconPosition, const Position* calibrationPosition) {
+extern AttenuationCoefficient Mathematician_getAttenuationCoefficient(const Power* power, const Position* beaconPosition, const CalibrationPosition* calibrationPosition) {
     AttenuationCoefficient attenuationCoefficient;
-    float distance = distanceCalculWithPosition(beaconPosition, calibrationPosition);
+    double distance = distanceCalculWithPosition(beaconPosition, &(calibrationPosition->position));
 
 
-    attenuationCoefficient = ((*power) - ATT_COEFF_1_METER) / (-10 * log10f(distance)); //TODO revoir le calcuul, pas sur
+    attenuationCoefficient = ((*power) - ATT_COEFF_1_METER) / (-10 * log10f(distance));
     return attenuationCoefficient;
 }
 
-extern AttenuationCoefficient Mathematician_getAverageCalcul(const BeaconCoefficients beaconCoefficients) {
+extern AttenuationCoefficient Mathematician_getAverageCalcul(const BeaconCoefficients* beaconCoefficients, uint8_t nbCoefficient) {
     AttenuationCoefficient somme = 0;
-    AttenuationCoefficient AttenuationCoefficient = 0;
-    for (int i = 0; i < NB_CALIBRATION_POSITIONS; i++) {
-        somme = somme + beaconCoefficients[i];
+    AttenuationCoefficient attenuationCoefficient = 0;
+    for (int i = 0; i < nbCoefficient; i++) {
+        somme = somme + beaconCoefficients[i].attenuationCoefficient;
     }
-    AttenuationCoefficient = somme / NB_CALIBRATION_POSITIONS;
-    return AttenuationCoefficient;
+    attenuationCoefficient = somme / nbCoefficient;
+    return attenuationCoefficient;
 }
 
 
-extern Position Mathematician_getCurrentPosition(const BeaconData beaconsData[NB_BEACONS]) {
-    Position b1Position = beaconsData[0].position;
-    /*Position b2Position = beaconsData[1].position;
-    Position b3Position = beaconsData[2].position;
-*/
-    return b1Position;
+extern Position Mathematician_getCurrentPosition(const BeaconData* beaconsData, uint8_t nbBeacon) {
+
+    Position A = beaconsData[0].position;
+    double Ax = (double) beaconsData[0].position.X;
+    double Ay = (double) beaconsData[0].position.Y;
+    double dA = distanceCalculWithPower(&beaconsData[0].power, &beaconsData[0].coefficientAverage);
+
+    Position B = beaconsData[1].position;
+    double dB = distanceCalculWithPower(&beaconsData[1].power, &beaconsData[1].coefficientAverage);
+
+    double Bx = (double) beaconsData[1].position.X;
+    double By = (double) beaconsData[1].position.Y;
+
+    Position C = beaconsData[2].position;
+    double dC = distanceCalculWithPower(&beaconsData[2].power, &beaconsData[2].coefficientAverage);
+
+    double Cx = (double) beaconsData[2].position.X;
+    double Cy = (double) beaconsData[2].position.Y;
+
+    Position currentPosition;
+    double a = 0;
+    double b = 0;
+    double c = 0;
+    double d = 0;
+
+//considérons que uniquement deux balises max peuvent etre sur le meme Y, jamais 3
+    if (A.Y == B.Y) { // si A et B meme ordonnee
+        a = (Cx - Ax) / (Ay - Cy);
+        b = (Ax * Ax + Ay * Ay - dA * dA - Cx * Cx - Cy * Cy + dC * dC) / (2 * (Ay - Cy));
+
+        c = (Bx - Cx) / (Cy - By);
+        d = (Cx * Cx + Cy * Cy - dC * dC - Bx * Bx - By * By + dB * dB) / (2 * (Cy - By));
+    } else if (A.Y == C.Y) { // si A et C meme ordonnee
+        a = (Bx - Ax) / (Ay - By);
+        b = (Ax * Ax + Ay * Ay - dA * dA - Bx * Bx - By * By + dB * dB) / (2 * (Ay - By));
+
+        c = (Bx - Cx) / (Cy - By);
+        d = (Cx * Cx + Cy * Cy - dC * dC - Bx * Bx - By * By + dB * dB) / (2 * (Cy - By));
+
+    } else if (B.Y == C.Y) { // si C et B meme ordonnee
+
+        a = (Bx - Ax) / (Ay - By);
+        b = (Ax * Ax + Ay * Ay - dA * dA - Bx * Bx - By * By + dB * dB) / (2 * (Ay - By));
+
+        c = (Cx - Ax) / (Ay - Cy);
+        d = (Ax * Ax + Ay * Ay - dA * dA - Cx * Cx - Cy * Cy + dC * dC) / (2 * (Ay - Cy));
+    }
+    double x = (d - b) / (a - c);
+    double y = a * x + b;
+    currentPosition.X = (uint32_t) x;
+    currentPosition.Y = (uint32_t) y;
+    return currentPosition;
 }

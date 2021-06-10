@@ -57,9 +57,11 @@ extern int8_t PostmanLOG_start(void);
  *
  * @param trame La trame a envoyer.
  * @param size La taille de la trame a envoyer.
- * @return int8_t 0 en cas de succes, une autre valeur sinon.
+ * @return int8_t -1 en cas d'erreur, 0 sinon.
+ *
+ * @warning La fonction appelante est en charge de la garantie de la validite du message (passage de pointeur).
  */
-extern int8_t PostmanLOG_sendMsg(Trame trame, uint8_t size);
+extern int8_t PostmanLOG_sendMsg(Trame* trame, uint16_t size);
 
 /**
  * @brief Lie sur le socket le nombre d'octet indique.
@@ -70,7 +72,7 @@ extern int8_t PostmanLOG_sendMsg(Trame trame, uint8_t size);
  *
  * @warning Fonction bloquante.
  */
-extern int8_t PostmanLOG_readMsg(Trame destTrame, uint8_t nbToRead);
+extern int8_t PostmanLOG_readMsg(Trame* destTrame, uint8_t nbToRead);
 
 /**
  * @brief Fermeture du socket.
