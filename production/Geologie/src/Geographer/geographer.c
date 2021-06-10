@@ -472,6 +472,8 @@ static void performAction(Action_GEOGRAPHER anAction, MqMsg* msg) {
     switch (anAction) {
         case A_STOP:
 
+            Scanner_ask4StopScanner();
+            
             ProxyLoggerMOB_stop();
 
             ProxyGUI_stop();
@@ -569,7 +571,7 @@ extern int8_t Geographer_new() {
 extern int8_t Geographer_free() {
     int8_t returnError = EXIT_FAILURE;
     mqDone();
-
+    Scanner_free();
     if (returnError == EXIT_SUCCESS) {
         returnError = ProxyLoggerMOB_free();
     }
