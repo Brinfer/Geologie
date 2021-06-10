@@ -329,6 +329,7 @@ static void perform_setCurrentPosition(MqMsg * msg){
 }
 
 static void perform_setCurrentProcessorAndMemoryLoad(MqMsg * msg){
+        Scanner_setCurrentProcessorAndMemoryLoad(msg->currentProcessorAndMemoryLoad);
         NbBeaconsAvailable = msg->NbBeaconsAvailable;
         currentProcessorAndMemoryLoad = msg->currentProcessorAndMemoryLoad;
         Geographer_dateAndSendData(beaconsData, NbBeaconsAvailable, &(currentPosition), &(currentProcessorAndMemoryLoad));

@@ -22,6 +22,7 @@
 #include <errno.h>
 #include <pthread.h>
 #include <stdbool.h>
+#include <assert.h>
 
 #include "receiver.h"
 #include "../TranslatorBeacon/translatorBeacon.h"
@@ -145,7 +146,7 @@ static void mqInit();
  * @param this structure du message envoye a la BAL
  * @return renvoie 1 si une erreur est detectee, sinon 0
 */
-static void sendMsg(MqMsg* this);
+static int8_t sendMsg(MqMsg* this);
 
 /**
  * @fn static void mqReceive(MqMsg* this)
@@ -225,10 +226,12 @@ static void mqInit() {
     }
 }
 
-static void sendMsg(MqMsg* msg) {
-
-    mq_send(descripteur, (char*) &msg, sizeof(msg), 0);
-
+static int8_t sendMsg(MqMsg* msg) {
+    int8_t returnError = EXIT_FAILURE;
+    if (mq_send(descripteur, (char*) msg, sizeof(msg), 0) == 0) {
+        returnError = EXIT_SUCCESS;
+    }
+    return returnError;
 }
 
 static void mqReceive(MqMsg* this) {
@@ -238,8 +241,8 @@ static void mqReceive(MqMsg* this) {
 }
 
 static void Receiver_translateChannelToBeaconsSignal(){
-	uint8_t index_signal = 0;
-	uint8_t index_channel = 0;
+	uint8_t index_signal;
+	uint8_t index_channel;
 
 	for (index_channel = 0; index_channel < NbBeaconsChannel; index_channel++)
 	{
@@ -268,12 +271,12 @@ static void Receiver_translateChannelToBeaconsSignal(){
 }
 
 static void reset_beaconsChannelAndSignal(){
-	memset(beaconsChannel, 0, NB_MAX_ADVERTISING_CHANNEL * sizeof(BeaconsChannel));
-	memset(beaconsSignal, 0, NB_BEACONS_AVAILABLE * sizeof(BeaconSignal));
+	memset(beaconsChannel, 0, NbBeaconsChannel * sizeof(BeaconsChannel));
+	memset(beaconsSignal, 0, NbBeaconsSignal * sizeof(BeaconSignal));
 }
 
 static void Receiver_getAllBeaconsChannel(){
-    uint32_t ret, status;
+    int32_t ret, status;
 
 	// Get HCI device.
 
@@ -453,18 +456,23 @@ extern void Receiver_new(){
 	wtd_TScan = Watchdog_construct(1000000, &(time_out));
 }
 
-extern void Receiver_ask4StartReceiver(){
+extern int8_t Receiver_ask4StartReceiver(){
+	int8_t returnError = EXIT_FAILURE;
     myState = S_SCANNING;
     mqInit();
     MqMsg msg = {
                 .event = E_MAJ_BEACONS_CHANNEL
                 };
     sendMsg(&msg);
-    pthread_create(&myThread, NULL, &run, NULL);
+    returnError = pthread_create(&myThread, NULL, &run, NULL);
+	assert(returnError >= 0);
+	return returnError;
 }
 
-extern void Receiver_ask4StopReceiver(){
-    pthread_join(myThread, NULL);
+extern int8_t Receiver_ask4StopReceiver(){
+    int8_t returnError = EXIT_FAILURE;
+	returnError = pthread_join(myThread, NULL);
+	return returnError;
 }
 
 extern void Receiver_free(){
@@ -472,9 +480,11 @@ extern void Receiver_free(){
     Watchdog_destroy(wtd_TScan);
 }
 
-extern void Receiver_ask4BeaconsSignal(){
+extern int8_t Receiver_ask4BeaconsSignal(){
+	int8_t returnError = EXIT_FAILURE;
     MqMsg msg = {
                 .event = E_ASK_BEACONS_SIGNAL
                 };
-    sendMsg(&msg);
+    returnError = sendMsg(&msg);
+	return returnError;
 }
