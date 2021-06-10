@@ -85,19 +85,19 @@ extern Position Mathematician_getCurrentPosition(const BeaconData * beaconsData,
     Position A = beaconsData[0].position;
     double Ax=(double)beaconsData[0].position.X;
     double Ay=(double)beaconsData[0].position.Y;
-    double dA = distanceCalculWithPower(&beaconsData[0].power, &beaconsData[0].attenuationCoefficient);
+    double dA = distanceCalculWithPower(&beaconsData[0].power, &beaconsData[0].coefficientAverage);
     //double dA = distanceCalculWithPosition(&M, &A);
     printf("distance avec A :%f\n", dA);
 
     Position B = beaconsData[1].position;
-    double dB = distanceCalculWithPower(&beaconsData[1].power, &beaconsData[1].attenuationCoefficient);
+    double dB = distanceCalculWithPower(&beaconsData[1].power, &beaconsData[1].coefficientAverage);
     //double dB = distanceCalculWithPosition(&M, &B);
     printf("distance avec B :%f\n", dB);
     double Bx=(double)beaconsData[1].position.X;
     double By=(double)beaconsData[1].position.Y;  
 
     Position C = beaconsData[2].position;
-    double dC = distanceCalculWithPower(&beaconsData[2].power, &beaconsData[2].attenuationCoefficient);
+    double dC = distanceCalculWithPower(&beaconsData[2].power, &beaconsData[2].coefficientAverage);
     //double dC = distanceCalculWithPosition(&M, &C);
     printf("distance avec C :%f\n", dC);
     double Cx=(double)beaconsData[2].position.X;
