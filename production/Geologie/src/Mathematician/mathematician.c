@@ -45,7 +45,7 @@ static double distanceCalculWithPosition(const Position* p1, const Position* p2)
  */
 static double distanceCalculWithPower(const Power* power, const AttenuationCoefficient* attenuationCoefficient) {
     double distance = 0;
-    double A = 0; ///correspond a ce qui est dans la puissance
+    double A = 0; 
     A = ((*power) - ATT_COEFF_1_METER) / (-10 * (*attenuationCoefficient));
     distance = pow(10, A);
     return distance;
@@ -63,7 +63,7 @@ extern AttenuationCoefficient Mathematician_getAttenuationCoefficient(const Powe
     double distance = distanceCalculWithPosition(beaconPosition, &(calibrationPosition->position));
 
 
-    attenuationCoefficient = ((*power) - ATT_COEFF_1_METER) / (-10 * log10f(distance)); //TODO revoir le calcul, pas sur
+    attenuationCoefficient = ((*power) - ATT_COEFF_1_METER) / (-10 * log10f(distance)); 
     return attenuationCoefficient;
 }
 
