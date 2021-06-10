@@ -41,6 +41,10 @@
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/**
+ * @brief variable static pour le thread 
+ *
+ */
 static pthread_t myThreadListen;
 
 /**
@@ -155,7 +159,7 @@ static void* readMsg() {
         Header header;
         int16_t returnError;
 
-        returnError = readHeader(&header); //on lit d'abord le header et on le traduit
+        returnError = readHeader(&header);
 
         if (returnError < 0) {
             LOG("Error on reading communication%s", "\n");
@@ -164,7 +168,7 @@ static void* readMsg() {
             Trame* trame;
             trame = malloc(header.size);
 
-            PostmanLOG_readMsg(trame, header.size); //on lit ensuite toute la trame //TODO mettre un mutex sur lecture/ecriture de trame et header
+            PostmanLOG_readMsg(trame, header.size); 
 
             dispatch(trame, &header);
         }

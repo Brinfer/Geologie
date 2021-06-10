@@ -41,8 +41,8 @@
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /**
-* @brief Tableau d'entier
-* creation d'un tableau constant d'entier
+* @brief Tableau contenant les positions experimentales
+* 
 */
 static ExperimentalPosition experimentalPositions[] = {
     {.id = 1, .position = {.X = 550, .Y = 200}},
@@ -71,7 +71,10 @@ static ExperimentalPosition experimentalPositions[] = {
     {.id = 24, .position = {.X = 150, .Y = 200}},
     {.id = 25, .position = {.X = 950, .Y = 200}}
 };
-
+/**
+* @brief Tableau contenant les positions de calibration
+* 
+*/
 static CalibrationPosition calibrationPositions[] = {
     {.id = 1, .position = {.X = 550, .Y = 200}},
     {.id = 2, .position = {.X = 550, .Y = 400}},
@@ -100,7 +103,10 @@ static CalibrationPosition calibrationPositions[] = {
     {.id = 25, .position = {.X = 950, .Y = 200}}
 };
 
-
+/**
+* @brief Tableau contenant le premier trajet experimental
+* 
+*/
 Position traject1[] = {
     {.X = 100, .Y = 1300 },
     {.X = 1000, .Y = 1300 },
@@ -108,16 +114,28 @@ Position traject1[] = {
     {.X = 100, .Y = 200 },
     {.X = 100, .Y = 1300}
 };
+
+/**
+* @brief Tableau contenant le deuxieme trajet experimental
+* 
+*/
 Position traject2[] = {
     {.X = 50, .Y = 1300 },
     {.X = 1050, .Y = 1000 }
 };
+/**
+* @brief Tableau contenant le troisieme trajet experimental
+* 
+*/
 Position traject3[] = {
     {.X = 950, .Y = 1000 },
     {.X = 350, .Y = 1200 },
     {.X = 50, .Y = 1000 }
 };
-
+/**
+* @brief Tableau contenant les trajets experimentaux
+* 
+*/
 static ExperimentalTraject experimentalTrajects[] = {
     {.id = 1, .traject = traject1, .nbPosition = 5},
     {.id = 2, .traject = traject2, .nbPosition = 2},
@@ -144,8 +162,11 @@ static int8_t calibrationCounter;
 static Date currentDate;
 
 
-
-/////////////////////////////////////////////////////////////////////////////
+/**
+ * @struct State_GEOGRAPHER
+ * @brief structure contenant les etat que peut prendre geographer
+ *
+ */
 typedef enum {
     S_FORGET = 0,
     S_DEATH,
@@ -157,7 +178,7 @@ typedef enum {
     S_CHOICE_CONNEXION,
     S_CHOICE_CALIBRATION,
     NB_STATE_
-} State_GEOGRAPHER; // Déclencheur
+} State_GEOGRAPHER; 
 
 const char* const State_Geographer_Name[] = {
     "S_FORGET",
@@ -176,6 +197,12 @@ static const char* State_Geographer_getName(int8_t i) {
     return State_Geographer_Name[i];
 }
 
+
+/**
+ * @struct Event_GEOGRAPHER
+ * @brief structure contenant les evenement que geographer peut recevoir 
+ *
+ */
 typedef enum {
     E_STOP = 0,
     E_CONNECTION_ESTABLISHED,
@@ -188,7 +215,7 @@ typedef enum {
     E_SIGNAL_END_UPDATE_ATTENUATION_ELSE,
     E_SIGNAL_END_AVERAGE_CALCUL,
     NB_EVENT_GEOGRAPHER
-} Event_GEOGRAPHER; // Déclencheur
+} Event_GEOGRAPHER; 
 
 const char* const Event_Geographer_Name[] = {
     "E_STOP",
@@ -208,6 +235,11 @@ static const char* Event_Geographer_getName(int8_t i) {
     return Event_Geographer_Name[i];
 }
 
+/**
+ * @struct Action_GEOGRAPHER
+ * @brief structure contenant les action que geographer peut effectuer
+ *
+ */
 typedef enum {
     A_NOP = 0,
     A_STOP,
@@ -240,14 +272,13 @@ static const char* Action_Geographer_getName(int8_t i) {
 }
 
 
-//etat de destination et action associé
 typedef struct {
     State_GEOGRAPHER destinationState;
     Action_GEOGRAPHER action;
 } Transition_GEOGRAPHER;
 
 typedef struct {
-    Event_GEOGRAPHER event; //evenement interne
+    Event_GEOGRAPHER event; 
     Position* currentPosition;
     BeaconData* beaconsData;
     int8_t beaconsDataSize;
@@ -255,7 +286,7 @@ typedef struct {
     CalibrationPositionId calibrationPositionId;
     CalibrationData* calibrationData;
     int8_t nbCalibration;
-} MqMsg; //type de message dans la BAL
+} MqMsg; 
 
 
 static State_GEOGRAPHER myState;
@@ -267,9 +298,9 @@ static pthread_t threadGeographer;
  */
 static const char BAL[] = "/BALGeographer";
 
-static mqd_t descripteur; //On déclare un descripteur de notre BAL qui permettra de l'ouvrir et de la fermer
+static mqd_t descripteur; 
 
-static struct mq_attr attr; //On déclare un attribut pour la fonction mq_open qui est une structure spécifique à la file pour la configurer (cf l.64)
+static struct mq_attr attr; 
 
 
 
@@ -280,7 +311,7 @@ static Transition_GEOGRAPHER stateMachine[NB_STATE_ - 1][NB_EVENT_GEOGRAPHER] =
 
     [S_IDLE][E_ASK_CALIBRATION_POSITIONS] = {S_WAITING_FOR_BE_PLACED,A_SET_CALIBRATION_POSITIONS},
     [S_IDLE][E_CONNECTION_DOWN] = {S_WATING_FOR_CONNECTION,A_CONNECTION_DOWN},
-    [S_IDLE][E_DATE_AND_SEND_DATA_ELSE] = {S_IDLE,A_NOP}, //TODO choice if dans appel methode dateAndSend
+    [S_IDLE][E_DATE_AND_SEND_DATA_ELSE] = {S_IDLE,A_NOP}, 
     [S_IDLE][E_DATE_AND_SEND_DATA_CONNECTED] = {S_IDLE,A_SET_ALL_DATA},
     [S_IDLE][E_STOP] = {S_DEATH,A_STOP},
 
@@ -289,8 +320,8 @@ static Transition_GEOGRAPHER stateMachine[NB_STATE_ - 1][NB_EVENT_GEOGRAPHER] =
     [S_WAITING_FOR_BE_PLACED][E_CONNECTION_DOWN] = {S_WATING_FOR_CONNECTION,A_CONNECTION_DOWN},
     [S_WAITING_FOR_BE_PLACED][E_STOP] = {S_DEATH,A_STOP},
 
-    [S_WAITING_FOR_ATTENUATION_COEFFICIENT_FROM_POSITION][E_SIGNAL_END_UPDATE_ATTENUATION_ELSE] = {S_WAITING_FOR_CALCUL_AVERAGE_COEFFICIENT,A_END_CALIBRATION},//TODO choice dans appel signalEndUpdateAttenuation
-    [S_WAITING_FOR_ATTENUATION_COEFFICIENT_FROM_POSITION][E_SIGNAL_END_UPDATE_ATTENUATION_CALIBRATION] = {S_WAITING_FOR_BE_PLACED,A_CALIBRATION_COUNTER},//TODO choice dans appel signalEndUpdateAttenuation
+    [S_WAITING_FOR_ATTENUATION_COEFFICIENT_FROM_POSITION][E_SIGNAL_END_UPDATE_ATTENUATION_ELSE] = {S_WAITING_FOR_CALCUL_AVERAGE_COEFFICIENT,A_END_CALIBRATION},
+    [S_WAITING_FOR_ATTENUATION_COEFFICIENT_FROM_POSITION][E_SIGNAL_END_UPDATE_ATTENUATION_CALIBRATION] = {S_WAITING_FOR_BE_PLACED,A_CALIBRATION_COUNTER},
     [S_WAITING_FOR_ATTENUATION_COEFFICIENT_FROM_POSITION][E_CONNECTION_DOWN] = {S_WATING_FOR_CONNECTION,A_CONNECTION_DOWN},
     [S_WAITING_FOR_ATTENUATION_COEFFICIENT_FROM_POSITION][E_STOP] = {S_DEATH,A_STOP},
 
@@ -370,17 +401,16 @@ static int8_t sendMsg(MqMsg* msg);
 
 
 static Date getCurrentDate() {
-    Date date = time(NULL);    //TODO determiner si c'est en secondes ou en millisecondes sur la discovery
+    Date date = time(NULL);    
     return date;
 }
 
 static void mqInit(void) {
-    attr.mq_flags = 0; //Flags de la file
-    attr.mq_maxmsg = MQ_MAX_MESSAGES; //Nombre maximum de messages dans la file
-    attr.mq_msgsize = sizeof(MqMsg); //Taille maximale de chaque message
-    attr.mq_curmsgs = 0; //Nombre de messages actuellement dans la file
+    attr.mq_flags = 0; 
+    attr.mq_maxmsg = MQ_MAX_MESSAGES; 
+    attr.mq_msgsize = sizeof(MqMsg); 
+    attr.mq_curmsgs = 0; 
 
-    /* destruction de la BAL si toutefois préexistante */
 
     if (mq_unlink(BAL) == -1) {
         if (errno != ENOENT) {
@@ -388,9 +418,7 @@ static void mqInit(void) {
             exit(1);
         }
     }
-    /* création et ouverture de la BAL */
     descripteur = mq_open(BAL, O_RDWR | O_CREAT, 0777, &attr);
-    /*On ouvre la BAL avec comme arguments : le nom de la BAL, un flag pour ouvrir la file en lecture et en ecriture (pour utiliser recEve et send) ou pour créer une MQ, le droit d'accès,l'attribut crée*/
     if (descripteur == -1) {
         perror("Erreur Open :\n");
     } else {
@@ -399,10 +427,10 @@ static void mqInit(void) {
 }
 
 static void mqDone(void) {
-    /* fermeture de la BAL */
+    
     mq_close(descripteur); //On ferme la BAL en mettant en paramètre le descripteur
 
-    /* destruction de la BAL */
+    
     mq_unlink(BAL); //On détruit la BAL en mettant en paramètre le nom de la BAL
 }
 
@@ -411,7 +439,7 @@ static void mqReceive(MqMsg* this) {
 }
 
 static void* run() {
-    MqMsg msg; //message prenant l'event
+    MqMsg msg; 
     Action_GEOGRAPHER act;
     while (myState != S_DEATH) {
         TRACE("début boucle while %s ", "\n");
@@ -422,7 +450,7 @@ static void* run() {
         if (stateMachine[myState][msg.event].destinationState == S_FORGET) // aucun état de destination, on ne fait rien
         {
             TRACE("MAE, perte evenement %s  \n", Event_Geographer_getName(msg.event));
-        } else /* on tire la transition */
+        } else 
         {
             TRACE("MAE, traitement evenement %s \n", Event_Geographer_getName(msg.event));
 
@@ -508,7 +536,7 @@ static void performAction(Action_GEOGRAPHER anAction, MqMsg* msg) {
     }
 }
 
-static int8_t sendMsg(MqMsg* msg) { //TODO pas besoin mutex, deja protege/a revoir
+static int8_t sendMsg(MqMsg* msg) { 
     int8_t returnError = EXIT_FAILURE;
     if (mq_send(descripteur, (char*) msg, sizeof(msg), 0) == 0) {
         returnError = EXIT_SUCCESS;
@@ -541,9 +569,6 @@ extern int8_t Geographer_new() {
 extern int8_t Geographer_free() {
     int8_t returnError = EXIT_FAILURE;
     mqDone();
-
-
-    //returnError = Scanner_free();
 
     if (returnError == EXIT_SUCCESS) {
         returnError = ProxyLoggerMOB_free();
@@ -582,21 +607,6 @@ extern int8_t Geographer_askSignalStopGeographer() {
 
     MqMsg msg = { .event = E_STOP };
     returnError = sendMsg(&msg);
-    // returnError = Scanner_askStopScanner();
-
-    // if (returnError == EXIT_SUCCESS) {
-    //     ProxyLoggerMOB_stop();
-    // }
-    // if (returnError == EXIT_SUCCESS) {
-    //     ProxyGUI_stop();
-    // }
-
-    // myState = S_DEATH;
-    // calibrationCounter = 0;
-    // connectionState = DISCONNECTED;
-    // TRACE("debut arret thread geographer %s ", "\n");
-    // pthread_join(threadGeographer, NULL);
-    // TRACE("fin arret thread geographer %s ", "\n");
 
     return returnError;
 }
@@ -689,9 +699,7 @@ extern int8_t Geographer_dateAndSendData(BeaconData* beaconsData, int8_t beacons
         returnError = sendMsg(&msg);
 
     } else { //si pas connecté
-    /*
-        MqMsg msg = { .event = E_DATE_AND_SEND_DATA_ELSE };
-        returnError = sendMsg(&msg, sizeof(msg));*/
+
         free(beaconsData);
         free(currentPosition);
         free(currentProcessorAndMemoryLoad);
@@ -702,5 +710,4 @@ extern int8_t Geographer_dateAndSendData(BeaconData* beaconsData, int8_t beacons
 }
 
 
-//TODO rajouter mutex methode extern avec sendMsg
-//mettre mutex dans la methode
+
