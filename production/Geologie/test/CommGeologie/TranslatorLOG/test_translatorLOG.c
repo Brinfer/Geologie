@@ -27,7 +27,7 @@
 /**
  * @brief Nombre de suites de tests a excuter.
  */
-#define NB_SUITE_TESTS_TRANSLATOR_LOG (5)
+#define NB_SUITE_TESTS_TRANSLATOR_LOG (6)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -70,6 +70,12 @@ extern int test_TranslatorLOG_run_translateForSendMemoryAndProcessorLoad(void);
  */
 extern int test_TranslatorLOG_run_translateForSendAllBeaconsData(void);
 
+/**
+ * @brief Execute les tests de TranslatorLOG_translateForSendExperimentalTrajects.
+ *
+ * @return int 0 en cas de succes, le numero du test qui a echoue sinon.
+ */
+extern int test_TranslatorLOG_run_translateForSendExperimentalTrajects(void);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -82,11 +88,12 @@ extern int test_TranslatorLOG_run_translateForSendAllBeaconsData(void);
  *
  */
 static int (*suite_tests[])(void) = {
-   test_TranslatorLOG_run_translateTrameToHeader,
-   test_TranslatorLOG_run_translateForSendCurrentPosition,
-   test_TranslatorLOG_run_translateForSendExperimentalPositions,
-   test_TranslatorLOG_run_translateForSendMemoryAndProcessorLoad,
-   test_TranslatorLOG_run_translateForSendAllBeaconsData
+    test_TranslatorLOG_run_translateTrameToHeader,
+    test_TranslatorLOG_run_translateForSendCurrentPosition,
+    test_TranslatorLOG_run_translateForSendExperimentalPositions,
+    test_TranslatorLOG_run_translateForSendMemoryAndProcessorLoad,
+    test_TranslatorLOG_run_translateForSendAllBeaconsData,
+    test_TranslatorLOG_run_translateForSendExperimentalTrajects
 };
 
 /**

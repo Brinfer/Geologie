@@ -95,7 +95,7 @@ extern void TranslatorLOG_translateForSendExperimentalPositions(uint8_t nbPosinb
  * @warning @a dest doit etre de la bonne taille.
  * @see #TranslatorLOG_getTrameSize
  */
-extern void TranslatorLOG_translateForExperimentalTrajects(const ExperimentalTraject* experimentalTrajects, uint8_t nbTraject, Trame* dest);
+extern void TranslatorLOG_translateForSendExperimentalTrajects(const ExperimentalTraject* experimentalTrajects, uint8_t nbTraject, Trame* dest);
 
 /**
  * @brief Traduit les donnees balise en une trame. Compose aussi le header.
