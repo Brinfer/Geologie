@@ -29,6 +29,7 @@
 #include <mqueue.h>
 #include <time.h>
 #include <errno.h>
+#include <stdbool.h>
 
 #include "geographer.h"
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -40,7 +41,7 @@
 * @brief Tableau d'entier
 * creation d'un tableau constant d'entier
 */
-static ExperimentalPosition experimentalPositions[]={
+static ExperimentalPosition experimentalPositions[] = {
     {.id = 1, .position = {.X = 550, .Y = 200}},
     {.id = 2, .position = {.X = 550, .Y = 400}},
     {.id = 3, .position = {.X = 550, .Y = 480}},
@@ -68,7 +69,7 @@ static ExperimentalPosition experimentalPositions[]={
     {.id = 25, .position = {.X = 950, .Y = 200}}
 };
 
-static CalibrationPosition calibrationPositions[]={
+static CalibrationPosition calibrationPositions[] = {
     {.id = 1, .position = {.X = 550, .Y = 200}},
     {.id = 2, .position = {.X = 550, .Y = 400}},
     {.id = 3, .position = {.X = 550, .Y = 480}},
@@ -97,34 +98,49 @@ static CalibrationPosition calibrationPositions[]={
 };
 
 
-Position traject1[]={
+Position traject1[] = {
     {.X = 100, .Y = 1300 },
     {.X = 1000, .Y = 1300 },
     {.X = 1000, .Y = 200 },
     {.X = 100, .Y = 200 },
     {.X = 100, .Y = 1300}
 };
-Position traject2[]={
+Position traject2[] = {
     {.X = 50, .Y = 1300 },
     {.X = 1050, .Y = 1000 }
 };
-Position traject3[]={
+Position traject3[] = {
     {.X = 950, .Y = 1000 },
     {.X = 350, .Y = 1200 },
     {.X = 50, .Y = 1000 }
 };
 
-static ExperimentalTraject experimentalTrajects[]={
-    {.id= 1, .traject = traject1, .nbPosition=5},
-    {.id= 2, .traject = traject2, .nbPosition=2},
-    {.id= 3, .traject = traject3, .nbPosition=3},
+static ExperimentalTraject experimentalTrajects[] = {
+    {.id = 1, .traject = traject1, .nbPosition = 5},
+    {.id = 2, .traject = traject2, .nbPosition = 2},
+    {.id = 3, .traject = traject3, .nbPosition = 3}
 };
 
+
+/**
+ * @brief Etat de la connexion.
+ *
+ */
 static ConnectionState connectionState;
 
-static uint8_t calibrationCounter;
+/**
+ * @brief Compteur de calibration.
+ *
+ */
+static int8_t calibrationCounter;
 
+/**
+ * @brief Date actuelle.
+ *
+ */
 static Date currentDate;
+
+
 
 /////////////////////////////////////////////////////////////////////////////
 typedef enum {
@@ -153,7 +169,7 @@ const char* const State_Geographer_Name[] = {
     "NB_STATE_"
 };
 
-static const char* State_Geographer_getName(uint8_t i) {
+static const char* State_Geographer_getName(int8_t i) {
     return State_Geographer_Name[i];
 }
 
@@ -185,7 +201,7 @@ const char* const Event_Geographer_Name[] = {
     "NB_EVENT_GEOGRAPHER"
 };
 
-static const char* Event_Geographer_getName(uint8_t i) {
+static const char* Event_Geographer_getName(int8_t i) {
     return Event_Geographer_Name[i];
 }
 
@@ -218,7 +234,7 @@ const char* const Action_Geographer_Name[] = {
     "A_CALIBRATION_COUNTER"
 };
 
-static const char* Action_Geographer_getName(uint8_t i) {
+static const char* Action_Geographer_getName(int8_t i) {
     return Action_Geographer_Name[i];
 }
 
@@ -233,16 +249,16 @@ typedef struct {
     Event_GEOGRAPHER event; //evenement interne
     Position* currentPosition;
     BeaconData* beaconsData;
-    uint8_t beaconsDataSize;
+    int8_t beaconsDataSize;
     ProcessorAndMemoryLoad* currentProcessorAndMemoryLoad;
     CalibrationPositionId calibrationPositionId;
     CalibrationData* calibrationData;
-    uint8_t nbCalibration;
+    int8_t nbCalibration;
 } MqMsg; //type de message dans la BAL
 
 
 static State_GEOGRAPHER myState;
-static pthread_t myThread;
+static pthread_t threadGeographer;
 
 
 /**
@@ -259,27 +275,30 @@ static struct mq_attr attr; //On déclare un attribut pour la fonction mq_open q
 static Transition_GEOGRAPHER stateMachine[NB_STATE_ - 1][NB_EVENT_GEOGRAPHER] =
 {
     [S_WATING_FOR_CONNECTION] [E_CONNECTION_ESTABLISHED] = {S_IDLE,A_CONNECTION_ESTABLISHED},
+    [S_WATING_FOR_CONNECTION][E_STOP] = {S_DEATH,A_STOP},
 
     [S_IDLE][E_ASK_CALIBRATION_POSITIONS] = {S_WAITING_FOR_BE_PLACED,A_SET_CALIBRATION_POSITIONS},
     [S_IDLE][E_CONNECTION_DOWN] = {S_WATING_FOR_CONNECTION,A_CONNECTION_DOWN},
     [S_IDLE][E_DATE_AND_SEND_DATA_ELSE] = {S_IDLE,A_NOP}, //TODO choice if dans appel methode dateAndSend
     [S_IDLE][E_DATE_AND_SEND_DATA_CONNECTED] = {S_IDLE,A_SET_ALL_DATA},
+    [S_IDLE][E_STOP] = {S_DEATH,A_STOP},
 
 
     [S_WAITING_FOR_BE_PLACED][E_VALIDATE_POSITION] = {S_WAITING_FOR_ATTENUATION_COEFFICIENT_FROM_POSITION,A_ASK_4_UPDATE_ATTENUATION_COEFFICIENT},
     [S_WAITING_FOR_BE_PLACED][E_CONNECTION_DOWN] = {S_WATING_FOR_CONNECTION,A_CONNECTION_DOWN},
+    [S_WAITING_FOR_BE_PLACED][E_STOP] = {S_DEATH,A_STOP},
 
     [S_WAITING_FOR_ATTENUATION_COEFFICIENT_FROM_POSITION][E_SIGNAL_END_UPDATE_ATTENUATION_ELSE] = {S_WAITING_FOR_CALCUL_AVERAGE_COEFFICIENT,A_END_CALIBRATION},//TODO choice dans appel signalEndUpdateAttenuation
     [S_WAITING_FOR_ATTENUATION_COEFFICIENT_FROM_POSITION][E_SIGNAL_END_UPDATE_ATTENUATION_CALIBRATION] = {S_WAITING_FOR_BE_PLACED,A_CALIBRATION_COUNTER},//TODO choice dans appel signalEndUpdateAttenuation
     [S_WAITING_FOR_ATTENUATION_COEFFICIENT_FROM_POSITION][E_CONNECTION_DOWN] = {S_WATING_FOR_CONNECTION,A_CONNECTION_DOWN},
+    [S_WAITING_FOR_ATTENUATION_COEFFICIENT_FROM_POSITION][E_STOP] = {S_DEATH,A_STOP},
 
     [S_WAITING_FOR_CALCUL_AVERAGE_COEFFICIENT][E_CONNECTION_DOWN] = {S_WATING_FOR_CONNECTION,A_CONNECTION_DOWN},
     [S_WAITING_FOR_CALCUL_AVERAGE_COEFFICIENT][E_SIGNAL_END_AVERAGE_CALCUL] = {S_IDLE,A_END_CALIBRATION},
+    [S_WAITING_FOR_CALCUL_AVERAGE_COEFFICIENT][E_STOP] = {S_DEATH,A_STOP},
 
 
 };
-
-
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -304,7 +323,7 @@ static Date getCurrentDate();
 static void mqInit();
 
 /**
- * @fn static uint8_t mqDone ()
+ * @fn static int8_t mqDone ()
  * @brief ferme et detruit la boite aux lettres
  *
  * @return 1 si erreur detectee, sinon retourne 0
@@ -312,7 +331,7 @@ static void mqInit();
 static void mqDone();
 
 /**
- * @fn static uint8_t mqReceive (MqMsg *this)
+ * @fn static int8_t mqReceive (MqMsg *this)
  * @brief ferme et detruit la boite aux lettres
  *
  * @return 1 si erreur detectee, sinon retourne 0
@@ -322,14 +341,14 @@ static void mqReceive(MqMsg* this);
 
 
 /**
- * @fn static void* run();
+ * @fn static void* run()
  * @brief methode appelee par un thread pour recevoir les action a faire grace a une boite au lettre et les effectuer
  *
  * cette metode lira la boite au lettre et effectuera les actions
  */
 static void* run();
 /**
- * @fn static void performAction(Action_GEOGRAPHER action, MqMsg* msg);
+ * @fn static void performAction(Action_GEOGRAPHER action, MqMsg* msg)
  * @brief methode appelee par run pour executer les actions
  *
  * @param action action a effectuee
@@ -338,14 +357,16 @@ static void* run();
 static void performAction(Action_GEOGRAPHER action, MqMsg* msg);
 
 /**
- * @fn static void sendMsg(MqMsg* msg, uint8_t sizeOfMsg);
+ * @fn static void sendMsg(MqMsg* msg, int8_t sizeOfMsg)
  * @brief methode pour envoyer des message a la queue
  *
  * @param sizeOfMsg taille du message a envoyer
  * @param msg structure contenant les donnees a utiliser pour effectuer l'action
  * @return 1 si erreur 0 si
  */
-static uint8_t sendMsg(MqMsg* msg);
+static int8_t sendMsg(MqMsg* msg);
+
+
 
 static Date getCurrentDate() {
     Date date = time(NULL);    //TODO determiner si c'est en secondes ou en millisecondes sur la discovery
@@ -353,7 +374,6 @@ static Date getCurrentDate() {
 }
 
 static void mqInit(void) {
-    printf("On entre dans le Init\n");
     attr.mq_flags = 0; //Flags de la file
     attr.mq_maxmsg = MQ_MAX_MESSAGES; //Nombre maximum de messages dans la file
     attr.mq_msgsize = sizeof(MqMsg); //Taille maximale de chaque message
@@ -373,14 +393,11 @@ static void mqInit(void) {
     if (descripteur == -1) {
         perror("Erreur Open :\n");
     } else {
-        printf("BAL ouverte\n");
     }
 
 }
 
 static void mqDone(void) {
-    printf("On entre dans le Done\n");
-
     /* fermeture de la BAL */
     mq_close(descripteur); //On ferme la BAL en mettant en paramètre le descripteur
 
@@ -389,36 +406,53 @@ static void mqDone(void) {
 }
 
 static void mqReceive(MqMsg* this) {
-    printf("On entre dans le mq_receive\n");
     mq_receive(descripteur, (char*) this, sizeof(*this), NULL);
 }
 
 static void* run() {
-    printf("run\n");
     MqMsg msg; //message prenant l'event
     Action_GEOGRAPHER act;
     while (myState != S_DEATH) {
-        mqReceive(&msg); //Opération privée pour lire dans la BAL de AdminUI
+        TRACE("début boucle while %s ", "\n");
+
+        mqReceive(&msg); //Opération privée pour lire dans la BAL de Geographer
+
+
         if (stateMachine[myState][msg.event].destinationState == S_FORGET) // aucun état de destination, on ne fait rien
         {
             TRACE("MAE, perte evenement %s  \n", Event_Geographer_getName(msg.event));
         } else /* on tire la transition */
         {
             TRACE("MAE, traitement evenement %s \n", Event_Geographer_getName(msg.event));
+
             act = stateMachine[myState][msg.event].action;
             TRACE("MAE, traitement action %s \n", Action_Geographer_getName(act));
             performAction(act, &msg);
             myState = stateMachine[myState][msg.event].destinationState;
             TRACE("MAE, va dans etat %s \n", State_Geographer_getName(myState));
-        }
-    }
-    return 0;
 
+        }
+        TRACE("fin boucle while %s ", "\n");
+    }
+    TRACE("fin de chez fin boucle while %s ", "\n");
+
+    return 0;
 }
 
 static void performAction(Action_GEOGRAPHER anAction, MqMsg* msg) {
     switch (anAction) {
     case A_STOP:
+
+        ProxyLoggerMOB_stop();
+
+        ProxyGUI_stop();
+
+
+        calibrationCounter = 0;
+        connectionState = DISCONNECTED;
+        TRACE("debut arret thread geographer %s ", "\n");
+        pthread_join(threadGeographer, NULL);
+        TRACE("fin arret thread geographer %s ", "\n");
         break;
 
     case A_NOP:
@@ -443,7 +477,7 @@ static void performAction(Action_GEOGRAPHER anAction, MqMsg* msg) {
 
     case A_SET_CALIBRATION_POSITIONS:
         calibrationCounter = 0;
-        ProxyGUI_setCalibrationPositions(calibrationPositions,CALIBRATION_POSITION_NUMBER);
+        ProxyGUI_setCalibrationPositions(calibrationPositions, CALIBRATION_POSITION_NUMBER);
         break;
 
     case A_ASK_4_UPDATE_ATTENUATION_COEFFICIENT:
@@ -467,14 +501,14 @@ static void performAction(Action_GEOGRAPHER anAction, MqMsg* msg) {
         break;
 
     default:
-        TRACE("Action inconnue, pb ds la MAE de geographer %s ","\n");
+        TRACE("Action inconnue, pb ds la MAE de geographer %s ", "\n");
         break;
     }
 }
 
-static uint8_t sendMsg(MqMsg* msg) { //TODO pas besoin mutex, deja protege/a revoir
-    uint8_t returnError = EXIT_FAILURE;
-    if (mq_send(descripteur, (char*) &msg, sizeof(msg), 0) == 0) {
+static int8_t sendMsg(MqMsg* msg) { //TODO pas besoin mutex, deja protege/a revoir
+    int8_t returnError = EXIT_FAILURE;
+    if (mq_send(descripteur, (char*) msg, sizeof(msg), 0) == 0) {
         returnError = EXIT_SUCCESS;
     }
     return returnError;
@@ -486,9 +520,8 @@ static uint8_t sendMsg(MqMsg* msg) { //TODO pas besoin mutex, deja protege/a rev
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-extern uint8_t Geographer_new() {
-    uint8_t returnError = EXIT_FAILURE;
-    printf("Geographer_New\n");
+extern int8_t Geographer_new() {
+    int8_t returnError = EXIT_FAILURE;
     returnError = ProxyGUI_new();
 
     if (returnError == EXIT_SUCCESS) {
@@ -502,8 +535,8 @@ extern uint8_t Geographer_new() {
     return returnError;
 }
 
-extern uint8_t Geographer_free() {
-    uint8_t returnError = EXIT_FAILURE;
+extern int8_t Geographer_free() {
+    int8_t returnError = EXIT_FAILURE;
     mqDone();
 
 
@@ -520,8 +553,8 @@ extern uint8_t Geographer_free() {
 }
 
 
-extern uint8_t Geographer_askSignalStartGeographer() {
-    uint8_t returnError = EXIT_FAILURE;
+extern int8_t Geographer_askSignalStartGeographer() {
+    int8_t returnError = EXIT_FAILURE;
     returnError = ProxyGUI_start();
     if (returnError == EXIT_SUCCESS) {
         ProxyLoggerMOB_start();
@@ -533,31 +566,39 @@ extern uint8_t Geographer_askSignalStartGeographer() {
     connectionState = DISCONNECTED;
     calibrationCounter = 0;
 
-    pthread_create(&myThread, NULL, &run, NULL);
+    pthread_create(&threadGeographer, NULL, &run, NULL);
 
     return returnError;
 }
 
 
-extern uint8_t Geographer_askSignalStopGeographer() {
-    uint8_t returnError = EXIT_FAILURE;
-    //returnError = Scanner_ask4StopScanner();
+extern int8_t Geographer_askSignalStopGeographer() {
+    int8_t returnError = EXIT_FAILURE;
 
-    if (returnError == EXIT_SUCCESS) {
-        ProxyLoggerMOB_stop();
-    }
-    if (returnError == EXIT_SUCCESS) {
-        ProxyGUI_stop();
-    }
-    pthread_join(myThread, NULL);
+    MqMsg msg = { .event = E_STOP };
+    returnError = sendMsg(&msg);
+    // returnError = Scanner_askStopScanner();
+
+    // if (returnError == EXIT_SUCCESS) {
+    //     ProxyLoggerMOB_stop();
+    // }
+    // if (returnError == EXIT_SUCCESS) {
+    //     ProxyGUI_stop();
+    // }
+
+    // myState = S_DEATH;
+    // calibrationCounter = 0;
+    // connectionState = DISCONNECTED;
+    // TRACE("debut arret thread geographer %s ", "\n");
+    // pthread_join(threadGeographer, NULL);
+    // TRACE("fin arret thread geographer %s ", "\n");
 
     return returnError;
 }
 
 
-extern uint8_t Geographer_askCalibrationPositions() {
-    uint8_t returnError = EXIT_FAILURE;
-    printf("Geographer_askCalibrationPositions\n");
+extern int8_t Geographer_askCalibrationPositions() {
+    int8_t returnError = EXIT_FAILURE;
     MqMsg msg = { .event = E_ASK_CALIBRATION_POSITIONS };
     returnError = sendMsg(&msg);
 
@@ -565,9 +606,8 @@ extern uint8_t Geographer_askCalibrationPositions() {
 }
 
 
-extern uint8_t Geographer_validatePosition(CalibrationPositionId calibrationPositionId) {
-    uint8_t returnError = EXIT_FAILURE;
-    printf("Geographer_validatePosition\n");
+extern int8_t Geographer_validatePosition(CalibrationPositionId calibrationPositionId) {
+    int8_t returnError = EXIT_FAILURE;
     //tempCalibrationPositionId = calibrationPositionId;
     MqMsg msg = {
         .event = E_VALIDATE_POSITION,
@@ -580,62 +620,57 @@ extern uint8_t Geographer_validatePosition(CalibrationPositionId calibrationPosi
 }
 
 
-extern uint8_t Geographer_signalEndUpdateAttenuation() {
-    uint8_t returnError = EXIT_FAILURE;
-    printf("Geographer_signalEndUpdateAttenuation\n");
+extern int8_t Geographer_signalEndUpdateAttenuation() {
+    int8_t returnError = EXIT_FAILURE;
 
     if (calibrationCounter == CALIBRATION_POSITION_NUMBER) {
         MqMsg msg = { .event = E_SIGNAL_END_UPDATE_ATTENUATION_CALIBRATION };
-        returnError = sendMsg(&msg );
+        returnError = sendMsg(&msg);
 
     } else {
         MqMsg msg = { .event = E_SIGNAL_END_UPDATE_ATTENUATION_ELSE };
-        returnError = sendMsg(&msg );
+        returnError = sendMsg(&msg);
     }
 
     return returnError;
 }
 
 
-extern uint8_t Geographer_signalEndAverageCalcul(CalibrationData* calibrationData, uint8_t nbCalibration) { //comment
-    uint8_t returnError = EXIT_FAILURE;
-    printf("Geographer_signalEndAverageCalcul\n");
+extern int8_t Geographer_signalEndAverageCalcul(CalibrationData* calibrationData, int8_t nbCalibration) { //comment
+    int8_t returnError = EXIT_FAILURE;
 
     MqMsg msg = {
         .event = E_SIGNAL_END_AVERAGE_CALCUL,
         .calibrationData = calibrationData,
         .nbCalibration = nbCalibration,
     };
-    returnError = sendMsg(&msg );
+    returnError = sendMsg(&msg);
 
     return returnError;
 }
 
 
-extern uint8_t Geographer_signalConnectionEstablished() {
-    uint8_t returnError = EXIT_FAILURE;
-    printf("Geographer_signalConnectionEstablished\n");
+extern int8_t Geographer_signalConnectionEstablished() {
+    int8_t returnError = EXIT_FAILURE;
     MqMsg msg = { .event = E_CONNECTION_ESTABLISHED };
-    returnError = sendMsg(&msg );
+    returnError = sendMsg(&msg);
 
     return returnError;
 }
 
 
-extern uint8_t Geographer_signalConnectionDown() {
-    uint8_t returnError = EXIT_FAILURE;
-    printf("Geographer_signalConnectionDown\n");
+extern int8_t Geographer_signalConnectionDown() {
+    int8_t returnError = EXIT_FAILURE;
     MqMsg msg = { .event = E_CONNECTION_DOWN };
-    returnError = sendMsg(&msg );
+    returnError = sendMsg(&msg);
 
     return returnError;
 }
 
 
 
-extern uint8_t Geographer_dateAndSendData(BeaconData* beaconsData, uint8_t beaconsDataSize, Position* currentPosition, ProcessorAndMemoryLoad * currentProcessorAndMemoryLoad) {
-    uint8_t returnError = EXIT_FAILURE;
-    printf("Geographer_dateAndSendData\n");
+extern int8_t Geographer_dateAndSendData(BeaconData* beaconsData, int8_t beaconsDataSize, Position* currentPosition, ProcessorAndMemoryLoad* currentProcessorAndMemoryLoad) {
+    int8_t returnError = EXIT_FAILURE;
     if (connectionState == CONNECTED) {
 
         MqMsg msg = {

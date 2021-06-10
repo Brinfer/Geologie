@@ -64,7 +64,7 @@ extern int test_TranslatorLOG_run_translateForSendExperimentalPositions(void);
 extern int test_TranslatorLOG_run_translateForSendMemoryAndProcessorLoad(void);
 
 /**
- * @brief Execute les tests de TranslatorLog_translateForSendAllBeaconsData.
+ * @brief Execute les tests de TranslatorLOG_translateForSendAllBeaconsData.
  *
  * @return int 0 en cas de succes, le numero du test qui a echoue sinon.
  */
