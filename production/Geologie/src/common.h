@@ -40,13 +40,19 @@
  *
  */
 #define SIZE_BEACON_ID (3)
+#define NB_CALIBRATION_POSITIONS (10)
+#define ATT_COEFF_1_METER (6)
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//                                              include
+//
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
+#include <stdint.h>
 /**
  * @brief  TODO
  *
  */
-#define ATT_COEFF_1_METER (-50) // TODO move
 
 /**
  * @brief  TODO
@@ -59,6 +65,10 @@ typedef uint8_t ExperimentalPositionId;
  *
  */
 typedef uint8_t ExperimentalTrajectId;
+typedef struct {
+    uint32_t X;
+    uint32_t Y;
+}Position;
 
 /**
  * @brief Id d'une balise
@@ -82,6 +92,7 @@ typedef float AttenuationCoefficient;
  *
  */
 typedef struct {
+    uint8_t beaconId[SIZE_BEACON_ID];
     uint8_t positionId;
     AttenuationCoefficient attenuationCoefficient;
 }BeaconCoefficients;
@@ -97,13 +108,6 @@ typedef uint8_t NbCoefficient;
  */
 typedef uint64_t Date;
 
-/**
- * @brief structure qui va prendre les coordonnees d'un point (X et Y seront des entiers et seront en cm)
- */
-typedef struct {
-    uint32_t X;
-    uint32_t Y;
-} Position;
 
 /**
  * @brief creation d'une structure qui va prendre les differentes donnees d'une balise
@@ -116,7 +120,7 @@ typedef struct {
 } BeaconData;
 
 typedef struct {
-    uint8_t beaconId;
+    uint8_t beaconId[SIZE_BEACON_ID];
     BeaconCoefficients* beaconCoefficient;
     uint8_t nbCoefficient;
     AttenuationCoefficient coefficientAverage;
@@ -144,10 +148,13 @@ typedef struct {
 
 /**
  * @brief  TODO
- * 
+ *
  */
 typedef struct {
-    /* data */
+    uint8_t name[SIZE_BEACON_ID];
+    int32_t uuid[2];
+    int8_t rssi;
+    Position position;
 } BeaconSignal;
 
 /**
