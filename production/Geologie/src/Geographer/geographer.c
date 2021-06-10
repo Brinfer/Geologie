@@ -23,8 +23,10 @@
 //                                              Include
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#include <assert.h>
 #include <stdlib.h>
-#include <unistd.h> // Macros, type Posix and co
+#include <unistd.h>
 #include <pthread.h>
 #include <mqueue.h>
 #include <time.h>
@@ -32,6 +34,7 @@
 #include <stdbool.h>
 
 #include "geographer.h"
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //                                              Variable et structure privee
@@ -439,69 +442,69 @@ static void* run() {
 
 static void performAction(Action_GEOGRAPHER anAction, MqMsg* msg) {
     switch (anAction) {
-    case A_STOP:
+        case A_STOP:
 
-        ProxyLoggerMOB_stop();
+            ProxyLoggerMOB_stop();
 
-        ProxyGUI_stop();
-
-
-        calibrationCounter = 0;
-        connectionState = DISCONNECTED;
-        TRACE("debut arret thread geographer %s ", "\n");
-        pthread_join(threadGeographer, NULL);
-        TRACE("fin arret thread geographer %s ", "\n");
-        break;
-
-    case A_NOP:
-        break;
-
-    case A_CONNECTION_ESTABLISHED:
-        connectionState = CONNECTED;
-        ProxyLoggerMOB_setExperimentalPositions(experimentalPositions, EXP_POSITION_NUMBER);
-        ProxyLoggerMOB_setExperimentalTrajects(experimentalTrajects, EXP_TRAJECT_NUMBER);
-        break;
-
-    case A_CONNECTION_DOWN:
-        connectionState = DISCONNECTED;
-        break;
-
-    case A_SET_ALL_DATA:
-        currentDate = getCurrentDate();
-        ProxyLoggerMOB_setAllBeaconsData(msg->beaconsData, msg->beaconsDataSize, currentDate);
-        ProxyLoggerMOB_setCurrentPosition(msg->currentPosition, currentDate);
-        ProxyLoggerMOB_setProcessorAndMemoryLoad(msg->currentProcessorAndMemoryLoad, currentDate);
-        break;
-
-    case A_SET_CALIBRATION_POSITIONS:
-        calibrationCounter = 0;
-        ProxyGUI_setCalibrationPositions(calibrationPositions, CALIBRATION_POSITION_NUMBER);
-        break;
-
-    case A_ASK_4_UPDATE_ATTENUATION_COEFFICIENT:
-        Scanner_ask4UpdateAttenuationCoefficientFromPosition(calibrationPositions[calibrationCounter]);
-        break;
+            ProxyGUI_stop();
 
 
+            calibrationCounter = 0;
+            connectionState = DISCONNECTED;
+            TRACE("debut arret thread geographer %s ", "\n");
+            pthread_join(threadGeographer, NULL);
+            TRACE("fin arret thread geographer %s ", "\n");
+            break;
 
-    case A_END_CALIBRATION: 
-        ProxyLoggerMOB_setCalibrationData(msg->calibrationData, msg->nbCalibration);
-        ProxyGUI_signalEndCalibration();
-        break;
+        case A_NOP:
+            break;
 
-    case A_CALIBRATION_COUNTER:
-        ProxyGUI_signalEndCalibrationPosition();
-        calibrationCounter++;
-        break;
+        case A_CONNECTION_ESTABLISHED:
+            connectionState = CONNECTED;
+            ProxyLoggerMOB_setExperimentalPositions(experimentalPositions, EXP_POSITION_NUMBER);
+            ProxyLoggerMOB_setExperimentalTrajects(experimentalTrajects, EXP_TRAJECT_NUMBER);
+            break;
 
-    case A_ASK_4_AVERAGE_CALCUL:
-        ProxyGUI_signalEndCalibrationPosition();
-        Scanner_ask4AverageCalcul();
-        break;
+        case A_CONNECTION_DOWN:
+            connectionState = DISCONNECTED;
+            break;
 
-    default:
-        TRACE("Action inconnue, pb ds la MAE de geographer %s ", "\n");
-        break;
+        case A_SET_ALL_DATA:
+            currentDate = getCurrentDate();
+            ProxyLoggerMOB_setAllBeaconsData(msg->beaconsData, msg->beaconsDataSize, currentDate);
+            ProxyLoggerMOB_setCurrentPosition(msg->currentPosition, currentDate);
+            ProxyLoggerMOB_setProcessorAndMemoryLoad(msg->currentProcessorAndMemoryLoad, currentDate);
+            break;
+
+        case A_SET_CALIBRATION_POSITIONS:
+            calibrationCounter = 0;
+            ProxyGUI_setCalibrationPositions(calibrationPositions, CALIBRATION_POSITION_NUMBER);
+            break;
+
+        case A_ASK_4_UPDATE_ATTENUATION_COEFFICIENT:
+            Scanner_ask4UpdateAttenuationCoefficientFromPosition(calibrationPositions[calibrationCounter]);
+            break;
+
+
+
+        case A_END_CALIBRATION:
+            ProxyLoggerMOB_setCalibrationData(msg->calibrationData, msg->nbCalibration);
+            ProxyGUI_signalEndCalibration();
+            break;
+
+        case A_CALIBRATION_COUNTER:
+            ProxyGUI_signalEndCalibrationPosition();
+            calibrationCounter++;
+            break;
+
+        case A_ASK_4_AVERAGE_CALCUL:
+            ProxyGUI_signalEndCalibrationPosition();
+            Scanner_ask4AverageCalcul();
+            break;
+
+        default:
+            TRACE("Action inconnue, pb ds la MAE de geographer %s ", "\n");
+            break;
     }
 }
 
@@ -523,13 +526,14 @@ extern int8_t Geographer_new() {
     int8_t returnError = EXIT_FAILURE;
     returnError = ProxyGUI_new();
 
-    if (returnError == EXIT_SUCCESS) {
+    if (returnError == 0) {
         returnError = ProxyLoggerMOB_new();
+
+        if (returnError >= 0) {
+            Scanner_new();
+            mqInit();
+        }
     }
-    if (returnError == EXIT_SUCCESS) {
-        returnError = Scanner_new();
-    }
-    mqInit();
 
     return returnError;
 }
@@ -557,16 +561,18 @@ extern int8_t Geographer_askSignalStartGeographer() {
     returnError = ProxyGUI_start();
     if (returnError == EXIT_SUCCESS) {
         returnError = ProxyLoggerMOB_start();
-    }
-    if (returnError == EXIT_SUCCESS) {
-        returnError = Scanner_ask4StartScanner();
-    }
-    myState = S_WATING_FOR_CONNECTION;
-    connectionState = DISCONNECTED;
-    calibrationCounter = 0;
 
-    pthread_create(&threadGeographer, NULL, &run, NULL);
+        if (returnError == 0) {
+            Scanner_ask4StartScanner();
 
+            myState = S_WATING_FOR_CONNECTION;
+            connectionState = DISCONNECTED;
+            calibrationCounter = 0;
+
+            returnError = pthread_create(&threadGeographer, NULL, &run, NULL);
+            assert(returnError >= 0);
+        }
+    }
     return returnError;
 }
 
