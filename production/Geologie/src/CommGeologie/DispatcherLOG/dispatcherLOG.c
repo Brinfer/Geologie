@@ -33,6 +33,7 @@
 #include "../com_common.h"
 #include <stdio.h>
 #include "../../tools.h"
+#include <stdbool.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -40,7 +41,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-/////////////////////////////////////////////////////////////////////////////
+
 
 
 
@@ -48,8 +49,17 @@ static pthread_t myThreadListen;
 
 
 
+/**
+ * @brief variable static pour la boucle while dans le thread
+ *
+ */
+static bool keepGoing = false;
 
-static int8_t keepGoing = 1;
+/**
+ * @brief Le mutex de dispatcher
+ *
+ */
+static pthread_mutex_t myMutex = PTHREAD_MUTEX_INITIALIZER;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //                                              Fonctions privee
@@ -74,10 +84,23 @@ static void* readMsg();
  */
 static void dispatch(Trame* trame, Header* Header);
 
+static bool getKeepGoing(void) {
+    bool returnValue;
+    pthread_mutex_lock(&myMutex);
+    returnValue = keepGoing;
+    pthread_mutex_unlock(&myMutex);
 
+    return returnValue;
+}
+
+static void setKeepGoing(bool newValue) {
+    pthread_mutex_lock(&myMutex);
+    keepGoing = newValue;
+    pthread_mutex_unlock(&myMutex);
+}
 
 static void dispatch(Trame* trame, Header* header) {
-    switch (header->commande)     {
+    switch (header->commande) {
     case ASK_CALIBRATION_POSITIONS:
         /* code */
         Geographer_askCalibrationPositions();
@@ -102,7 +125,7 @@ static void dispatch(Trame* trame, Header* header) {
         break;
     case SIGNAL_CALIBRATION_POSITION:;
         /* code */
-        CalibrationPositionId calibrationPositionId= TranslatorLog_translateForSignalCalibrationPosition(trame);
+        CalibrationPositionId calibrationPositionId = TranslatorLog_translateForSignalCalibrationPosition(trame);
         Geographer_validatePosition(calibrationPositionId);
         break;
     case SIGNAL_CALIRATION_END:
@@ -114,29 +137,49 @@ static void dispatch(Trame* trame, Header* header) {
 
 
     free(trame);
-    free(header);
+    //free(header);
 }
 
 
 
-static void readHeader(Header* header) {
-    Trame headerTrame[SIZE_HEADER];
-    PostmanLOG_readMsg(headerTrame, SIZE_HEADER); //on lit la trame contenant le header
-    TranslatorLog_translateTrameToHeader(headerTrame, header); //on traduit la trame header en header
+static int16_t readHeader(Header* header) {
+    Trame* headerTrame;
+    headerTrame = malloc(SIZE_HEADER);
+    int16_t returnError;
+    returnError = PostmanLOG_readMsg(headerTrame, SIZE_HEADER);//on lit la trame contenant le header
+    if (returnError == 1) {
+        TRACE("deconnexion %s", "\n");
+
+    } else {
+        TranslatorLog_translateTrameToHeader(headerTrame, header); //on traduit la trame header en header
+
+    } //TODO gerer le cas ou on a  pas tout recu
+    return returnError;
 }
 
 
 
 static void* readMsg() {
-    TRACE("readMsg%s","\n");
-    while (keepGoing) {
+    TRACE("readMsg%s", "\n");
+    while (getKeepGoing()) {
         Header header;
-        readHeader(&header); //on lit d'abord le header et on le traduit
+        int16_t returnError;
 
-        Trame* trame;
-        trame = malloc(header.size);
-        PostmanLOG_readMsg(trame, header.size); //on lit ensuite toute la trame //TODO mettre un mutex sur lecture/ecriture de trame et header
-        dispatch(trame,&header);
+        returnError = readHeader(&header); //on lit d'abord le header et on le traduit
+        if (returnError == 1) {
+            TRACE("deconnexion, on  ne fait rien %s", "\n");
+            //Geographer_askSignalStopGeographer();
+        } else {
+            Trame* trame;
+            trame = malloc(header.size);
+            TRACE("on lit la trame %s", "\n");
+
+            PostmanLOG_readMsg(trame, header.size); //on lit ensuite toute la trame //TODO mettre un mutex sur lecture/ecriture de trame et header
+            dispatch(trame, &header);
+        }
+
+
+
     }
     return 0;
 }
@@ -150,7 +193,12 @@ static void* readMsg() {
 
 
 extern int8_t DispatcherLOG_new() {
-    /* Nothing to do */
+    int8_t returnError = EXIT_SUCCESS;
+
+    returnError = pthread_mutex_init(&myMutex, NULL);
+    STOP_ON_ERROR(returnError < 0);
+    setKeepGoing(false);
+
     return EXIT_SUCCESS;
 }
 
@@ -162,33 +210,34 @@ extern int8_t DispatcherLOG_free() {
 
 extern int8_t DispatcherLOG_start() {
     int8_t returnError = EXIT_FAILURE;
+    setKeepGoing(true);
 
-    if (returnError == EXIT_SUCCESS) {
-        returnError = pthread_create(&myThreadListen, NULL, &readMsg, NULL);
+    returnError = pthread_create(&myThreadListen, NULL, &readMsg, NULL);
         // premier thread pour recevoir
-        if (keepGoing != EXIT_SUCCESS) {
-            keepGoing = 0;
-        }
+    if (returnError != EXIT_SUCCESS) {
+    setKeepGoing(false);
     }
+
 
     return returnError;
 }
 
 extern int8_t DispatcherLOG_stop() {
-    int8_t returnError = EXIT_FAILURE;
+    int8_t returnError = EXIT_SUCCESS;
+    setKeepGoing(false);
 
-    if (returnError == EXIT_SUCCESS) {
-        returnError = pthread_join(myThreadListen, NULL);
+    returnError = pthread_join(myThreadListen, NULL);
 
-    }
+    TRACE("dispatcher joined %s", "\n");
+
     return returnError;
 }
 
 extern int8_t DispatcherLOG_setConnectionState(ConnectionState connectionState) {
 
-    if(connectionState==CONNECTED){
+    if (connectionState == CONNECTED) {
         Geographer_signalConnectionEstablished();
-    }else{
+    } else {
         Geographer_signalConnectionDown();
     }
 

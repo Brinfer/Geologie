@@ -65,10 +65,11 @@ extern void ManagerLOG_startGEOLOGIE(void) {
     returnError = Geographer_askSignalStartGeographer();
     STOP_ON_ERROR(returnError < 0);
 
-    returnError = DispatcherLOG_start();
-    STOP_ON_ERROR(returnError < 0);
 
     returnError = UI_askSignalBeginningGEOLOGIE();
+    STOP_ON_ERROR(returnError < 0);
+
+    //returnError = DispatcherLOG_start();
     STOP_ON_ERROR(returnError < 0);
 }
 
@@ -79,19 +80,22 @@ extern void ManagerLOG_stopGEOLOGIE(void) {
 
     int8_t returnError = EXIT_SUCCESS;
 
-    returnError = DispatcherLOG_stop();
+    //returnError = DispatcherLOG_stop();
     STOP_ON_ERROR(returnError < 0);
 
-    returnError = Geographer_askSignalStopGeographer();
-    STOP_ON_ERROR(returnError < 0);
 
     returnError = PostmanLOG_stop();
     STOP_ON_ERROR(returnError < 0);
 
-    returnError = UI_askSignalEndingGEOLOGIE();
+
+
+    returnError = Geographer_askSignalStopGeographer();
     STOP_ON_ERROR(returnError < 0);
 
-    /* Free */
+    returnError = UI_askSignalEndingGEOLOGIE();
+    STOP_ON_ERROR(returnError < 0);
+    TRACE("UI_askSignalEndingGEOLOGIE %s", "\n");
+/* Free */
 
     TRACE("%sDestruction of GEOLOGIE%s%s", "\033[47m\033[30m", "\033[0m", "\n");
 
