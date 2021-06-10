@@ -36,10 +36,11 @@ typedef le_advertising_info BeaconsChannel;
 
 extern void Receivers_getAllBeaconsData();
 
-extern void Receivers_new();
-extern void Receivers_free();
-extern void Receivers_ask4StartReceiver();
-extern void Receivers_ask4StopReceiver();
+extern void Receiver_new();
+extern void Receiver_free();
+extern void Receiver_ask4StartReceiver();
+extern void Receiver_ask4StopReceiver();
+extern void Receiver_ask4BeaconsSignal();
 
 
 #endif /* RECEIVERS_H_ */
