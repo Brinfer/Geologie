@@ -267,8 +267,8 @@ static void Receiver_translateChannelToBeaconsSignal(){
 }
 
 static void reset_beaconsChannelAndSignal(){
-	memset(beaconsChannel, 0, NB_MAX_ADVERTISING_CHANNEL);
-	memset(beaconsSignal, 0, NB_BEACONS_AVAILABLE);
+	memset(beaconsChannel, 0, NB_MAX_ADVERTISING_CHANNEL * sizeof(BeaconsChannel));
+	memset(beaconsSignal, 0, NB_BEACONS_AVAILABLE * sizeof(BeaconSignal));
 }
 
 static void Receiver_getAllBeaconsChannel(){
@@ -277,7 +277,7 @@ static void Receiver_getAllBeaconsChannel(){
 	// Get HCI device.
 
 	const uint32_t device = hci_open_dev(hci_get_route(NULL));
-	if ( device < 0 ) { 
+	if ( device < 0 ) {
 		perror("Failed to open HCI device.");
 	}
 
@@ -392,7 +392,7 @@ static void performAction(Action_RECEIVER action, MqMsg * msg){
     switch (action) {
 
         case A_SEND_BEACONS_SIGNAL:
-            Scanner_setAllBeaconsSignal(beaconsSignal, nbSignalAvailable);      
+            Scanner_setAllBeaconsSignal(beaconsSignal, nbSignalAvailable);
             break;
 
         case A_MAJ_BEACONS_CHANNELS:
