@@ -133,7 +133,7 @@ static uint32_t  nbSignalAvailable;
 /**
  * @fn static void mqInit()
  * @brief Initialise la boite aux lettres
- * 
+ *
  * @return renvoie 1 si une erreur est detectee, sinon 0
 */
 static void mqInit();
@@ -141,7 +141,7 @@ static void mqInit();
 /**
  * @fn static void sendMsg(MqMsg* this)
  * @brief Envoie des messages a la BAL
- * 
+ *
  * @param this structure du message envoye a la BAL
  * @return renvoie 1 si une erreur est detectee, sinon 0
 */
@@ -150,7 +150,7 @@ static void sendMsg(MqMsg* this);
 /**
  * @fn static void mqReceive(MqMsg* this)
  * @brief Va chercher les messages dans la BAL
- * 
+ *
  * @param msg structure du message a recuperer
  * @return renvoie 1 si une erreur est detectee, sinon 0
 */
@@ -180,7 +180,7 @@ static void Receiver_getAllBeaconsChannel();
 /**
  * @fn static void performAction(Action_SCANNER action, MqMsg * msg)
  * @brief execute les fonctions a realiser en fonction du parametre action
- * 
+ *
  * @param action action a executer
  * @param msg message qui contient les donnees necessaire a l'execution de la fonction
 */
@@ -200,9 +200,6 @@ static void time_out();
 
 
 static void mqInit() {
-
-    printf("On entre dans le Init\n");
-
     attr.mq_flags = 0; //Flags de la file
     attr.mq_maxmsg = MQ_MAX_MESSAGES; //Nombre maximum de messages dans la file
     attr.mq_msgsize = sizeof(MqMsg); //Taille maximale de chaque message
@@ -225,8 +222,6 @@ static void mqInit() {
 
     if (descripteur == -1) {
         perror("Erreur Open :\n");
-    } else {
-        printf("BAL ouverte\n");
     }
 }
 
@@ -245,7 +240,7 @@ static void mqReceive(MqMsg* this) {
 static void Receiver_translateChannelToBeaconsSignal(){
 	uint8_t index_signal = 0;
 	uint8_t index_channel = 0;
-	
+
 	for (index_channel = 0; index_channel < NB_MAX_ADVERTISING_CHANNEL; index_channel++)
 	{
 		BeaconSignal signal;
@@ -264,16 +259,16 @@ static void Receiver_translateChannelToBeaconsSignal(){
 		}
 	}
 
-	MqMsg msg = { 
+	MqMsg msg = {
                 .event = E_TRANSLATING_DONE
                 };
     sendMsg(&msg);
-	
+
 }
 
 static void reset_beaconsChannelAndSignal(){
 	memset(beaconsChannel, 0, NB_MAX_ADVERTISING_CHANNEL);
-	memset(beaconsSignal, 0, NB_BEACONS_AVAILABLE);	
+	memset(beaconsSignal, 0, NB_BEACONS_AVAILABLE);
 }
 
 static void Receiver_getAllBeaconsChannel(){
@@ -287,10 +282,10 @@ static void Receiver_getAllBeaconsChannel(){
 	}
 
 	// Set BLE scan parameters.
-	
+
 	le_set_scan_parameters_cp scan_params_cp;
 	memset(&scan_params_cp, 0, sizeof(scan_params_cp));
-	scan_params_cp.type 			= 0x00; 
+	scan_params_cp.type 			= 0x00;
 	scan_params_cp.interval 		= htobs(0x0010);
 	scan_params_cp.window 			= htobs(0x0010);
 	scan_params_cp.own_bdaddr_type 	= 0x00; // Public Device Address (default).
@@ -298,7 +293,7 @@ static void Receiver_getAllBeaconsChannel(){
 
 
 	struct hci_request scan_params_rq = ble_hci_request(OCF_LE_SET_SCAN_PARAMETERS, LE_SET_SCAN_PARAMETERS_CP_SIZE, &status, &scan_params_cp);
-	
+
 	ret = hci_send_req(device, &scan_params_rq, 1000);
 	if ( ret < 0 ) {
 		hci_close_dev(device);
@@ -344,8 +339,6 @@ static void Receiver_getAllBeaconsChannel(){
 		perror("Could not set socket options\n");
 	}
 
-	printf("Scanning...\n");
-
 	uint8_t buf[HCI_MAX_EVENT_SIZE];
 	evt_le_meta_event * meta_event;
 	BeaconsChannel * info;
@@ -365,7 +358,7 @@ static void Receiver_getAllBeaconsChannel(){
 					if ( ret < 0 ) {
 						hci_close_dev(device);
 						perror("Failed to enable scan.");
-					}			
+					}
 
 					memcpy(uuid, info->data + 21, 2);
 
@@ -418,25 +411,25 @@ static void performAction(Action_RECEIVER action, MqMsg * msg){
 }
 
 static void * run(){
-    
+
     MqMsg msg;
 
     Action_RECEIVER action;
 
     while (myState != S_DEATH) {
 
-        mqReceive(&msg); 
+        mqReceive(&msg);
         action = stateMachine[myState][msg.event].action;
         performAction(action, &msg);
         myState =  stateMachine[myState][msg.event].destinationState;
 
     }
-        
+
    return 0;
 }
 
 static void time_out(){
-    MqMsg msg = { 
+    MqMsg msg = {
                 .event = E_TIME_OUT
                 };
     sendMsg(&msg);
@@ -461,7 +454,7 @@ extern void Receiver_new(){
 extern void Receiver_ask4StartReceiver(){
     myState = S_SCANNING;
     mqInit();
-    MqMsg msg = { 
+    MqMsg msg = {
                 .event = E_MAJ_BEACONS_CHANNEL
                 };
     sendMsg(&msg);
@@ -478,7 +471,7 @@ extern void Receiver_free(){
 }
 
 extern void Receiver_ask4BeaconsSignal(){
-    MqMsg msg = { 
+    MqMsg msg = {
                 .event = E_ASK_BEACONS_SIGNAL
                 };
     sendMsg(&msg);
