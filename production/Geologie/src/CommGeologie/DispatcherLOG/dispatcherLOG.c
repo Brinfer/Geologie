@@ -216,10 +216,9 @@ extern int8_t DispatcherLOG_new() {
     int8_t returnError = EXIT_SUCCESS;
 
     returnError = pthread_mutex_init(&myMutex, NULL);
-    STOP_ON_ERROR(returnError < 0);
     setKeepGoing(false);
 
-    return EXIT_SUCCESS;
+    return returnError;
 }
 
 

@@ -213,7 +213,6 @@ typedef enum {
     A_SET_ALL_DATA,
     A_SET_CALIBRATION_POSITIONS,
     A_ASK_4_UPDATE_ATTENUATION_COEFFICIENT,
-    A_END_CALIBRATION_POSITION,
     A_END_CALIBRATION,
     A_ASK_4_AVERAGE_CALCUL,
     A_CALIBRATION_COUNTER
@@ -228,7 +227,6 @@ const char* const Action_Geographer_Name[] = {
     "A_SET_ALL_DATA",
     "A_SET_CALIBRATION_POSITIONS",
     "A_ASK_4_UPDATE_ATTENUATION_COEFFICIENT",
-    "A_END_CALIBRATION_POSITION",
     "A_END_CALIBRATION",
     "A_ASK_4_AVERAGE_CALCUL",
     "A_CALIBRATION_COUNTER"
@@ -484,19 +482,20 @@ static void performAction(Action_GEOGRAPHER anAction, MqMsg* msg) {
         Scanner_ask4UpdateAttenuationCoefficientFromPosition(calibrationPositions[calibrationCounter]);
         break;
 
-    case A_END_CALIBRATION_POSITION:
 
+
+    case A_END_CALIBRATION: 
         ProxyLoggerMOB_setCalibrationData(msg->calibrationData, msg->nbCalibration);
-        break;
-
-    case A_END_CALIBRATION: //TODO
+        ProxyGUI_signalEndCalibration();
         break;
 
     case A_CALIBRATION_COUNTER:
+        ProxyGUI_signalEndCalibrationPosition();
         calibrationCounter++;
         break;
 
     case A_ASK_4_AVERAGE_CALCUL:
+        ProxyGUI_signalEndCalibrationPosition();
         Scanner_ask4AverageCalcul();
         break;
 
@@ -525,10 +524,10 @@ extern int8_t Geographer_new() {
     returnError = ProxyGUI_new();
 
     if (returnError == EXIT_SUCCESS) {
-        ProxyLoggerMOB_new();
+        returnError = ProxyLoggerMOB_new();
     }
     if (returnError == EXIT_SUCCESS) {
-        Scanner_new();
+        returnError = Scanner_new();
     }
     mqInit();
 
@@ -543,10 +542,10 @@ extern int8_t Geographer_free() {
     //returnError = Scanner_free();
 
     if (returnError == EXIT_SUCCESS) {
-        ProxyLoggerMOB_free();
+        returnError = ProxyLoggerMOB_free();
     }
     if (returnError == EXIT_SUCCESS) {
-        ProxyGUI_free();
+        returnError = ProxyGUI_free();
     }
     mqDone();
     return returnError;
@@ -557,10 +556,10 @@ extern int8_t Geographer_askSignalStartGeographer() {
     int8_t returnError = EXIT_FAILURE;
     returnError = ProxyGUI_start();
     if (returnError == EXIT_SUCCESS) {
-        ProxyLoggerMOB_start();
+        returnError = ProxyLoggerMOB_start();
     }
     if (returnError == EXIT_SUCCESS) {
-        Scanner_ask4StartScanner();
+        returnError = Scanner_ask4StartScanner();
     }
     myState = S_WATING_FOR_CONNECTION;
     connectionState = DISCONNECTED;
@@ -608,7 +607,6 @@ extern int8_t Geographer_askCalibrationPositions() {
 
 extern int8_t Geographer_validatePosition(CalibrationPositionId calibrationPositionId) {
     int8_t returnError = EXIT_FAILURE;
-    //tempCalibrationPositionId = calibrationPositionId;
     MqMsg msg = {
         .event = E_VALIDATE_POSITION,
         .calibrationPositionId = calibrationPositionId,
@@ -675,7 +673,7 @@ extern int8_t Geographer_dateAndSendData(BeaconData* beaconsData, int8_t beacons
 
         MqMsg msg = {
             .event = E_DATE_AND_SEND_DATA_CONNECTED,
-            .beaconsData = &(*beaconsData),
+            .beaconsData = beaconsData,
             .beaconsDataSize = beaconsDataSize,
             .currentPosition = currentPosition,
             .currentProcessorAndMemoryLoad = currentProcessorAndMemoryLoad,
