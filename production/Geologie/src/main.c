@@ -16,11 +16,11 @@
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <signal.h>
-#include <pthread.h>
-#include <stdlib.h>
 #include <assert.h>
+#include <pthread.h>
+#include <signal.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 #include "ManagerLOG/managerLOG.h"
 #include "tools.h"
@@ -39,14 +39,17 @@
 static void intHandler(int _);
 
 /**
+ * @brief Gere les erreurs.
+ */
+static void errorHandler(void);
+
+/**
  * @brief Met en place l'environnement de GEOLOGIE.
- *
  */
 static void setUp(void);
 
 /**
  * @brief Demantele l'environnement de GEOLOGIE.
- *
  */
 static void tearDown(void);
 
@@ -112,6 +115,9 @@ static void setUp(void) {
 
     returnError = pthread_cond_init(&cond, NULL);
     assert(returnError >= 0);
+
+    returnError = atexit(errorHandler);
+    assert(returnError >= 0);
 }
 
 static void tearDown(void) {
@@ -130,6 +136,15 @@ static void tearDown(void) {
 
 static void intHandler(int _) {
     LOG("Press CTRL+C%s", "\n");
+
+    int8_t returnError = EXIT_SUCCESS;
+
+    returnError = pthread_cond_signal(&cond);
+    assert(returnError >= 0);
+}
+
+static void errorHandler(void) {
+    LOG("Catch an error%s", "\n");
 
     int8_t returnError = EXIT_SUCCESS;
 
