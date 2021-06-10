@@ -26,13 +26,13 @@
 
 //
 
-//                                              Define 
+//                                              Define
 
 //
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-/** 
+/**
 
  * @def SCANNER_H
 
@@ -40,13 +40,13 @@
 
 #ifndef SCANNER_H
 
-#define SCANNER_H 
+#define SCANNER_H
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //
 
-//                                              Include 
+//                                              Include
 
 //
 
@@ -136,7 +136,7 @@ extern void Scanner_ask4AverageCalcul();
  * @fn extern int Scanner_setAllBeaconsSignal(BeaconsSignal beaconsSignal)
  * @brief Envoie les donnée d’émission de toutes les balises détectées.
  * @param beaconsSignal : Id, Position et RSSI d'une balise
- * 
+ *
  * @return retourne 1 s'il y a une erreur dans l'execution de la méthode
 */
 
@@ -152,5 +152,6 @@ extern void Scanner_setAllBeaconsSignal(BeaconSignal * beaconsSignal, uint32_t N
 
 extern void setCurrentProcessorAndMemoryLoad(ProcessorAndMemoryLoad currentProcessorAndMemoryLoad);
 
+extern void Scanner_setCurrentProcessorAndMemoryLoad(ProcessorAndMemoryLoad currentPAndMLoad);
 
 #endif /* SCANNER_H */
