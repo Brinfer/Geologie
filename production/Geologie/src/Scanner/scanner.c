@@ -59,6 +59,7 @@ static BeaconSignal * beaconSignal;
 static CalibrationData * calibrationData;
 static uint32_t beaconsIds[NB_BEACONS_MAX];
 static uint32_t NbBeaconsCoefficients;
+static uint32_t NbBeaconsAvailable;
 
 typedef enum{
     S_DEATH = 0,
@@ -128,8 +129,6 @@ static mqd_t descripteur;
 static struct mq_attr attr;
 
 Watchdog * wtd_TMaj;
-
-static uint32_t NbBeaconsAvailable;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -325,14 +324,14 @@ static void sortBeaconsCoefficientId(BeaconCoefficients * beaconsCoefficient){
 static void perform_setCurrentPosition(MqMsg * msg){
         beaconSignal = msg->beaconsSignal;
         translateBeaconsSignalToBeaconsData(msg->beaconsSignal, beaconsData);
-        currentPosition = Mathematician_getCurrentPosition(beaconsData, sizeof(BeaconData)); //check nb balises recup de receiver
+        currentPosition = Mathematician_getCurrentPosition(beaconsData, NbBeaconsAvailable); 
         Bookkeeper_ask4CurrentProcessorAndMemoryLoad();
 }
 
 static void perform_setCurrentProcessorAndMemoryLoad(MqMsg * msg){
         NbBeaconsAvailable = msg->NbBeaconsAvailable;
         currentProcessorAndMemoryLoad = msg->currentProcessorAndMemoryLoad;
-        Geographer_dateAndSendData(beaconsData, sizeof(BeaconData), &(currentPosition), &(currentProcessorAndMemoryLoad)); //check sizeOf
+        Geographer_dateAndSendData(beaconsData, NbBeaconsAvailable, &(currentPosition), &(currentProcessorAndMemoryLoad));
         MqMsg message = {
                     .event = E_ASK_BEACONS_SIGNAL
                     };
@@ -358,7 +357,7 @@ static void perform_askCalibrationAverage(MqMsg * msg){
             BeaconCoefficients * coef;
             CalibrationData cd;
             uint32_t index_coef = 0;
-            for (uint32_t j = 0; j < sizeof(beaconsCoefficient); j++)    //check sizeOf
+            for (uint32_t j = 0; j < NbBeaconsCoefficients; j++)    //check sizeOf
             {
                 if(beaconsCoefficient[j].beaconId[2] == beaconsIds[index_balise]){
                     coef[index_coef] = beaconsCoefficient[j];   //check
