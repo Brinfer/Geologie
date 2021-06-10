@@ -91,7 +91,7 @@ static Transition_RECEIVER stateMachine[NB_STATE - 1][NB_EVENT_RECEIVER] =
     [S_TRANSLATING] [E_TRANSLATING_DONE] = {S_SCANNING, A_MAJ_BEACONS_CHANNELS}
 };
 
-struct hci_request ble_hci_request(uint16_t ocf, int clen, void * status, void * cparam)
+struct hci_request ble_hci_request(uint16_t ocf, uint8_t clen, void * status, void * cparam)
 {
 	struct hci_request rq;
 	memset(&rq, 0, sizeof(rq));
@@ -128,7 +128,76 @@ Watchdog * wtd_TScan;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-static void mqInit(void) {
+/**
+ * @fn static void mqInit()
+ * @brief Initialise la boite aux lettres
+ * 
+ * @return renvoie 1 si une erreur est detectee, sinon 0
+*/
+static void mqInit();
+
+/**
+ * @fn static void sendMsg(MqMsg* this)
+ * @brief Envoie des messages a la BAL
+ * 
+ * @param this structure du message envoye a la BAL
+ * @return renvoie 1 si une erreur est detectee, sinon 0
+*/
+static void sendMsg(MqMsg* this);
+
+/**
+ * @fn static void mqReceive(MqMsg* this)
+ * @brief Va chercher les messages dans la BAL
+ * 
+ * @param msg structure du message a recuperer
+ * @return renvoie 1 si une erreur est detectee, sinon 0
+*/
+static void mqReceive(MqMsg* this);
+
+/**
+ * @fn static void Receiver_translateChannelToBeaconsSignal()
+ * @brief traduit le tableau en variable globale de BeaconChannel en BeaconSignal
+ */
+
+static void Receiver_translateChannelToBeaconsSignal();
+
+/**
+ * @fn reset_beaconsChannelAndSignal()
+ * @brief methode privee permettant de supprimer l'ensemble des trames et des BeaconsSignal contenus dans les variable globales.
+ */
+
+static void reset_beaconsChannelAndSignal();
+
+/**
+ * @fn static void Receiver_getAllBeaconsChannel()
+ * @brief methode privee permettant de memoriser dans beaconsChannel l'ensemble des trames des balises
+ */
+
+static void Receiver_getAllBeaconsChannel();
+
+/**
+ * @fn static void performAction(Action_SCANNER action, MqMsg * msg)
+ * @brief execute les fonctions a realiser en fonction du parametre action
+ * 
+ * @param action action a executer
+ * @param msg message qui contient les donnees necessaire a l'execution de la fonction
+*/
+static void performAction(Action_RECEIVER action, MqMsg * msg);
+
+/**
+ * @fn static void * run()
+ * @brief thread qui lit la BAL et met a jour l'action a realiser
+*/
+static void * run();
+
+/**
+ * @fn static void time_out()
+ * @brief fonction de callback du watchdog wtd_TScan
+*/
+static void time_out();
+
+
+static void mqInit() {
 
     printf("On entre dans le Init\n");
 
@@ -171,16 +240,9 @@ static void mqReceive(MqMsg* this) {
 
 }
 
-
-/**
- * @fn static void Receiver_translateChannelToBeaconsSignal(BeaconsChannel channel[])()
- * @brief methode privee permettant traduire les trames memorisees dans beaconsChannel
- * @param Tableau de BeaconsChannel a traduire
- */
-
 static void Receiver_translateChannelToBeaconsSignal(){
-	int index_signal = 0;
-	int index_channel = 0;
+	uint8_t index_signal = 0;
+	uint8_t index_channel = 0;
 	
 	for (index_channel = 0; index_channel < NB_MAX_ADVERTISING_CHANNEL; index_channel++)
 	{
@@ -198,7 +260,6 @@ static void Receiver_translateChannelToBeaconsSignal(){
 			beaconsSignal[index_signal] = signal;
 			index_signal++;
 		}
-		
 	}
 
 	MqMsg msg = { 
@@ -208,17 +269,17 @@ static void Receiver_translateChannelToBeaconsSignal(){
 	
 }
 
-/**
- * @fn static void Receiver_getAllBeaconsChannel()
- * @brief methode privee permettant de memoriser dans beaconsChannel l'ensemble des trames des balises
- */
+static void reset_beaconsChannelAndSignal(){
+	memset(beaconsChannel, 0, NB_MAX_ADVERTISING_CHANNEL);
+	memset(beaconsSignal, 0, NB_BEACONS_AVAILABLE);	
+}
 
 static void Receiver_getAllBeaconsChannel(){
-    int ret, status;
+    uint8_t ret, status;
 
 	// Get HCI device.
 
-	const int device = hci_open_dev(hci_get_route(NULL));
+	const uint8_t device = hci_open_dev(hci_get_route(NULL));
 	if ( device < 0 ) { 
 		perror("Failed to open HCI device.");
 	}
@@ -286,9 +347,9 @@ static void Receiver_getAllBeaconsChannel(){
 	uint8_t buf[HCI_MAX_EVENT_SIZE];
 	evt_le_meta_event * meta_event;
 	BeaconsChannel * info;
-	static int index_channel = 0;
-	int uuid[2];
-	int len;
+	static uint8_t index_channel = 0;
+	uint8_t uuid[2];
+	uint8_t len;
 
 	while(1){
 		len = read(device, buf, sizeof(buf));
@@ -341,6 +402,7 @@ static void performAction(Action_RECEIVER action, MqMsg * msg){
 
         case A_MAJ_BEACONS_CHANNELS:
 			Watchdog_start(wtd_TScan);
+			reset_beaconsChannelAndSignal();
             Receiver_getAllBeaconsChannel();
             break;
 
@@ -352,12 +414,6 @@ static void performAction(Action_RECEIVER action, MqMsg * msg){
     }
 
 }
-
-/**
- * @fn static void Receiver_performAction()
- * @brief methode privee permettant de definir les actions a effectuer
- * @param TODO
- */
 
 static void * run(){
     
@@ -377,7 +433,7 @@ static void * run(){
    return 0;
 }
 
-static void timeOut(){
+static void time_out(){
     MqMsg msg = { 
                 .event = E_TIME_OUT
                 };
@@ -397,7 +453,7 @@ static void timeOut(){
 
 extern void Receiver_new(){
     myState = S_DEATH;
-	wtd_TScan = Watchdog_construct(1000000, &(timeOut)); //CHANGER CALLBACK -> vers translating
+	wtd_TScan = Watchdog_construct(1000000, &(time_out));
 }
 
 extern void Receiver_ask4StartReceiver(){
