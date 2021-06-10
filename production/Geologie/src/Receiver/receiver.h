@@ -1,5 +1,5 @@
 /**
- * @file receivers.h
+ * @file receiver.h
  *
  * @brief TODO
  *
@@ -10,37 +10,53 @@
  * @license BSD 2-clauses
  */
 
-//#include <stdlib.h>
-//#include <errno.h>
-//#include <curses.h>
-//#include <unistd.h>
-//#include <sys/ioctl.h>
-//#include <sys/socket.h>
 #include <bluetooth/bluetooth.h>
 #include <bluetooth/hci.h>
-//#include <bluetooth/hci_lib.h>
-//#include <inttypes.h>
 #include "../common.h"
 
 #ifndef RECEIVERS_H_
 #define RECEIVERS_H_
 
-#define RAW_DATA_FLAGS_LENGTH_INDEX
-#define RAW_DATA_NAME_LENGTH_INDEX
-#define RAW_DATA_UUID_LENGTH_INDEX
-#define RAW_DATA_FLAGS_VALUE_INDEX
-#define RAW_DATA_NAME_VALUE_INDEX
-#define RAW_DATA_UUID_VALUE_INDEX
-
 typedef le_advertising_info BeaconsChannel;
 
-extern void Receivers_getAllBeaconsData();
+
+/**
+ * @fn extern void Receiver_new()
+ * @brief Instancie et initialise l'objet Receiver
+*/
 
 extern void Receiver_new();
+
+/**
+ * @fn extern void Receiver_free()
+ * @brief Libere et supprime l'objet Receiver
+*/
+
 extern void Receiver_free();
-extern void Receiver_ask4StartReceiver();
-extern void Receiver_ask4StopReceiver();
-extern void Receiver_ask4BeaconsSignal();
+
+/**
+ * @fn extern int8_t Receiver_ask4StartScanner()
+ * @brief Demande le démarrage de Receiver
+ * @return retourne 1 s'il y a une erreur dans l'execution de la méthode
+*/
+
+extern int8_t Receiver_ask4StartReceiver();
+
+/**
+ * @fn extern int8_t Receiver_ask4StopScanner()
+ * @brief Demande l'arret de Receiver
+ * @return retourne 1 s'il y a une erreur dans l'execution de la méthode
+*/
+
+extern int8_t Receiver_ask4StopReceiver();
+
+/**
+ * @fn extern int8_t Receiver_ask4BeaconsSignal()
+ * @brief Demande le démarrage du scan
+ * @return retourne 1 s'il y a une erreur dans l'execution de la méthode
+*/
+
+extern int8_t Receiver_ask4BeaconsSignal();
 
 
 #endif /* RECEIVERS_H_ */
