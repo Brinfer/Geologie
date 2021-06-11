@@ -6,22 +6,39 @@
 
 #include "cmocka.h"
 
-/** Nombre de suites de tests a excuter. */
+/**
+ * @brief Nombre de suites de tests a excuter.
+ */
 #define NB_SUITE_TESTS (2)
 
-extern int translatorLOG_run_tests(void);
-extern int translatorBeacon_run_tests(void);
+/**
+ * @brief Fonction lançant la suite des tests pour TranslatorLOG.
+ *
+ * @return int32_t 0 en cas de succee ou le numero du test qui a echoue.
+ */
+extern int32_t translatorLOG_run_tests(void);
 
-/** Liste des suites de tests a excuter. */
-static int (*suite_tests[])(void) = {
+/**
+ * @brief Lance la suite de test du module TranslatorBeacon.
+ *
+ * @return int32_t 0 en cas de succee ou le numero du test qui a echoue.
+ */
+extern int32_t translatorBeacon_run_tests(void);
+
+/**
+ * @brief Liste des suites de tests a excuter.
+ */
+static int32_t (*suite_tests[])(void) = {
     translatorLOG_run_tests,
     translatorBeacon_run_tests
 };
 
 /**
- * Fonction principal du programme de test.
+ * @brief Fonction principal du programme de test.
+ *
+ * @retval int32_t 0.
  */
-int main(int argc, char* argv[]) {
+int32_t main(int argc, char* argv[]) {
     for (int i = 0; i < NB_SUITE_TESTS; i++) {
         suite_tests[i]();
     }

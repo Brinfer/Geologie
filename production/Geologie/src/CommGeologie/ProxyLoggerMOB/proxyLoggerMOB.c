@@ -79,7 +79,7 @@ extern int8_t ProxyLoggerMOB_setExperimentalPositions(const ExperimentalPosition
 
 extern int8_t ProxyLoggerMOB_setCalibrationData(const CalibrationData* calibrationData, uint8_t nbCalibrationData) {
     int8_t returnError;
-    uint16_t size = TranslatorLOG_getTrameSize(SEND_CALIBRATION_DATA, nbCalibrationData);
+    uint16_t size = TranslatorLOG_getTrameSizeCalibrationData(calibrationData, nbCalibrationData);
     Trame* trame = calloc(1, size);
 
     TranslatorLOG_translateForSendCalibrationData(calibrationData, nbCalibrationData, trame);

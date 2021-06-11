@@ -76,7 +76,6 @@ typedef struct {
 typedef uint8_t CalibrationPositionId;
 
 /**
- * @typedef type Power
  * @brief type representant une puissance de reception d'un signal bluetooth
  */
 typedef float Power;
