@@ -37,8 +37,6 @@
 extern int8_t ProxyGUI_new() {
     /* Nothing to do */
     return EXIT_SUCCESS;
-
-    return 0;
 }
 
 extern int8_t ProxyGUI_free() {
@@ -59,11 +57,14 @@ extern int8_t ProxyGUI_stop() {
 extern int8_t ProxyGUI_setCalibrationPositions(CalibrationPosition* calibrationPositions, u_int16_t size) {
     int8_t returnError = EXIT_FAILURE;
     Trame* trame;
-    Commande commande = REP_CALIBRATION_POSITIONS;
-    uint16_t sizeTrame = TranslatorLOG_getTrameSize(commande, size);
+
+    uint16_t sizeTrame = TranslatorLOG_getTrameSize(REP_CALIBRATION_POSITIONS, size);
+
     trame = malloc(sizeTrame);
     TranslatorLOG_translateForRepCalibrationPosition(size, calibrationPositions, trame);
+
     returnError = PostmanLOG_sendMsg(trame, sizeTrame);
+    ERROR(returnError < 0, "[ProxyGUI] Can't send the calibration position.");
 
     return returnError;
 }
@@ -71,11 +72,14 @@ extern int8_t ProxyGUI_setCalibrationPositions(CalibrationPosition* calibrationP
 extern int8_t ProxyGUI_signalEndCalibrationPosition() {
     int8_t returnError = EXIT_FAILURE;
     Trame* trame;
-    Commande commande = SIGNAL_END_CALIBRATION_POSITION;
-    u_int16_t sizeTrame = TranslatorLOG_getTrameSize(commande, 0);
-        trame = malloc(sizeTrame);
+
+    u_int16_t sizeTrame = TranslatorLOG_getTrameSize(SIGNAL_END_CALIBRATION_POSITION, 0);
+
+    trame = malloc(sizeTrame);
     TranslatorLOG_translateForSignalCalibrationEndPosition(trame);
+
     returnError = PostmanLOG_sendMsg(trame, sizeTrame);
+    ERROR(returnError < 0, "[ProxyGUI] Can't send the calibration position.");
 
     return returnError;
 }
@@ -83,11 +87,14 @@ extern int8_t ProxyGUI_signalEndCalibrationPosition() {
 extern int8_t ProxyGUI_signalEndCalibration() {
     int8_t returnError = EXIT_FAILURE;
     Trame* trame;
-    Commande commande = SIGNAL_CALIRATION_END;
-    u_int16_t sizeTrame = TranslatorLOG_getTrameSize(commande, 0);
+
+    u_int16_t sizeTrame = TranslatorLOG_getTrameSize(SIGNAL_CALIRATION_END, 0);
+
     trame = malloc(sizeTrame);
     TranslatorLOG_translateForSignalCalibrationEnd(trame);
+
     returnError = PostmanLOG_sendMsg(trame, sizeTrame);
+    ERROR(returnError < 0, "[ProxyGUI] Can't send the signal end calibration.");
 
     return returnError;
 }
