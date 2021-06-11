@@ -139,7 +139,6 @@ static Trame trameExpected_B[40] = {
     0x10, 0xFE, 0xDC, 0xBA,     // Position 2 Y
 };
 
-
 /**
  * @brief Ensemble des donnees de tests.
  */
@@ -157,7 +156,6 @@ static ParameterTestExperimentalTraject parameterTest[] = {
         .sizeTrameExpected = 40
     },
 };
-
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
