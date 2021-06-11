@@ -27,7 +27,7 @@
 /**
  * @brief Nombre de suites de tests a excuter.
  */
-#define NB_SUITE_TESTS_TRANSLATOR_LOG (8)
+#define NB_SUITE_TESTS_TRANSLATOR_LOG (9)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -87,9 +87,16 @@ extern int32_t test_TranslatorLOG_run_translateForSendCalibrationData(void);
 /**
  * @brief Execute les tests de TranslatorLOG_translateForRepCalibrationPosition.
  *
- * @return int 0 en cas de succes, le numero du test qui a echoue sinon.
+ * @return int32_t 0 en cas de succes, le numero du test qui a echoue sinon.
  */
-extern int test_TranslatorLOG_run_translateForRepCalibrationPosition(void);
+extern int32_t test_TranslatorLOG_run_translateForRepCalibrationPosition(void);
+
+/**
+ * @brief Execute les tests de TranslatorLOG_signalCalibrationPosition.
+ *
+ * @return int32_t 0 en cas de succes, le numero du test qui a echoue sinon.
+ */
+extern int32_t test_TranslatorLOG_run_translateSignalCalibrationPosition(void);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -108,7 +115,8 @@ static int32_t (*suite_tests[])(void) = {
     test_TranslatorLOG_run_translateForSendAllBeaconsData,
     test_TranslatorLOG_run_translateForSendExperimentalTrajects,
     test_TranslatorLOG_run_translateForSendCalibrationData,
-    test_TranslatorLOG_run_translateForRepCalibrationPosition
+    test_TranslatorLOG_run_translateForRepCalibrationPosition,
+    test_TranslatorLOG_run_translateSignalCalibrationPosition
 };
 
 /**
