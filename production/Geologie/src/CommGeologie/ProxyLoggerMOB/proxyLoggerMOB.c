@@ -26,6 +26,7 @@
 
 #include "../com_common.h"
 #include "../../common.h"
+#include "../../tools.h"
 #include "../PostmanLOG/postmanLOG.h"
 #include "../TranslatorLOG/translatorLOG.h"
 

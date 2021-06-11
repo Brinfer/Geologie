@@ -61,6 +61,7 @@
             } else {                                                        \
                 fprintf(stderr, fmt);                                       \
             }                                                               \
+            fprintf(stderr, "\n");                                          \
         }                                                                   \
     } while (0)
 #else
