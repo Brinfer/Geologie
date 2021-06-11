@@ -63,6 +63,7 @@ static uint32_t NbBeaconsAvailable;
 
 typedef enum{
     S_DEATH = 0,
+    S_FORGET,
     S_BEGINNING,
     S_WAITING_DATA_BEACONS,
     S_COMPUTE_POSITION,
@@ -128,7 +129,7 @@ static const char BAL[] = "/BALScanner";
 static mqd_t descripteur;
 static struct mq_attr attr;
 
-Watchdog * wtd_TMaj;
+static Watchdog * wtd_TMaj;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -216,6 +217,18 @@ static void perform_askCalibrationFromPosition(MqMsg * msg);
 static void perform_askCalibrationAverage(MqMsg * msg);
 
 /**
+ * @fn static void perform_stop()
+ * @brief perform_action dans le cas de A_STOP
+*/
+static void perform_stop();
+
+/**
+ * @fn static void perform_askBeaconsSignal()
+ * @brief perform_action dans le cas de A_ASK_BEACONS_SIGNAL
+*/
+static void perform_askBeaconsSignal();
+
+/**
  * @fn static void performAction(Action_SCANNER action, MqMsg * msg)
  * @brief execute les fonctions a realiser en fonction du parametre action
  *
@@ -285,7 +298,7 @@ static void translateBeaconsSignalToBeaconsData(BeaconSignal * beaconSignal, Bea
 
         for (j = 0; j < NbBeaconsAvailable; j++)
         {
-            if(data.ID == calibrationData[j].beaconId){
+            if(strcmp((char *)data.ID, (char*)calibrationData[j].beaconId) == 0){
                 data.coefficientAverage = calibrationData[j].coefficientAverage;
             }
         }
@@ -366,10 +379,10 @@ static void perform_askCalibrationAverage(MqMsg * msg){
 
             BeaconCoefficients * coef = calloc(1, index_coef);
 
-            for (uint32_t j = 0; j < NbBeaconsCoefficients; j++)    //check sizeOf
+            for (uint32_t j = 0; j < NbBeaconsCoefficients; j++)
             {
                 if(beaconsCoefficient[j].beaconId[2] == beaconsIds[index_balise]){
-                    coef[index_coef] = beaconsCoefficient[j];   //check
+                    coef[index_coef] = beaconsCoefficient[j];
                     memcpy(cd.beaconId, beaconsCoefficient[j].beaconId, sizeof(beaconsCoefficient[j].beaconId));
                 }
             }
@@ -378,17 +391,29 @@ static void perform_askCalibrationAverage(MqMsg * msg){
             cd.nbCoefficient = index_coef;
             cd.coefficientAverage = Mathematician_getAverageCalcul(coef, cd.nbCoefficient);
         }
-        Geographer_signalEndAverageCalcul(calibrationData, sizeof(calibrationData));    //check sizeOf
+        Geographer_signalEndAverageCalcul(calibrationData, sizeof(calibrationData));
+}
+
+static void perform_stop(){
+    Receiver_ask4StopReceiver();
+    Bookkeeper_askStopBookkeeper();
+}
+
+static void perform_askBeaconsSignal(){
+    Receiver_ask4BeaconsSignal();
 }
 
 static void performAction(Action_SCANNER action, MqMsg * msg){
     switch (action) {
         case A_STOP:
-            Receiver_free();
+            perform_stop();
+            break;
+
+        case A_NOP:
             break;
 
         case A_ASK_BEACONS_SIGNAL:
-            Receiver_ask4BeaconsSignal();
+            perform_askBeaconsSignal();
             break;
 
         case A_SET_CURRENT_POSITION:
@@ -419,10 +444,13 @@ static void * run(){
     while (myState != S_DEATH) {
 
         mqReceive(&msg);
-        action = stateMachine[myState][msg.event].action;
-        performAction(action, &msg);
-        myState =  stateMachine[myState][msg.event].destinationState;
 
+        if (stateMachine[myState][msg.event].destinationState != S_FORGET)
+        {
+            action = stateMachine[myState][msg.event].action;
+            performAction(action, &msg);
+            myState =  stateMachine[myState][msg.event].destinationState;
+        } 
     }
    return 0;
 }
@@ -475,6 +503,11 @@ extern void Scanner_ask4StartScanner(){
 extern void Scanner_ask4StopScanner(){
     Receiver_ask4StopReceiver();
     Bookkeeper_askStopBookkeeper();
+    MqMsg msg = {
+            .event = E_STOP
+            };
+
+    sendMsg(&msg);
     pthread_join(myThread, NULL);
 }
 
