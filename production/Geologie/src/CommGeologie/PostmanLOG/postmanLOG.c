@@ -300,7 +300,7 @@ extern int8_t PostmanLOG_new(void) {
     if (returnError >= 0) {
         returnError = pthread_mutex_init(&myMutex, NULL);
         if (returnError < 0) {
-            ERROR(true, "[PostmanLOG] Fail to set up the mutex ... Retry%s", "\n");
+            ERROR(true, "[PostmanLOG] Fail to set up the mutex ... Retry");
             returnError = pthread_mutex_init(&myMutex, NULL);
             ERROR(returnError < 0, "[PostmanLOG] Fail to set up the mutex");
         }

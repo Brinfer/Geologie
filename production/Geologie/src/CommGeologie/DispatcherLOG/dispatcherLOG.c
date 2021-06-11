@@ -168,10 +168,13 @@ static void* readMsg() {
         } else {
             Trame trame[header.size];
 
-            PostmanLOG_readMsg(trame, header.size);
-            ERROR(true, "[DispatcheurLOG] Can't read the message.");
+            returnError = PostmanLOG_readMsg(trame, header.size);
 
-            dispatch(trame, &header);
+            if (returnError < 0) {
+                ERROR(returnError < 0, "[DispatcheurLOG] Can't read the message.");
+            } else {
+                dispatch(trame, &header);
+            }
         }
     }
 
@@ -206,7 +209,7 @@ extern int8_t DispatcherLOG_free() {
     int8_t returnError = EXIT_SUCCESS;
 
     returnError = pthread_mutex_destroy(&myMutex);
-    ERROR(true, "[DispatcheurLOG] Fail to destroy the mutex.");
+    ERROR(returnError < 0, "[DispatcheurLOG] Fail to destroy the mutex.");
 
     return returnError;
 }
@@ -222,7 +225,7 @@ extern int8_t DispatcherLOG_start() {
     } else {
         ERROR(true, "[DispatcheurLOG] Fail to create the processus ... Retry");
         returnError = pthread_create(&myThreadListen, NULL, &readMsg, NULL);
-        ERROR(true, "[DispatcheurLOG] Fail to create the processus");
+        ERROR(returnError < 0, "[DispatcheurLOG] Fail to create the processus");
     }
 
     return returnError;
