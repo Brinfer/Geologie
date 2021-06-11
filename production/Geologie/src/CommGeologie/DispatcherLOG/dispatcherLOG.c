@@ -1,12 +1,15 @@
 /**
  * @file dispatcherLOG.c
  *
- * @version 1.0
- * @date 06/06/21
- * @author Nathan BRIENT
- * @copyright BSD 2-clauses
+ * @brief Recoit les trames sur la socket et execute des actions 
  *
+ * @version 1.0
+ * @date 06-06-2021
+ * @author BRIENT Nathan
+ * @copyright Geo-Boot
+ * @license BSD 2-clauses
  */
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //                                              Define
@@ -137,12 +140,10 @@ static void dispatch(Trame* trame, Header* header) {
     }
 
     free(trame);
-    free(header);
 }
 
 static int16_t readHeader(Header* header) {
-    Trame* headerTrame;
-    headerTrame = malloc(SIZE_HEADER);
+    Trame headerTrame[SIZE_HEADER];
     int16_t returnError;
     returnError = PostmanLOG_readMsg(headerTrame, SIZE_HEADER);//on lit la trame contenant le header
 
@@ -194,7 +195,8 @@ extern int8_t DispatcherLOG_new() {
 }
 
 extern int8_t DispatcherLOG_free() {
-    /* Nothing to do */
+    pthread_mutex_destroy(&myMutex);
+
     return EXIT_SUCCESS;
 }
 
