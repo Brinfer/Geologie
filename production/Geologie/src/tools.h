@@ -15,8 +15,9 @@
 #ifndef DEBUG_TOOLS_
 #define DEBUG_TOOLS_
 
-#include <unistd.h>
+#include <errno.h>
 #include <stdio.h>
+#include <unistd.h>
 
 #define DEBUG_FILE_PATH "./debug.log"
 
@@ -47,6 +48,34 @@
         FILE *stream = fopen(DEBUG_FILE_PATH, "a");             \
         fprintf(stream, fmt, ##__VA_ARGS__);                    \
         fclose(stream);                                         \
+    } while (0)
+#endif
+
+#ifndef NDEBUG
+#define ERROR(error_condition, fmt)                                         \
+    do {                                                                    \
+        if (error_condition) {                                              \
+            if (errno != 0) {                                               \
+                perror(fmt);                                                \
+                errno = 0;                                                  \
+            } else {                                                        \
+                fprintf(stderr, fmt);                                       \
+            }                                                               \
+        }                                                                   \
+    } while (0)
+#else
+#define ERROR(error_condition, fmt)                                         \
+    do {                                                                    \
+        if (error_condition) {                                              \
+            FILE *stream = fopen(DEBUG_FILE_PATH, "a");                     \
+            if (errno != 0) {                                               \
+                fprintf(stream, "%s : %s\n", fmt, strerror(erro));          \
+                errno = 0;                                                  \
+            } else {                                                        \
+                fprintf(stream,"%s\n", fmt);                                \
+            }                                                               \
+            fclose(stream);                                                 \
+        }                                                                   \
     } while (0)
 #endif
 
