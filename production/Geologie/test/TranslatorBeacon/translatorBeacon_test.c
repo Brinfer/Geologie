@@ -32,8 +32,14 @@
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/**
+ * @brief La taille de la trame.
+ */
 #define SIZE_TRAME (23)
 
+/**
+ * @brief Structure passee au fonction test.
+ */
 typedef struct {
     uint8_t inputData[SIZE_TRAME];
     BeaconSignal resultExpected;
@@ -45,6 +51,9 @@ typedef struct {
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/**
+ * @brief Les donnees balises des tests.
+ */
 TestData parametersTestData[] = {
     {
         .inputData = {
@@ -103,23 +112,39 @@ TestData parametersTestData[] = {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * @brief Lance la suite de test du module translator.
+ * @brief Lance la suite de test du module TranslatorBeacon.
  *
  * @return int32_t 0 en cas de succee ou le numero du test qui a echoue.
  */
 int32_t translatorBeacon_run_tests();
 
+/**
+ * @brief Fonction execute avant chaque debut de test.
+ *
+ * @param state Parametre passe pour mettre en place les tests, ici ignore.
+ * @return int32_t 0 en cas de succes, -1 sinon.
+ */
 int32_t setUp(void** state);
 
+/**
+ * @brief Fonction execute apres chaque test.
+ *
+ * @param state Parametre passe pour mettre en place les tests, ici ignore.
+ * @return int32_t 0 en cas de succes, -1 sinon.
+ */
 int32_t tearDown(void** state);
 
+/**
+ * @brief Fonction test de #TranslatorBeacon_translateChannelToBeaconsSignal.
+ *
+ * @param state Les donnees #TestData passe au test.
+ */
 void test_translationToByte(void** state);
 
 
 /**
  * @brief Suite de test de la conversion des tableau d'octet e, structure.
  */
-
 static const struct CMUnitTest tests[] = {
     cmocka_unit_test_prestate(test_translationToByte, &(parametersTestData[0])),
     cmocka_unit_test_prestate(test_translationToByte, &(parametersTestData[1])),
@@ -141,7 +166,7 @@ int32_t tearDown(void** state) {
 }
 
 int32_t translatorBeacon_run_tests() {
-    return cmocka_run_group_tests_name("Test of the module translator", tests, setUp, tearDown);
+    return cmocka_run_group_tests_name("Test of the module translatorBeacon", tests, setUp, tearDown);
 }
 
 void test_translationToByte(void** state) {

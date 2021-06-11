@@ -140,7 +140,6 @@ static Trame trameExpected_B[27] = {
     0x40, 0x80, 0x00, 0x00, // Attenuation Coefficient
 };
 
-
 /**
  * @brief Ensemble des donnees de tests.
  */
