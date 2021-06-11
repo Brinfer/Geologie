@@ -347,7 +347,7 @@ extern void TranslatorLOG_translateForRepCalibrationPosition(uint8_t nbCalibrati
 
     /* calibration position */
     for (uint8_t i = 0; i < nbCalibrationPositions; i++) {
-        dest[1 + (SIZE_CALIBRATION_POSITION * i)] = calibrationPositions[i].id;
+        dest[SIZE_HEADER + 1 + (SIZE_CALIBRATION_POSITION * i)] = calibrationPositions[i].id;
         convertPositionToByte(&(calibrationPositions[i].position), &(dest[SIZE_HEADER + 2 + (i * SIZE_CALIBRATION_POSITION)]));
     }
 }
