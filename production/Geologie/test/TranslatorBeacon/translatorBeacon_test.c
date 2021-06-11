@@ -112,7 +112,7 @@ TestData parametersTestData[] = {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * @brief Lance la suite de test du module translator.
+ * @brief Lance la suite de test du module TranslatorBeacon.
  *
  * @return int32_t 0 en cas de succee ou le numero du test qui a echoue.
  */
