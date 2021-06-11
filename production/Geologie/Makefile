@@ -51,7 +51,7 @@ check:
 	cppcheck-htmlreport --source-dir=./ --file=$(CHECK_DIR)/report.xml --report-dir=$(CHECK_DIR) --title=GEOLOGIE
 
 # Gestion d'un rapport de couverture de code par les tests
-coverage:
+coverage: run_test
 	[ -d $(COVERAGE_DIR) ] || mkdir -p $(COVERAGE_DIR)
 	@cd $(TST_DIR) && $(MAKE) $@
 
