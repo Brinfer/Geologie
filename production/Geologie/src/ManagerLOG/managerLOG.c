@@ -48,7 +48,10 @@ extern void ManagerLOG_startGEOLOGIE(void) {
     assert(returnError >= 0);
 
     returnError = PostmanLOG_new();
-    assert(returnError >= 0);
+    if(returnError < 0) {
+        LOG("Fail to init PostmanLOG ... Exit%s", "\n");
+        exit(1);
+    }
 
     returnError = Geographer_new();
     assert(returnError >= 0);
@@ -61,7 +64,10 @@ extern void ManagerLOG_startGEOLOGIE(void) {
     LOG("Start of GEOLOGIE%s", "\n");
 
     returnError = PostmanLOG_start();
-    assert(returnError >= 0);
+    if(returnError < 0) {
+        LOG("Fail to start PostmanLOG ... Exit%s", "\n");
+        exit(1);
+    }
 
     returnError = Geographer_askSignalStartGeographer();
     assert(returnError >= 0);
@@ -79,7 +85,10 @@ extern void ManagerLOG_stopGEOLOGIE(void) {
     int8_t returnError = EXIT_SUCCESS;
 
     returnError = PostmanLOG_stop();
-    assert(returnError >= 0);
+    if(returnError < 0) {
+        LOG("Fail to stop PostmanLOG ... Exit%s", "\n");
+        exit(1);
+    }
 
     returnError = Geographer_askSignalStopGeographer();
     assert(returnError >= 0);
@@ -97,8 +106,7 @@ extern void ManagerLOG_stopGEOLOGIE(void) {
     returnError = Geographer_free();
     assert(returnError >= 0);
 
-    returnError = PostmanLOG_free();
-    assert(returnError >= 0);
+    PostmanLOG_free();
 
     returnError = UI_free();
     assert(returnError >= 0);

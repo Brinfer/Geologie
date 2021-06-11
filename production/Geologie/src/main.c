@@ -83,7 +83,7 @@ static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
  * @return int 0
  */
 int main() {
-    LOG("%s", "\033[2J\033[;H");
+    TRACE("%s", "\033[2J\033[;H");
     setUp();
 
     ManagerLOG_startGEOLOGIE();
@@ -144,7 +144,7 @@ static void intHandler(int _) {
 }
 
 static void errorHandler(void) {
-    LOG("Catch an error%s", "\n");
+    TRACE("Catch an error%s", "\n");
 
     int8_t returnError = EXIT_SUCCESS;
 
