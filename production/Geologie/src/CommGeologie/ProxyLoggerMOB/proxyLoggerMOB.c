@@ -62,6 +62,7 @@ extern int8_t ProxyLoggerMOB_setExperimentalTrajects(const ExperimentalTraject* 
 
     TranslatorLOG_translateForSendExperimentalTrajects(experimentalTrajects, nbExperimentalTraject, trame);
     returnError = PostmanLOG_sendMsg(trame, size);
+    ERROR(returnError < 0, "[ProxyLoggerMOB] Can't send the experimental trajects.");
 
     return returnError;
 }
@@ -84,6 +85,7 @@ extern int8_t ProxyLoggerMOB_setCalibrationData(const CalibrationData* calibrati
 
     TranslatorLOG_translateForSendCalibrationData(calibrationData, nbCalibrationData, trame);
     returnError = PostmanLOG_sendMsg(trame, size);
+    ERROR(returnError < 0, "[ProxyLoggerMOB] Can't send the calibration data.");
 
     return returnError;
 }
@@ -95,6 +97,7 @@ extern int8_t ProxyLoggerMOB_setAllBeaconsData(const BeaconData* beaconsData, un
 
     TranslatorLOG_translateForSendAllBeaconsData(nbBeacons, beaconsData, currentDate, trame);
     returnError = PostmanLOG_sendMsg(trame, size);
+    ERROR(returnError < 0, "[ProxyLoggerMOB] Can't send the beacons data.");
 
     return returnError;
 }
@@ -106,6 +109,7 @@ extern int8_t ProxyLoggerMOB_setCurrentPosition(const Position* currentPosition,
 
     TranslatorLOG_translateForSendCurrentPosition(currentPosition, currentDate, trame);
     returnError = PostmanLOG_sendMsg(trame, size);
+    ERROR(returnError < 0, "[ProxyLoggerMOB] Can't send the current position.");
 
     return returnError;
 }
@@ -117,6 +121,7 @@ extern int8_t ProxyLoggerMOB_setProcessorAndMemoryLoad(const ProcessorAndMemoryL
 
     TranslatorLOG_translateForSendMemoryAndProcessorLoad(processorAndMemoryLoad, currentDate, trame);
     returnError = PostmanLOG_sendMsg(trame, size);
+    ERROR(returnError < 0, "[ProxyLoggerMOB] Can't send the memory and processor load.");
 
     return returnError;
 }
