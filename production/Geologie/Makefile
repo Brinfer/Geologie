@@ -41,7 +41,7 @@ prod:
 	[ -d $(BIN_DIR) ] || mkdir -p $(BIN_DIR)
 	@cd $(SRC_DIR) && $(MAKE) $@
 
-test: prod
+test: coverage_clean prod
 	[ -d $(BIN_DIR) ] || mkdir -p $(BIN_DIR)
 	@cd $(TST_DIR) && $(MAKE) $@
 

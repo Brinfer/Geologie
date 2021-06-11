@@ -166,7 +166,7 @@ int32_t tearDown(void** state) {
 }
 
 int32_t translatorBeacon_run_tests() {
-    return cmocka_run_group_tests_name("Test of the module translator", tests, setUp, tearDown);
+    return cmocka_run_group_tests_name("Test of the module translatorBeacon", tests, setUp, tearDown);
 }
 
 void test_translationToByte(void** state) {
