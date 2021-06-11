@@ -1,7 +1,7 @@
 /**
  * @file dispatcherLOG.c
  *
- * @brief Recoit les trames sur la socket et execute des actions 
+ * @brief Recoit les trames sur la socket et execute des actions
  *
  * @version 1.0
  * @date 06-06-2021
@@ -24,12 +24,12 @@
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <stdlib.h>
-#include <unistd.h> // Macros, type Posix and co
-#include <pthread.h>
-#include <mqueue.h>
-#include <time.h>
 #include <errno.h>
+#include <mqueue.h>
+#include <pthread.h>
+#include <stdlib.h>
+#include <time.h>
+#include <unistd.h>
 
 #include "dispatcherLOG.h"
 #include <stdint.h>
@@ -61,6 +61,7 @@ static bool keepGoing = false;
  *
  */
 static pthread_mutex_t myMutex = PTHREAD_MUTEX_INITIALIZER;
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //                                              Fonctions privee
@@ -138,13 +139,12 @@ static void dispatch(Trame* trame, Header* header) {
         case SIGNAL_CALIRATION_END:
             break;
     }
-
-    free(trame);
 }
 
 static int16_t readHeader(Header* header) {
     Trame headerTrame[SIZE_HEADER];
     int16_t returnError;
+
     returnError = PostmanLOG_readMsg(headerTrame, SIZE_HEADER);//on lit la trame contenant le header
 
     if (returnError == 0) {
@@ -163,13 +163,13 @@ static void* readMsg() {
         returnError = readHeader(&header);
 
         if (returnError < 0) {
-            LOG("Error on reading communication%s", "\n");
+            ERROR(true, "[DispatcheurLOG] Can't read the header.");
             DispatcherLOG_stop();
         } else {
-            Trame* trame;
-            trame = malloc(header.size);
+            Trame trame[header.size];
 
             PostmanLOG_readMsg(trame, header.size);
+            ERROR(true, "[DispatcheurLOG] Can't read the message.");
 
             dispatch(trame, &header);
         }
@@ -189,15 +189,26 @@ extern int8_t DispatcherLOG_new() {
     int8_t returnError = EXIT_SUCCESS;
 
     returnError = pthread_mutex_init(&myMutex, NULL);
-    setKeepGoing(false);
+    if (returnError < 0) {
+        ERROR(true, "[DispatcheurLOG] Fail to create the mutex ... Retry.");
+        returnError = pthread_mutex_init(&myMutex, NULL);
+        ERROR(returnError < 0, "[DispatcheurLOG] Fail to mutex the processus.");
+    }
+
+    if (returnError < 0) {
+        setKeepGoing(false);
+    }
 
     return returnError;
 }
 
 extern int8_t DispatcherLOG_free() {
-    pthread_mutex_destroy(&myMutex);
+    int8_t returnError = EXIT_SUCCESS;
 
-    return EXIT_SUCCESS;
+    returnError = pthread_mutex_destroy(&myMutex);
+    ERROR(true, "[DispatcheurLOG] Fail to destroy the mutex.");
+
+    return returnError;
 }
 
 extern int8_t DispatcherLOG_start() {
@@ -206,8 +217,12 @@ extern int8_t DispatcherLOG_start() {
 
     returnError = pthread_create(&myThreadListen, NULL, &readMsg, NULL);
         // premier thread pour recevoir
-    if (returnError != EXIT_SUCCESS) {
+    if (returnError >= 0) {
         setKeepGoing(false);
+    } else {
+        ERROR(true, "[DispatcheurLOG] Fail to create the processus ... Retry");
+        returnError = pthread_create(&myThreadListen, NULL, &readMsg, NULL);
+        ERROR(true, "[DispatcheurLOG] Fail to create the processus");
     }
 
     return returnError;
@@ -218,20 +233,24 @@ extern int8_t DispatcherLOG_stop() {
     setKeepGoing(false);
 
     returnError = pthread_join(myThreadListen, NULL);
+    ERROR(returnError < 0, "[DispatcheurLOG] Fail to wait the processus");
 
     return returnError;
 }
 
 extern int8_t DispatcherLOG_setConnectionState(ConnectionState connectionState) {
+    int8_t returnError = EXIT_FAILURE;
 
     if (connectionState == CONNECTED) {
         Geographer_signalConnectionEstablished();
-        DispatcherLOG_start();
+        returnError = DispatcherLOG_start();
+        ERROR(returnError < 0, "[DispatcheurLOG] Fail to start the processus");
 
     } else {
         Geographer_signalConnectionDown();
-        DispatcherLOG_stop();
+        returnError = DispatcherLOG_stop();
+        ERROR(returnError < 0, "[DispatcheurLOG] Fail to stop the processus");
     }
 
-    return 0;
+    return returnError;
 }
