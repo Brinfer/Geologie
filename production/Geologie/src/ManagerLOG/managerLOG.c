@@ -48,9 +48,16 @@ extern void ManagerLOG_startGEOLOGIE(void) {
     assert(returnError >= 0);
 
     returnError = PostmanLOG_new();
-    if(returnError < 0) {
-        LOG("Fail to init PostmanLOG ... Exit%s", "\n");
-        exit(1);
+    if (returnError < 0) {
+        LOG("[ManagerLOG] Fail to init PostmanLOG ... Retry%s", "\n");
+
+        PostmanLOG_free();
+        returnError = PostmanLOG_new();
+
+        if (returnError < 0) {
+            LOG("[ManagerLOG] Fail to init PostmanLOG ... Exit%s", "\n");
+            exit(1);
+        }
     }
 
     returnError = Geographer_new();
@@ -64,9 +71,15 @@ extern void ManagerLOG_startGEOLOGIE(void) {
     LOG("Start of GEOLOGIE%s", "\n");
 
     returnError = PostmanLOG_start();
-    if(returnError < 0) {
-        LOG("Fail to start PostmanLOG ... Exit%s", "\n");
-        exit(1);
+    if (returnError < 0) {
+        LOG("[ManagerLOG] Fail to start PostmanLOG ... Retry%s", "\n");
+
+        returnError = PostmanLOG_start();
+
+        if (returnError < 0) {
+            LOG("[ManagerLOG] Fail to start PostmanLOG ... Exit%s", "\n");
+            exit(1);
+        }
     }
 
     returnError = Geographer_askSignalStartGeographer();
@@ -85,9 +98,11 @@ extern void ManagerLOG_stopGEOLOGIE(void) {
     int8_t returnError = EXIT_SUCCESS;
 
     returnError = PostmanLOG_stop();
-    if(returnError < 0) {
-        LOG("Fail to stop PostmanLOG ... Exit%s", "\n");
-        exit(1);
+    if (returnError < 0) {
+        LOG("[ManagerLOG] Fail to stop PostmanLOG ... Retry%s", "\n");
+        returnError = PostmanLOG_stop();
+
+        ERROR(returnError < 0, "[ManagerLOG] Fail to init PostmanLOG ... Continue");
     }
 
     returnError = Geographer_askSignalStopGeographer();
@@ -107,6 +122,11 @@ extern void ManagerLOG_stopGEOLOGIE(void) {
     assert(returnError >= 0);
 
     PostmanLOG_free();
+    if (returnError < 0) {
+        LOG("[ManagerLOG] Fail to destroy PostmanLOG ... Retry%s", "\n");
+        returnError = PostmanLOG_free();
+        ERROR(returnError < 0, "[ManagerLOG] Fail to destroy PostmanLOG ... Continue");
+    }
 
     returnError = UI_free();
     assert(returnError >= 0);
