@@ -396,6 +396,11 @@ static void performAction(Action_GEOGRAPHER action, MqMsg* msg);
  * @param msg structure contenant les donnees a utiliser pour effectuer l'action
  * @return 1 si erreur 0 si
  */
+
+#ifndef _TESTING_MODE
+static void transitionFct(MqMsg msg);
+#endif
+
 static int8_t sendMsg(MqMsg* msg);
 
 
@@ -438,9 +443,25 @@ static void mqReceive(MqMsg* this) {
     mq_receive(descripteur, (char*) this, sizeof(*this), NULL);
 }
 
+#ifndef _TESTING_MODE
+static void transitionFct(MqMsg msg)
+#else
+void transitionFct(MqMsg msg);
+void __real_transitionFct(MqMsg msg)
+#endif
+{
+    Action_GEOGRAPHER act;
+    TRACE("MAE, traitement evenement %s \n", Event_Geographer_getName(msg.event));
+
+    act = stateMachine[myState][msg.event].action;
+    TRACE("MAE, traitement action %s \n", Action_Geographer_getName(act));
+    performAction(act, &msg);
+    myState = stateMachine[myState][msg.event].destinationState;
+    TRACE("MAE, va dans etat %s \n", State_Geographer_getName(myState));
+}
+
 static void* run() {
     MqMsg msg;
-    Action_GEOGRAPHER act;
     while (myState != S_DEATH) {
         TRACE("début boucle while %s ", "\n");
 
@@ -452,14 +473,7 @@ static void* run() {
             TRACE("MAE, perte evenement %s  \n", Event_Geographer_getName(msg.event));
         } else
         {
-            TRACE("MAE, traitement evenement %s \n", Event_Geographer_getName(msg.event));
-
-            act = stateMachine[myState][msg.event].action;
-            TRACE("MAE, traitement action %s \n", Action_Geographer_getName(act));
-            performAction(act, &msg);
-            myState = stateMachine[myState][msg.event].destinationState;
-            TRACE("MAE, va dans etat %s \n", State_Geographer_getName(myState));
-
+            transitionFct(msg);
         }
         TRACE("fin boucle while %s ", "\n");
     }
