@@ -143,8 +143,6 @@ static void intHandler(int _) {
 static void errorHandler(void) {
     TRACE("Catch an error%s", "\n");
 
-    int8_t returnError = EXIT_SUCCESS;
-
     pthread_cond_signal(&cond); // in case of the function is called by an exit
 
     ManagerLOG_stopGEOLOGIE();

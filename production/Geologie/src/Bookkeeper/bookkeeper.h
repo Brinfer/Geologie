@@ -1,17 +1,27 @@
 /**
  * @file bookkeeper.h
  *
- * @brief TODO
+ * @brief  TODO
  *
- * @version 1.0
- * @date 03 juin 2021
- * @author MOLARD Simon
- * @copyright BSD 2-clauses
- *
+ * @version 2.0
+ * @date 12-06-2021
+ * @author GAUTIER Pierre-Louis
+ * @copyright Geo-Boot
+ * @license BSD 2-clauses
  */
 
-#ifndef BOOKKEEPER
-#define BOOKKEEPER
+#ifndef BOOKKEEPER_
+#define BOOKKEEPER_
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//                                              Include
+//
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#include <stdint.h>
+
+#include "../common.h"
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -19,14 +29,6 @@
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-
-/**
- * @def LED_LABEL
- *
- * @brief Correspond au label de la LED.
- */
-//#define LED_LABEL "LED_Geologie"
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -41,28 +43,39 @@
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-extern void Bookkeeper_new();
-
-extern void Bookkeeper_free();
+/**
+ * @brief Initialise Bookkeeper.
+ *
+ * @return int8_t -1 en cas d'erreur, 0 sinon.
+ */
+extern int8_t Bookkeeper_new(void);
 
 /**
- * @fn extern void askStartBookkeeper(void)
+ * @brief Detruit Bookkeeper.
+ *
+ * @return int8_t -1 en cas d'erreur, 0 sinon.
+ */
+extern int8_t Bookkeeper_free(void);
+
+/**
  * @brief Demande le demarrage de bookkeeper.
+ *
+ * @return int8_t -1 en cas d'erreur, 0 sinon.
  */
-extern void Bookkeeper_askStartBookkeeper(void);
+extern int8_t Bookkeeper_askStartBookkeeper(void);
 
 /**
- * @fn extern void askStopBookkeeper(void)
- * 
  * @brief Demande l'arret de Bookkeeper.
+ *
+ * @return int8_t -1 en cas d'erreur, 0 sinon.
  */
-extern void Bookkeeper_askStopBookkeeper(void);
+extern int8_t Bookkeeper_askStopBookkeeper(void);
 
 /**
- * @fn extern void askCurrentProcessorAndMemoryLoad(void);
- * 
- * @brief Demande les charges mémoire et processeur actuelles.
+ * @brief Demande aupres de Bookkeeper la charge processeur et memoire actuelle.
+ *
+ * @return int8_t -1 en cas d'erreur, 0 sinon.
  */
-extern void Bookkeeper_ask4CurrentProcessorAndMemoryLoad(void);
+extern int8_t Bookkeeper_ask4CurrentProcessorAndMemoryLoad();
 
-#endif /* BOOKKEEPER */
+#endif /* BOOKKEEPER_ */

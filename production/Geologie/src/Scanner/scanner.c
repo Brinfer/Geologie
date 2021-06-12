@@ -123,7 +123,7 @@ typedef struct {
 } MqMsg;
 
 static State_SCANNER myState;
-static pthread_t myThread;
+static pthread_t myThreadMq;
 
 static const char BAL[] = "/BALScanner";
 static mqd_t descripteur;
@@ -337,12 +337,13 @@ static void sortBeaconsCoefficientId(BeaconCoefficients * beaconsCoefficient){
 static void perform_setCurrentPosition(MqMsg * msg){
         beaconSignal = msg->beaconsSignal;
         translateBeaconsSignalToBeaconsData(msg->beaconsSignal, beaconsData);
-        currentPosition = Mathematician_getCurrentPosition(beaconsData, NbBeaconsAvailable); 
+        currentPosition = Mathematician_getCurrentPosition(beaconsData, NbBeaconsAvailable);
         Bookkeeper_ask4CurrentProcessorAndMemoryLoad();
 }
 
 static void perform_setCurrentProcessorAndMemoryLoad(MqMsg * msg){
-        Scanner_setCurrentProcessorAndMemoryLoad(msg->currentProcessorAndMemoryLoad);
+        Scanner_setCurrentProcessorAndMemoryLoad(&(msg->currentProcessorAndMemoryLoad));
+
         NbBeaconsAvailable = msg->NbBeaconsAvailable;
         currentProcessorAndMemoryLoad = msg->currentProcessorAndMemoryLoad;
         Geographer_dateAndSendData(beaconsData, NbBeaconsAvailable, &(currentPosition), &(currentProcessorAndMemoryLoad));
@@ -450,7 +451,7 @@ static void * run(){
             action = stateMachine[myState][msg.event].action;
             performAction(action, &msg);
             myState =  stateMachine[myState][msg.event].destinationState;
-        } 
+        }
     }
    return 0;
 }
@@ -497,7 +498,7 @@ extern void Scanner_ask4StartScanner(){
                 };
     sendMsg(&msg);
     Watchdog_start(wtd_TMaj);
-    pthread_create(&myThread, NULL, &run, NULL);
+    pthread_create(&myThreadMq, NULL, &run, NULL);
 }
 
 extern void Scanner_ask4StopScanner(){
@@ -508,7 +509,7 @@ extern void Scanner_ask4StopScanner(){
             };
 
     sendMsg(&msg);
-    pthread_join(myThread, NULL);
+    pthread_join(myThreadMq, NULL);
 }
 
 
@@ -542,10 +543,10 @@ extern void Scanner_setAllBeaconsSignal(BeaconSignal * beaconsSignal, uint32_t N
 }
 
 
-extern void Scanner_setCurrentProcessorAndMemoryLoad(ProcessorAndMemoryLoad currentPAndMLoad){
+extern void Scanner_setCurrentProcessorAndMemoryLoad(ProcessorAndMemoryLoad* currentPAndMLoad){
     MqMsg msg = {
                 .event = E_SET_PROCESSOR_AND_MEMORY,
-                .currentProcessorAndMemoryLoad = currentPAndMLoad
+                .currentProcessorAndMemoryLoad = *currentPAndMLoad
                 };
 
     sendMsg(&msg);

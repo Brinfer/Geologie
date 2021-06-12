@@ -143,15 +143,11 @@ extern void Scanner_ask4AverageCalcul();
 extern void Scanner_setAllBeaconsSignal(BeaconSignal * beaconsSignal, uint32_t NbBeaconsAvailable);
 
 /**
- * @fn extern int setCurrentProcessorAndMemoryLoad(ProcessorAndMemoryLoad currentProcessorAndMemoryLoad)
  * @brief Envoie les charges processeur et memoire
  * @param currentProcessorAndMemoryLoad : charge memoire et processeur
  *
  * @return retourne 1 s'il y a une erreur dans l'execution de la méthode
 */
-
-extern void setCurrentProcessorAndMemoryLoad(ProcessorAndMemoryLoad currentProcessorAndMemoryLoad);
-
-extern void Scanner_setCurrentProcessorAndMemoryLoad(ProcessorAndMemoryLoad currentPAndMLoad);
+extern void Scanner_setCurrentProcessorAndMemoryLoad(ProcessorAndMemoryLoad* currentPAndMLoad);
 
 #endif /* SCANNER_H */

@@ -115,7 +115,7 @@ extern int8_t DispatcherLOG_new() {
     int8_t returnError = EXIT_SUCCESS;
 
     returnError = pthread_mutex_init(&myMutex, NULL);
-    ERROR(returnError < 0, "[DispatcheurLOG] Error when creating the mutex.");
+    ERROR(returnError < 0, "[DispatcheurLOG] Error when creating the mutex");
 
     if (returnError < 0) {
         setKeepGoing(false);
@@ -128,7 +128,7 @@ extern int8_t DispatcherLOG_free() {
     int8_t returnError = EXIT_SUCCESS;
 
     returnError = pthread_mutex_destroy(&myMutex);
-    ERROR(returnError < 0, "[DispatcheurLOG] Error when destroying the mutex.");
+    ERROR(returnError < 0, "[DispatcheurLOG] Error when destroying the mutex");
 
     return returnError;
 }
@@ -142,9 +142,9 @@ extern int8_t DispatcherLOG_start() {
     if (returnError >= 0) {
         setKeepGoing(false);
     } else {
-        ERROR(true, "[DispatcheurLOG] Error when creating the processus.");
+        ERROR(true, "[DispatcheurLOG] Error when creating the processus");
         returnError = pthread_create(&myThreadListen, NULL, &readMsg, NULL);
-        ERROR(returnError < 0, "[DispatcheurLOG] Error when creating the processus ... Abondement.");
+        ERROR(returnError < 0, "[DispatcheurLOG] Error when creating the processus ... Abondement");
     }
 
     return returnError;
@@ -158,9 +158,9 @@ extern int8_t DispatcherLOG_stop() {
     if (returnError >= 0) {
         setKeepGoing(false);
     } else {
-        ERROR(true, "[DispatcheurLOG] Error when joining the processus.");
+        ERROR(true, "[DispatcheurLOG] Error when joining the processus");
         returnError = pthread_join(myThreadListen, NULL);
-        ERROR(returnError < 0, "[DispatcheurLOG] Error when joining the processus ... Abondement.");
+        ERROR(returnError < 0, "[DispatcheurLOG] Error when joining the processus ... Abondement");
     }
 
     return returnError;
@@ -172,12 +172,12 @@ extern int8_t DispatcherLOG_setConnectionState(ConnectionState connectionState) 
     if (connectionState == CONNECTED) {
         Geographer_signalConnectionEstablished();
         returnError = DispatcherLOG_start();
-        ERROR(returnError < 0, "[DispatcheurLOG] Error when starting the processus.");
+        ERROR(returnError < 0, "[DispatcheurLOG] Error when starting the processus");
 
     } else {
         Geographer_signalConnectionDown();
         returnError = DispatcherLOG_stop();
-        ERROR(returnError < 0, "[DispatcheurLOG] Error when stopping the processus.");
+        ERROR(returnError < 0, "[DispatcheurLOG] Error when stopping the processus");
     }
 
     return returnError;
@@ -247,7 +247,7 @@ static void* readMsg() {
         returnError = readHeader(&header);
 
         if (returnError < 0) {
-            ERROR(true, "[DispatcheurLOG] Can't read the header ... Stop the processus.");
+            ERROR(true, "[DispatcheurLOG] Can't read the header ... Stop the processus");
             setKeepGoing(false);
         } else {
             Trame trame[header.size];
@@ -255,7 +255,7 @@ static void* readMsg() {
             returnError = PostmanLOG_readMsg(trame, header.size);
 
             if (returnError < 0) {
-                ERROR(true, "[DispatcheurLOG] Can't read the message.");
+                ERROR(true, "[DispatcheurLOG] Can't read the message");
                 setKeepGoing(true);
             } else {
                 dispatch(trame, &header);

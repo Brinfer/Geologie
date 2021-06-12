@@ -143,7 +143,7 @@ extern int8_t ProxyLoggerMOB_setCurrentPosition(const Position* currentPosition,
 }
 
 extern int8_t ProxyLoggerMOB_setProcessorAndMemoryLoad(const ProcessorAndMemoryLoad* processorAndMemoryLoad, Date currentDate) {
-    LOG("[ProxyLoggerMOB] Send the processor and memory load%s.", "\n");
+    LOG("[ProxyLoggerMOB] Send the processor and memory load%s", "\n");
 
 
     int8_t returnError;
@@ -165,7 +165,7 @@ extern int8_t ProxyLoggerMOB_setProcessorAndMemoryLoad(const ProcessorAndMemoryL
 
 static int8_t sendMsg(Trame* trame, uint16_t size) {
     int8_t returnError = PostmanLOG_sendMsg(trame, size);
-    ERROR(returnError < 0, "[ProxyLoggerMOB] Can't send the message ... Abondement.");
+    ERROR(returnError < 0, "[ProxyLoggerMOB] Can't send the message ... Abondement");
 
     return returnError;
 }
