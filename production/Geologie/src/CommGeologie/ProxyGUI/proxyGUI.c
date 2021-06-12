@@ -30,10 +30,24 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//                                              Fonctions publiques
+//                                              Prototypes de fonctions
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/**
+ * @brief Envoie le message aupres de PostmanLOG.
+ *
+ * @param trame La trame a envoyer.
+ * @param size La taille de la trame a envoyer.
+ * @return int8_t -1 en cas d'erreur, 0 sinon.
+ */
+static int8_t sendMsg(Trame* trame, uint16_t size);
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//                                              Fonctions publiques
+//
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 extern int8_t ProxyGUI_new() {
     /* Nothing to do */
@@ -55,22 +69,25 @@ extern int8_t ProxyGUI_stop() {
     return EXIT_SUCCESS;
 }
 
-extern int8_t ProxyGUI_setCalibrationPositions(CalibrationPosition* calibrationPositions, u_int16_t size) {
+extern int8_t ProxyGUI_setCalibrationPositions(CalibrationPosition* calibrationPositions, uint8_t nbCalibrationPosition) {
+    LOG("[ProxyGUI] Send the calibration position.%s", "\n");
+
     int8_t returnError = EXIT_FAILURE;
     Trame* trame;
 
-    uint16_t sizeTrame = TranslatorLOG_getTrameSize(REP_CALIBRATION_POSITIONS, size);
+    uint16_t sizeTrame = TranslatorLOG_getTrameSize(REP_CALIBRATION_POSITIONS, nbCalibrationPosition);
 
     trame = malloc(sizeTrame);
-    TranslatorLOG_translateForRepCalibrationPosition(size, calibrationPositions, trame);
+    TranslatorLOG_translateForRepCalibrationPosition(sizeTrame, calibrationPositions, trame);
 
-    returnError = PostmanLOG_sendMsg(trame, sizeTrame);
-    ERROR(returnError < 0, "[ProxyGUI] Can't send the calibration position.");
+    returnError = sendMsg(trame, sizeTrame);
 
     return returnError;
 }
 
 extern int8_t ProxyGUI_signalEndCalibrationPosition() {
+    LOG("[ProxyGUI] Signal the end of the calibration at a position.%s", "\n");
+
     int8_t returnError = EXIT_FAILURE;
     Trame* trame;
 
@@ -79,13 +96,14 @@ extern int8_t ProxyGUI_signalEndCalibrationPosition() {
     trame = malloc(sizeTrame);
     TranslatorLOG_translateForSignalCalibrationEndPosition(trame);
 
-    returnError = PostmanLOG_sendMsg(trame, sizeTrame);
-    ERROR(returnError < 0, "[ProxyGUI] Can't send the calibration position.");
+    returnError = sendMsg(trame, sizeTrame);
 
     return returnError;
 }
 
 extern int8_t ProxyGUI_signalEndCalibration() {
+    LOG("[ProxyGUI] Signal the end of the calibration.%s", "\n");
+
     int8_t returnError = EXIT_FAILURE;
     Trame* trame;
 
@@ -94,8 +112,20 @@ extern int8_t ProxyGUI_signalEndCalibration() {
     trame = malloc(sizeTrame);
     TranslatorLOG_translateForSignalCalibrationEnd(trame);
 
-    returnError = PostmanLOG_sendMsg(trame, sizeTrame);
-    ERROR(returnError < 0, "[ProxyGUI] Can't send the signal end calibration.");
+    returnError = sendMsg(trame, sizeTrame);
+
+    return returnError;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//                                              Fonctions static
+//
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+static int8_t sendMsg(Trame* trame, uint16_t size) {
+    int8_t returnError = PostmanLOG_sendMsg(trame, size);
+    ERROR(returnError < 0, "[ProxyGUI] Can't send the message ... Abondement.");
 
     return returnError;
 }

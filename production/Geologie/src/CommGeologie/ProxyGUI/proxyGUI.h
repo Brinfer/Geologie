@@ -80,7 +80,7 @@ extern int8_t ProxyGUI_stop();
  * @return retourne 1 s'il y a une erreur dans l'execution de la methode
  *
 */
-extern int8_t ProxyGUI_setCalibrationPositions(CalibrationPosition * calibrationPositions, uint16_t size);
+extern int8_t ProxyGUI_setCalibrationPositions(CalibrationPosition * calibrationPositions, uint8_t nbCalibrationPosition);
 
 /**
  * @fn extern int ProxyGUI_signalEndCalibrationPosition();
