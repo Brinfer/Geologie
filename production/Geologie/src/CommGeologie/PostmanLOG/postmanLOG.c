@@ -95,10 +95,13 @@
  */
 #define MQ_MODE (S_IRUSR | S_IWUSR)
 
-
+/**
+ * @brief L'enumeration des different type de message ecrit dans la MQueue de
+ * PostmanLOG.
+ */
 typedef enum {
-    SEND = 0,
-    STOP = 1
+    SEND = 0,   /**< Le message contenue doit etre envoye. */
+    STOP = 1    /**< Le message indique l'arret du processus. */
 } Flag;
 
 /**
@@ -284,26 +287,18 @@ extern int8_t PostmanLOG_new(void) {
 
     /* Init Socket */
     returnError = setUpSocket();
-    if (returnError < 0) {
-        LOG("Error to set up the server ... Retry%s", "\n");
-        returnError = setUpSocket();
-    }
+    ERROR(returnError < 0, "[PostmanLOG] Fail to set up the socket");
 
     /* Init Mq */
-    returnError = setUpMq();
-    if (returnError < 0) {
-        LOG("Error to set up the queue ... Retry%s", "\n");
+    if (returnError >= 0) {
         returnError = setUpMq();
+        ERROR(returnError < 0, "[PostmanLOG] Fail to set up the queue");
     }
 
     /* Init mutex */
     if (returnError >= 0) {
         returnError = pthread_mutex_init(&myMutex, NULL);
-        if (returnError < 0) {
-            ERROR(true, "[PostmanLOG] Fail to set up the mutex ... Retry");
-            returnError = pthread_mutex_init(&myMutex, NULL);
-            ERROR(returnError < 0, "[PostmanLOG] Fail to set up the mutex");
-        }
+        ERROR(returnError < 0, "[PostmanLOG] Fail to set up the mutex");
 
         /* Set value */
         if (returnError >= 0) {
@@ -324,11 +319,7 @@ extern int8_t PostmanLOG_start(void) {
     setConnectionState(DISCONNECTED);
 
     returnError = pthread_create(&myThread, NULL, &run, NULL);
-    if (returnError < 0) {
-        LOG("Fail to create PostmanLOG processus ... Retry%s", "\n");
-        returnError = pthread_create(&myThread, NULL, &run, NULL);
-        ERROR(returnError < 0, "[PostmanLOG] Fail to create PostmanLOG processus");
-    }
+    ERROR(returnError < 0, "[PostmanLOG] Fail to create PostmanLOG processus");
 
     return returnError;
 }
@@ -340,6 +331,19 @@ extern int8_t PostmanLOG_sendMsg(Trame* trame, uint16_t size) {
 
     returnError = mqSendMessage(&msg);
 
+    if (returnError < 0) {
+        LOG("[PostmanLOG] Fail to send the message in the queue ... Re set up the queue%s", "\n");
+        returnError = setUpMq();
+
+        if (returnError < 0) {
+            LOG("[PostmanLOG] Fail to re set up the queue ... Abandonment%s", "\n");
+        } else {
+            LOG("[PostmanLOG] Success to re set up the message queue ... Send the message.%s", "\n");
+            returnError = mqSendMessage(&msg);
+            ERROR(returnError < 0, "[PostmanLOG] Fail to send the message in the queue ... Abandonment");
+        }
+    }
+
     return returnError;
 }
 
@@ -347,6 +351,19 @@ extern int8_t PostmanLOG_readMsg(Trame* destTrame, uint8_t nbToRead) {
     int8_t returnError = EXIT_SUCCESS;
 
     returnError = socketReadMessage(destTrame, nbToRead);
+
+    if (returnError < 0) {
+        LOG("[PostmanLOG] Fail to read the message in the queue ... Re set up the queue%s", "\n");
+        returnError = setUpMq();
+
+        if (returnError < 0) {
+            LOG("[PostmanLOG] Fail to re set up the queue ... Abandonment%s", "\n");
+        } else {
+            LOG("[PostmanLOG] Success to re set up the message queue ... Read the message.%s", "\n");
+            returnError = socketReadMessage(destTrame, nbToRead);
+            ERROR(returnError < 0, "[PostmanLOG] Fail to read the message in the queue ... Abandonment");
+        }
+    }
 
     return returnError;
 }
@@ -362,15 +379,18 @@ extern int8_t PostmanLOG_stop(void) {
     }
 
     returnError = shutdown(myServerSocket, SHUT_RDWR); // wake up accept and recv, do not destroy the socket
-    ERROR(returnError < 0, "[PostmanLOG] Fail to stop the socket");
+    ERROR(returnError < 0, "[PostmanLOG] Error when shutdown the socket.");
 
-    MqMsg msg = { .size = 0, .trame = NULL, .flag = STOP };
-    returnError = mqSendMessage(&msg); // wake up the PostmanLOG's thread to stop him
-    ERROR(returnError < 0, "[PostmanLOG] Can't send the message");
+    if (returnError >= 0) {
+        MqMsg msg = { .size = 0, .trame = NULL, .flag = STOP };
+        returnError = mqSendMessage(&msg); // wake up the PostmanLOG's thread to stop him
+        ERROR(returnError < 0, "[PostmanLOG] Error when sending the STOP message.");
 
-    errno = 0;
-    returnError = pthread_join(myThread, NULL);
-    ERROR(returnError < 0, "[PostmanLOG] Fail to join the PostmanLOG's processsus");
+        if (returnError >= 0) {
+            returnError = pthread_join(myThread, NULL);
+            ERROR(returnError < 0, "[PostmanLOG] Error to join the PostmanLOG's processsus");
+        }
+    }
 
     return returnError;
 }
@@ -379,13 +399,13 @@ extern int8_t PostmanLOG_free(void) {
     int8_t returnError = EXIT_SUCCESS;
 
     returnError -= tearDownSocket();
-    ERROR(returnError < 0, "[PostmanLOG] Can't close the server");
+    ERROR(returnError < 0, "[PostmanLOG] Error when closing the socket.");
 
     returnError -= tearDownMq();
-    ERROR(returnError < 0, "[PostmanLOG] Can't close the PostmanLOG's queue");
+    ERROR(returnError < 0, "[PostmanLOG] Error when closing the queue.");
 
     returnError -= pthread_mutex_destroy(&myMutex);
-    ERROR(returnError < 0, "[PostmanLOG] Can't destroy the PostmanLOG's mutex");
+    ERROR(returnError < 0, "[PostmanLOG] Error when destroy the mutex.");
 
     return returnError < 0 ? -1 : 0;
 }
@@ -403,7 +423,6 @@ static int8_t setUpSocket(void) {
     struct sockaddr_in serverAddress;
 
     myServerSocket = socket(AF_INET, SOCK_STREAM, 0);                                               // Socket creation : AF_INET = IP, SOCK_STREAM = TCP
-
 
     if (myServerSocket < 0) {
         ERROR(true, "[PostmanLOG] Error to create the socket");
@@ -426,17 +445,15 @@ static int8_t tearDownSocket(void) {
     int8_t returnError = EXIT_SUCCESS;
 
     if (myClientSocket > 0) {
-        errno = 0;
         returnError = close(myClientSocket);
 
-        ERROR(returnError < 0, "[PostmanLOG] Fail to close the client socket");
+        ERROR(returnError < 0, "[PostmanLOG] Error when closing the client socket.");
     }
 
-    errno = 0;
-    returnError = close(myServerSocket);
-    ERROR(returnError < 0, "[PostmanLOG] Fail to close the server socket");
+    returnError -= close(myServerSocket);
+    ERROR(returnError < 0, "[PostmanLOG] Error when closing the server socket.");
 
-    return returnError;
+    return returnError < 0 ? -1 : 0;
 }
 
 static int8_t socketReadMessage(Trame* destTrame, uint8_t nbToRead) {
@@ -450,21 +467,16 @@ static int8_t socketReadMessage(Trame* destTrame, uint8_t nbToRead) {
         quantityReaddean = recv(myClientSocket, &destTrame + quantityReaddean, nbToRead, RECV_FLAGS);
 
         if (quantityReaddean < 0) {
-            ERROR(true, "[PostmanLOG] Error when receiving the message");
-
             if (errno == ECONNRESET) {
-                LOG("Connection aborted by the server ... Disconnecting all.%s", "\n");
-                stopAll();
-                returnError = -1;
+                LOG("[PostmanLOG] The socket is shutdown%s", "\n");
+                returnError = 0;
             } else {
-                LOG("Retry to re set up the server%s", "\n");
-                tearDownSocket();
-                returnError = setUpSocket();
-
-                ERROR(returnError < 0, "[PostmanLOG] Fail to re set up the server");
+                ERROR(true, "[PostmanLOG] Error when receiving the message in the socket.");
+                returnError = -1;
             }
+
         } else if (quantityReaddean == 0) {
-            LOG("Client is disconnect .. Disconnection all.%s", "\n");
+            LOG("[PostmanLOG] Client is disconnect .. Disconnection all.%s", "\n");
             stopAll();
             returnError = -1;
         }
@@ -482,20 +494,19 @@ static int8_t socketSendMessage(Trame* trame, uint8_t size) {
     uint8_t quantityToWrite = size;
     int8_t returnError = EXIT_SUCCESS;
 
-    while (quantityToWrite > 0) {
+    while (quantityToWrite > 0 && returnError >= 0) {
         quantityWritten = send(myClientSocket, trame + quantityWritten, quantityToWrite, SEND_FLAGS);
 
         if (quantityWritten < 0) {
-            ERROR(true, "[PostmanLOG] Error when sending the message ... try to re set up");
-            stopAll();
-            returnError = setUpSocket();
-            ERROR(returnError < 0, "[PostmanLOG] Fail to re set up the server.");
-        }
-
-        if (returnError > 0) {
-            quantityToWrite -= quantityWritten;
+            if (errno == ECONNRESET) {
+                LOG("[PostmanLOG] The socket is shutdown%s", "\n");
+                returnError = 0;
+            } else {
+                ERROR(true, "[PostmanLOG] Error when sending the message");
+            }
+            returnError = -1;
         } else {
-            break; // quantityToWrite
+            quantityToWrite -= quantityWritten;
         }
     }
     return returnError;
@@ -511,12 +522,7 @@ static int8_t connectClient(void) {
     int8_t returnError = EXIT_SUCCESS;
 
     returnError = listen(myServerSocket, MAX_PENDING_CONNECTIONS);
-
-    if (returnError < 0) {
-        ERROR(true, "[PostmanLOG] Fail to set up the client connection ... Retry");
-        returnError = listen(myServerSocket, MAX_PENDING_CONNECTIONS);
-        ERROR(returnError < 0, "[PostmanLOG] Fail to set up the client connection.");
-    }
+    ERROR(returnError < 0, "[PostmanLOG] Error when set up the client connection.");
 
     if (returnError >= 0) {
         myClientSocket = accept(myServerSocket, NULL, 0);
@@ -524,12 +530,13 @@ static int8_t connectClient(void) {
         if (myClientSocket < 0) {
             if (errno == EINVAL) {
                 // Socket no more accept any connection
-                LOG("Connection aborted by the server%s", "\n");
+                LOG("[PostmanLOG] Connection aborted by the server.%s", "\n");
             } else {
-                LOG("Error when connecting the client%s", "\n");
+                ERROR(true, "[PostmanLOG] Error when connecting the client");
                 returnError = -1;
             }
         } else {
+            LOG("[PostmanLOG] New client is connected%s", "\n");
             setConnectionState(CONNECTED);
             DispatcherLOG_setConnectionState(CONNECTED);
         }
@@ -542,10 +549,9 @@ static int8_t disconnectClient(void) {
     int8_t returnError = EXIT_SUCCESS;
 
     returnError = close(myClientSocket);
+    ERROR(returnError < 0, "[PostmanLOG] Error when closing the client socket.");
 
-    if (returnError < 0) {
-        LOG("Error when disconnecting the client%s", "\n");
-    } else {
+    if (returnError >= 0) {
         setConnectionState(DISCONNECTED);
         DispatcherLOG_setConnectionState(DISCONNECTED);
     }
@@ -580,9 +586,9 @@ static int8_t tearDownMq(void) {
 
     if (returnError >= 0) {
         returnError = mq_close(myMq);
-        ERROR(returnError < 0, "[PostmanLOG] Fail to close the Queue");
+        ERROR(returnError < 0, "[PostmanLOG] Error when closing the queue");
     } else {
-        ERROR(true, "[PostmanLOG] Fail to unlink the Queue");
+        ERROR(true, "[PostmanLOG] Error when unlinking the queue.");
     }
 
     return returnError;
@@ -593,17 +599,7 @@ static int8_t mqSendMessage(MqMsg* message) {
     errno = 0;
 
     returnError = mq_send(myMq, (char*) message, sizeof(MqMsg), 0); // put char to avoid a warning
-    if (returnError < 0) {
-        ERROR(true, "[PostmanLOG] Fail to send the message ... Try to re set up the Queue and re-send");
-
-        tearDownMq();
-        returnError = setUpMq();
-
-        if (returnError >= 0) {
-            returnError = mq_send(myMq, (char*) message, sizeof(MqMsg), 0); // put char to avoid a warning
-            ERROR(returnError < 0, "[PostmanLOG] Fail to send the message");
-        }
-    }
+    ERROR(returnError < 0, "PostmanLOG] Error when sending the message in the queue.");
 
     return returnError;
 }
@@ -612,17 +608,7 @@ static int8_t mqReadMessage(MqMsg* dest) {
     int8_t returnError = EXIT_SUCCESS;
 
     returnError = mq_receive(myMq, (char*) dest, sizeof(MqMsg), NULL); // put char to avoid a warning
-    ERROR(returnError < 0, "[PostmanLOG] Fail to read the message ... Try to re set up the Queue");
-
-    if (returnError < 0) {
-        tearDownMq();
-        returnError = setUpMq();
-
-        if (returnError >= 0) {
-            returnError = mq_receive(myMq, (char*) dest, sizeof(MqMsg), NULL); // put char to avoid a warning
-            ERROR(returnError < 0, "[PostmanLOG] Fail to read the message");
-        }
-    }
+    ERROR(returnError < 0, "[PostmanLOG] Error when reading the message in the queue.");
 
     return returnError;
 }
@@ -665,19 +651,60 @@ static void* run(void* _) {
         MqMsg msg;
 
         if (getConnectionState() == DISCONNECTED) {
-            TRACE("Try to reconnect to the client%s", "\n");
+            LOG("[PostmanLOG] Try to reconnect to the client%s", "\n");
 
             returnError = connectClient();
+
+            if (returnError < 0) {
+                ERROR(true, "[PostmanLOG] Error when trying to etablish a connection ... Retry");
+
+                returnError = connectClient();
+                if (returnError < 0) {
+                    ERROR(true, "[PostmanLOG] Error when trying to etablish a connection ... Stop the processus");
+                    break;
+                }
+            }
         }
 
         if (returnError >= 0) {
             returnError = mqReadMessage(&msg);
-            ERROR(returnError < 0, "[PostmanLOG] Can't read the message");
+
+            if (returnError < 0) {
+                LOG("[PostmanLOG] Can't read the message in the queue ... Re set up the queue.%s", "\n");
+                returnError = setUpMq();
+
+                if (returnError < 0) {
+                    LOG("[PostmanLOG] Can't re set-up the message queue ... Stop the processus.%s", "\n");
+                    break;
+                } else {
+                    returnError = mqReadMessage(&msg);
+                    if (returnError < 0) {
+                        LOG("[PostmanLOG] Can't read the message in the queue ... Stop the processus.%s", "\n");
+                        break;
+                    }
+                }
+            }
         }
 
-        if (returnError >= 0 && msg.flag == SEND) {
+        if (msg.flag == SEND) {
             if (getConnectionState() == CONNECTED && getKeepGoing() == true) {
                 returnError = socketSendMessage(msg.trame, msg.size);
+                if (returnError < 0) {
+                    LOG("[PostmanLOG] Can't read the message in the socket ... Re set up the socket%s", "\n");
+                    tearDownSocket();
+                    returnError = setUpSocket();
+
+                    if (returnError < 0) {
+                        LOG("[PostmanLOG] Can't re set up the socket ... Stop the processus%s", "\n");
+                        break;
+                    } else {
+                        returnError = socketSendMessage(msg.trame, msg.size);
+                        if (returnError < 0) {
+                            LOG("[PostmanLOG] Can't read message in the socket ... Stop the processus%s", "\n");
+                            break;
+                        }
+                    }
+                }
 
             }
             free(msg.trame);
@@ -685,9 +712,14 @@ static void* run(void* _) {
             if (returnError < 0) {
                 break;
             }
-        } else {
+        } else if (msg.flag == STOP) {
             break;
+        } else {
+            LOG("[PostmanLOG] Unknown message in the message queue, flag's value %d ... Ignore it.%s", msg.flag, "\n");
         }
     }
+
+    LOG("[PostmanLOG] Server is down, can't send more message%s", "\n");
+
     return NULL;
 }
