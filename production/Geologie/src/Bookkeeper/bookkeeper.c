@@ -1,7 +1,7 @@
 /**
  * @file bookkeeper.c
  *
- * @brief  TODO
+ * @brief Permet de calculer les charges memoire et processeur de maniere periodique.
  *
  * @version 2.0
  * @date 12-06-2021
@@ -36,35 +36,78 @@
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/**
+ * @brief Le label de la MQueue de Bookkeeper.
+ */
 #define MQ_LABEL "/MQ_Bookkeeper"
 
+/**
+ * @brief Le nombre maximal de message dans la MQueue de Bookkeeper.
+ */
 #define MQ_MAX_MESSAGES (2)
 
+/**
+ * @brief Le periode de mise a jour des donnees de Bookkeeper en seconde.
+ *
+ */
 #define T_MAJ_LOAD (0.5)
 
+/**
+ * @brief Le nombre maximale d'erreur qu'il est possible de faire pour une donnee avant
+ * la lecture de cette donnee.
+ */
 #define MAX_ERROR_READING (2)
 
+/**
+ * @brief L'enumeration des different type de message ecrit dans la MQueue de
+ * Bookkeeper.
+ */
 typedef enum {
-    STOP = 0,
-    GET_VALUE
+    GET_VALUE = 0,  /**< Le message indique une demande de mise a jour de Scanner. */
+    STOP = 1        /**< Le message indique l'arret du processus. */
 } MqFlags;
 
+/**
+ * @brief La structure correspondant aux message passant par la boite aux letres de Bookkeeper.
+ */
 typedef struct {
     MqFlags flag;
 } MqMsg;
 
+/**
+ * @brief Le pourcentage courant de memoire utilisee.
+ */
 static float percentMemoryUsed;
 
+/**
+ * @brief Le pourcentage courant de processeur utilise.
+ */
 static float percentProcessorUsed;
 
+/**
+ * @brief Le thread de lecture de la MQueue de Bookkeeper.
+ */
 static pthread_t myThreadMq;
 
+/**
+ * @brief Le thread de mise a jour des donnees de Bookkeeper.
+ */
 static pthread_t myThreadUpdate;
 
+/**
+ * @brief Le mutex de Bookkeeper protegeant l'access a #percentMemoryUsed,
+ * #percentProcessorUsed et a #keepGoing.
+ */
 static pthread_mutex_t myMutex = PTHREAD_MUTEX_INITIALIZER;
 
+/**
+ * @brief La MQueue de Bookkeeper.
+ */
 static mqd_t myMq;
 
+/**
+ * @brief Boolean indiquant a Bookkeeper s'il doit continuer son processus.
+ */
 static bool keepGoing = false;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -87,28 +130,97 @@ static int8_t updateProcessorLoad(void);
  */
 static int8_t updateMemoryLoad(void);
 
+/**
+ * @brief Initialise la queue #myMq.
+ *
+ * @return int8_t -1 en cas d'erreur, 0 sinon.
+ */
 static int8_t setUpMq(void);
 
+/**
+ * @brief Ferme le socket #myMq.
+ *
+ * @return int8_t -1 en cas d'erreur, 0 sinon.
+ */
 static int8_t tearDownMq(void);
 
+/**
+ * @brief Ecrit la #MqMsg dans la boite aux lettres de Bookkeeper.
+ *
+ * @param message Le message a ecrire.
+ * @return int8_t -1 en cas d'erreur, 0 sinon.
+ *
+ * @warning La fonction appelante est en charge de la garantie de la validite du message (passage de pointeur).
+ */
 static int8_t sendMsgMq(MqMsg* msg);
 
+/**
+ * @brief Lie une #MqMsg dans la boite au lettre de Bookkeeper.
+ *
+ * Le message lue est place dans @a dest.
+ *
+ * @param dest La #MqMsg ou place le message lue.
+ * @return int8_t -1 en cas d'erreur, 0 sinon.
+ */
 static int8_t readMsgMq(MqMsg* dest);
 
+/**
+ * @brief Retourne le pourcentage de la charge memoire utilise.
+ *
+ * @return float La valeur de #percentMemoryUsed.
+ */
 static float getPercentMemoryLoad(void);
 
+/**
+ * @brief Modifie le pourcentage sauvegarde de la charge memoire utilise
+ *
+ * @param newValue La nouvelle valeur de #percentMemoryUsed.
+ */
 static void setPercentMemoryLoad(float newValue);
 
+/**
+ * @brief Retourne le pourcentage de la charge processeur utilise.
+ *
+ * @return float La valeur de #percentProcessorUsed.
+ */
 static float getPercentProcessorLoad(void);
 
+/**
+ * @brief Modifie le pourcentage sauvegarde de la charge processeur utilise
+ *
+ * @param newValue La nouvelle valeur de #percentProcessorUsed.
+ */
 static void setPercentProcessorLoad(float newValue);
 
+/**
+ * @brief Modifie l'indication du thread de Bookkeeper sur s'il doit continuer ou non sa routine.
+ *
+ * @param newValue false le thread de Bookkeeper doit arreter sa routine, sinon il doit continuer
+ */
 static void setKeepGoing(bool newValue);
 
+/**
+ * @brief Retourne l'indication du thread de Bookkeeper sur s'il doit continuer ou non sa routine.
+ *
+ * @return true Le thread de Bookkeeper doit continuer sa routine.
+ * @return false Le thread de Bookkeeper doit arreter sa routine.
+ */
 static bool getKeepGoing(void);
 
+/**
+ * @brief Routine du thread de Bookkeeper permettant de lire sa boite au lettre.
+ *
+ * @param _ Le parametre passe a la routine du thread, ignore ici
+ * @return void* La valeur retourne par la routine du thread, NULL ici
+ */
 static void* runMq(void* _);
 
+/**
+ * @brief Routine du thread de Bookkeeper permettant de mettre a jour les donnees systemes.
+ *
+ * @param _ Le parametre passe a la routine du thread, ignore ici
+ * @return void* La valeur retourne par la routine du thread, NULL ici
+ */
 static void* runUpdate(void* _);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -213,7 +213,7 @@ static void stopAll(void);
 static int8_t setUpMq(void);
 
 /**
- * @brief Ferme le socket #myMq.
+ * @brief Ferme la queue #myMq.
  *
  * @return int8_t -1 en cas d'erreur, 0 sinon.
  */
@@ -250,7 +250,7 @@ static bool getKeepGoing(void);
 /**
  * @brief Modifie l'indication du thread de PostmanLOG sur s'il doit continuer ou non sa routine.
  *
- * @param newValue
+ * @param newValue false le thread de PostmanLOG doit arreter sa routine, sinon il doit continuer
  */
 static void setKeepGoing(bool newValue);
 
