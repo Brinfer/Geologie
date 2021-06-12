@@ -84,6 +84,8 @@ static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
  */
 int main() {
     TRACE("%s", "\033[2J\033[;H");
+    LOG(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> GEOLOGIE is launched <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<%s", "\n\n");
+
     setUp();
 
     ManagerLOG_startGEOLOGIE();
@@ -93,6 +95,8 @@ int main() {
     ManagerLOG_stopGEOLOGIE();
 
     tearDown();
+
+    LOG(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> GEOLOGIE is stopped <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<%s", "\n\n");
 
     return 0;
 }
@@ -146,8 +150,5 @@ static void intHandler(int _) {
 static void errorHandler(void) {
     TRACE("Catch an error%s", "\n");
 
-    int8_t returnError = EXIT_SUCCESS;
-
-    returnError = pthread_cond_signal(&cond);
-    assert(returnError >= 0);
+    ManagerLOG_stopGEOLOGIE();
 }
