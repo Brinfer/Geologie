@@ -468,68 +468,105 @@ static void* run() {
     return 0;
 }
 
+//Commenter les actionAction
+
+static void actionStop(){
+    Scanner_ask4StopScanner();        
+    ProxyLoggerMOB_stop();
+    ProxyGUI_stop();
+
+    calibrationCounter = 0;
+    connectionState = DISCONNECTED;
+    TRACE("debut arret thread geographer %s ", "\n");
+    pthread_join(threadGeographer, NULL);
+    TRACE("fin arret thread geographer %s ", "\n");
+}
+
+static void actionNop(){
+    //do nothing
+}
+
+static void actionConnectionEstablished(){
+    connectionState = CONNECTED;
+    ProxyLoggerMOB_setExperimentalPositions(experimentalPositions, EXP_POSITION_NUMBER);
+    ProxyLoggerMOB_setExperimentalTrajects(experimentalTrajects, EXP_TRAJECT_NUMBER);
+}
+
+static void actionConnectionDown(){
+    connectionState = DISCONNECTED;
+}
+
+static void actionSetAllData(MqMsg * msg){
+    currentDate = getCurrentDate();
+    ProxyLoggerMOB_setAllBeaconsData(msg->beaconsData, msg->beaconsDataSize, currentDate);
+    ProxyLoggerMOB_setCurrentPosition(msg->currentPosition, currentDate);
+    ProxyLoggerMOB_setProcessorAndMemoryLoad(msg->currentProcessorAndMemoryLoad, currentDate); 
+}
+
+static void actionSetCalibrationPositions(){
+    calibrationCounter = 0;
+    ProxyGUI_setCalibrationPositions(calibrationPositions, CALIBRATION_POSITION_NUMBER);
+}
+
+static void actionAsk4UpdateAttenuationCoefficient(){
+    Scanner_ask4UpdateAttenuationCoefficientFromPosition(calibrationPositions[calibrationCounter]);
+}
+
+static void actionEndCalibration(MqMsg * msg){
+    ProxyLoggerMOB_setCalibrationData(msg->calibrationData, msg->nbCalibration);
+    ProxyGUI_signalEndCalibration();
+}
+
+static void actionCalibrationCounter(){
+    ProxyGUI_signalEndCalibrationPosition();
+    calibrationCounter++;
+}
+
+static void actionAsk4AverageCalcul(){
+    ProxyGUI_signalEndCalibrationPosition();
+    Scanner_ask4AverageCalcul();
+}
+
 static void performAction(Action_GEOGRAPHER anAction, MqMsg* msg) {
     switch (anAction) {
         case A_STOP:
-
-            Scanner_ask4StopScanner();
-            
-            ProxyLoggerMOB_stop();
-
-            ProxyGUI_stop();
-
-
-            calibrationCounter = 0;
-            connectionState = DISCONNECTED;
-            TRACE("debut arret thread geographer %s ", "\n");
-            pthread_join(threadGeographer, NULL);
-            TRACE("fin arret thread geographer %s ", "\n");
+            actionStop();
             break;
 
         case A_NOP:
+            actionNop();
             break;
 
         case A_CONNECTION_ESTABLISHED:
-            connectionState = CONNECTED;
-            ProxyLoggerMOB_setExperimentalPositions(experimentalPositions, EXP_POSITION_NUMBER);
-            ProxyLoggerMOB_setExperimentalTrajects(experimentalTrajects, EXP_TRAJECT_NUMBER);
+            actionConnectionEstablished();
             break;
 
         case A_CONNECTION_DOWN:
-            connectionState = DISCONNECTED;
+            actionConnectionDown();
             break;
 
         case A_SET_ALL_DATA:
-            currentDate = getCurrentDate();
-            ProxyLoggerMOB_setAllBeaconsData(msg->beaconsData, msg->beaconsDataSize, currentDate);
-            ProxyLoggerMOB_setCurrentPosition(msg->currentPosition, currentDate);
-            ProxyLoggerMOB_setProcessorAndMemoryLoad(msg->currentProcessorAndMemoryLoad, currentDate);
+            actionSetAllData(msg);
             break;
 
         case A_SET_CALIBRATION_POSITIONS:
-            calibrationCounter = 0;
-            ProxyGUI_setCalibrationPositions(calibrationPositions, CALIBRATION_POSITION_NUMBER);
+            actionSetCalibrationPositions();
             break;
 
         case A_ASK_4_UPDATE_ATTENUATION_COEFFICIENT:
-            Scanner_ask4UpdateAttenuationCoefficientFromPosition(calibrationPositions[calibrationCounter]);
+            actionAsk4UpdateAttenuationCoefficient();
             break;
 
-
-
         case A_END_CALIBRATION:
-            ProxyLoggerMOB_setCalibrationData(msg->calibrationData, msg->nbCalibration);
-            ProxyGUI_signalEndCalibration();
+            actionEndCalibration(msg);
             break;
 
         case A_CALIBRATION_COUNTER:
-            ProxyGUI_signalEndCalibrationPosition();
-            calibrationCounter++;
+            actionCalibrationCounter();
             break;
 
         case A_ASK_4_AVERAGE_CALCUL:
-            ProxyGUI_signalEndCalibrationPosition();
-            Scanner_ask4AverageCalcul();
+            actionAsk4AverageCalcul();
             break;
 
         default:
