@@ -467,13 +467,8 @@ static int8_t socketReadMessage(Trame* destTrame, uint8_t nbToRead) {
         quantityReaddean = recv(myClientSocket, &destTrame + quantityReaddean, nbToRead, RECV_FLAGS);
 
         if (quantityReaddean < 0) {
-            if (errno == ECONNRESET) {
-                LOG("[PostmanLOG] The socket is shutdown%s", "\n");
-                returnError = 0;
-            } else {
-                ERROR(true, "[PostmanLOG] Error when receiving the message in the socket.");
-                returnError = -1;
-            }
+            ERROR(errno != ECONNRESET, "[PostmanLOG] Error when receiving the message in the socket.");
+            returnError = -1;
 
         } else if (quantityReaddean == 0) {
             LOG("[PostmanLOG] Client is disconnect .. Disconnection all.%s", "\n");
@@ -661,6 +656,7 @@ static void* run(void* _) {
                 returnError = connectClient();
                 if (returnError < 0) {
                     ERROR(true, "[PostmanLOG] Error when trying to etablish a connection ... Stop the processus");
+                    setKeepGoing(false);
                     break;
                 }
             }
@@ -675,47 +671,44 @@ static void* run(void* _) {
 
                 if (returnError < 0) {
                     LOG("[PostmanLOG] Can't re set-up the message queue ... Stop the processus.%s", "\n");
-                    break;
+                    setKeepGoing(false);
                 } else {
                     returnError = mqReadMessage(&msg);
                     if (returnError < 0) {
                         LOG("[PostmanLOG] Can't read the message in the queue ... Stop the processus.%s", "\n");
-                        break;
+                        setKeepGoing(false);
                     }
                 }
             }
         }
 
-        if (msg.flag == SEND) {
-            if (getConnectionState() == CONNECTED && getKeepGoing() == true) {
-                returnError = socketSendMessage(msg.trame, msg.size);
-                if (returnError < 0) {
-                    LOG("[PostmanLOG] Can't read the message in the socket ... Re set up the socket%s", "\n");
-                    tearDownSocket();
-                    returnError = setUpSocket();
-
+        if (returnError >= 0) {
+            if (msg.flag == SEND) {
+                if (getConnectionState() == CONNECTED && getKeepGoing() == true) {
+                    returnError = socketSendMessage(msg.trame, msg.size);
                     if (returnError < 0) {
-                        LOG("[PostmanLOG] Can't re set up the socket ... Stop the processus%s", "\n");
-                        break;
-                    } else {
-                        returnError = socketSendMessage(msg.trame, msg.size);
+                        LOG("[PostmanLOG] Can't read the message in the socket ... Re set up the socket%s", "\n");
+                        tearDownSocket();
+                        returnError = setUpSocket();
+
                         if (returnError < 0) {
-                            LOG("[PostmanLOG] Can't read message in the socket ... Stop the processus%s", "\n");
-                            break;
+                            LOG("[PostmanLOG] Can't re set up the socket ... Stop the processus%s", "\n");
+                            setKeepGoing(false);
+                        } else {
+                            returnError = socketSendMessage(msg.trame, msg.size);
+                            if (returnError < 0) {
+                                LOG("[PostmanLOG] Can't read message in the socket ... Stop the processus%s", "\n");
+                                setKeepGoing(false);
+                            }
                         }
                     }
+                    free(msg.trame);
                 }
-
+            } else if (msg.flag == STOP) {
+                setKeepGoing(false);
+            } else {
+                LOG("[PostmanLOG] Unknown message in the message queue, flag's value %d ... Ignore it.%s", msg.flag, "\n");
             }
-            free(msg.trame);
-
-            if (returnError < 0) {
-                break;
-            }
-        } else if (msg.flag == STOP) {
-            break;
-        } else {
-            LOG("[PostmanLOG] Unknown message in the message queue, flag's value %d ... Ignore it.%s", msg.flag, "\n");
         }
     }
 

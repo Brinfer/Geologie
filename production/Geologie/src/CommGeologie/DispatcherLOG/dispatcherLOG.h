@@ -59,7 +59,8 @@ extern int8_t DispatcherLOG_free();
 /**
  * @brief Demande le demarrage de dispatcherLOG
  *
- * Demande a dispatcherLOG de demarrer, demarre le thread
+ * Demande a dispatcherLOG de demarrer, demarre le thread.
+ * En cas d'erreur lors de la creation du thread, une deuxieme tentative est faite.
  *
  * @return retourne 1 s'il y a une erreur dans l'execution de la methode
  *
@@ -69,7 +70,8 @@ extern int8_t DispatcherLOG_start();
 /**
  * @brief Demande l'arret de dispatcherLOG
  *
- * Demande a dispatcherLOG de s'arreter, arrete le thread ferme la boite aux lettres
+ * Demande a dispatcherLOG de s'arreter, arrete le thread.
+ * En cas d'erreur lors de l'arret, une deuxieme tentative est faite.
  *
  * @return retourne 1 s'il y a une erreur dans l'execution de la methode
  *
@@ -77,10 +79,12 @@ extern int8_t DispatcherLOG_start();
 extern int8_t DispatcherLOG_stop();
 
 /**
- * @brief  TODO
+ * @brief Permet de changer l'etat de la connexion pour DispatcheurLOG.
  *
- * @param connectionState
- * @return int8_t
+ * Si la connexion est etablie, alors le processus est lance, sinon il est arreter.
+ *
+ * @param connectionState L'etat de la connexion.
+ * @return retourne 1 s'il y a une erreur dans l'execution de la methode
  */
 extern int8_t DispatcherLOG_setConnectionState(ConnectionState connectionState);
 

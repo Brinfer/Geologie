@@ -64,7 +64,12 @@ extern void ManagerLOG_startGEOLOGIE(void) {
     assert(returnError >= 0);
 
     returnError = DispatcherLOG_new();
-    assert(returnError >= 0);
+    if (returnError < 0) {
+        LOG("[ManagerLOG] Fail to init DispatcherLOG ... Retry%s", "\n");
+        returnError = DispatcherLOG_new();
+        ERROR(returnError < 0, "[ManagerLOG] Fail to init DispatcherLOG ... Exit");
+        exit(1);
+    }
 
     /* Start */
 
@@ -116,7 +121,11 @@ extern void ManagerLOG_stopGEOLOGIE(void) {
     LOG("Destruction of GEOLOGIE%s", "\n");
 
     returnError = DispatcherLOG_free();
-    assert(returnError >= 0);
+    if (returnError < 0) {
+        LOG("[ManagerLOG] Fail to destroy DispatcherLOG ... Retry%s", "\n");
+        returnError = DispatcherLOG_free();
+        ERROR(returnError < 0, "[ManagerLOG] Fail to destroy DispatcherLOG ... Continue");
+    }
 
     returnError = Geographer_free();
     assert(returnError >= 0);
