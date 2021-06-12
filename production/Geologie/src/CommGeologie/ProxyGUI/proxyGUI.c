@@ -125,7 +125,7 @@ extern int8_t ProxyGUI_signalEndCalibration() {
 
 static int8_t sendMsg(Trame* trame, uint16_t size) {
     int8_t returnError = PostmanLOG_sendMsg(trame, size);
-    ERROR(returnError < 0, "[ProxyGUI] Can't send the message ... Abondement.");
+    ERROR(returnError < 0, "[ProxyGUI] Can't send the message ... Abondement");
 
     return returnError;
 }

@@ -133,7 +133,7 @@ static mqd_t myMq;
 /**
  * @brief Le thread de PostmanLOG
  */
-static pthread_t myThread;
+static pthread_t myThreadMq;
 
 /**
  * @brief Le mutex de PostmanLOG.
@@ -318,7 +318,7 @@ extern int8_t PostmanLOG_start(void) {
     setKeepGoing(true);
     setConnectionState(DISCONNECTED);
 
-    returnError = pthread_create(&myThread, NULL, &run, NULL);
+    returnError = pthread_create(&myThreadMq, NULL, &run, NULL);
     ERROR(returnError < 0, "[PostmanLOG] Fail to create PostmanLOG processus");
 
     return returnError;
@@ -379,15 +379,15 @@ extern int8_t PostmanLOG_stop(void) {
     }
 
     returnError = shutdown(myServerSocket, SHUT_RDWR); // wake up accept and recv, do not destroy the socket
-    ERROR(returnError < 0, "[PostmanLOG] Error when shutdown the socket.");
+    ERROR(returnError < 0, "[PostmanLOG] Error when shutdown the socket");
 
     if (returnError >= 0) {
         MqMsg msg = { .size = 0, .trame = NULL, .flag = STOP };
         returnError = mqSendMessage(&msg); // wake up the PostmanLOG's thread to stop him
-        ERROR(returnError < 0, "[PostmanLOG] Error when sending the STOP message.");
+        ERROR(returnError < 0, "[PostmanLOG] Error when sending the STOP message");
 
         if (returnError >= 0) {
-            returnError = pthread_join(myThread, NULL);
+            returnError = pthread_join(myThreadMq, NULL);
             ERROR(returnError < 0, "[PostmanLOG] Error to join the PostmanLOG's processsus");
         }
     }
@@ -399,13 +399,13 @@ extern int8_t PostmanLOG_free(void) {
     int8_t returnError = EXIT_SUCCESS;
 
     returnError -= tearDownSocket();
-    ERROR(returnError < 0, "[PostmanLOG] Error when closing the socket.");
+    ERROR(returnError < 0, "[PostmanLOG] Error when closing the socket");
 
     returnError -= tearDownMq();
-    ERROR(returnError < 0, "[PostmanLOG] Error when closing the queue.");
+    ERROR(returnError < 0, "[PostmanLOG] Error when closing the queue");
 
     returnError -= pthread_mutex_destroy(&myMutex);
-    ERROR(returnError < 0, "[PostmanLOG] Error when destroy the mutex.");
+    ERROR(returnError < 0, "[PostmanLOG] Error when destroy the mutex");
 
     return returnError < 0 ? -1 : 0;
 }
@@ -447,11 +447,11 @@ static int8_t tearDownSocket(void) {
     if (myClientSocket > 0) {
         returnError = close(myClientSocket);
 
-        ERROR(returnError < 0, "[PostmanLOG] Error when closing the client socket.");
+        ERROR(returnError < 0, "[PostmanLOG] Error when closing the client socket");
     }
 
     returnError -= close(myServerSocket);
-    ERROR(returnError < 0, "[PostmanLOG] Error when closing the server socket.");
+    ERROR(returnError < 0, "[PostmanLOG] Error when closing the server socket");
 
     return returnError < 0 ? -1 : 0;
 }
@@ -467,7 +467,7 @@ static int8_t socketReadMessage(Trame* destTrame, uint8_t nbToRead) {
         quantityReaddean = recv(myClientSocket, &destTrame + quantityReaddean, nbToRead, RECV_FLAGS);
 
         if (quantityReaddean < 0) {
-            ERROR(errno != ECONNRESET, "[PostmanLOG] Error when receiving the message in the socket.");
+            ERROR(errno != ECONNRESET, "[PostmanLOG] Error when receiving the message in the socket");
             returnError = -1;
 
         } else if (quantityReaddean == 0) {
@@ -517,7 +517,7 @@ static int8_t connectClient(void) {
     int8_t returnError = EXIT_SUCCESS;
 
     returnError = listen(myServerSocket, MAX_PENDING_CONNECTIONS);
-    ERROR(returnError < 0, "[PostmanLOG] Error when set up the client connection.");
+    ERROR(returnError < 0, "[PostmanLOG] Error when set up the client connection");
 
     if (returnError >= 0) {
         myClientSocket = accept(myServerSocket, NULL, 0);
@@ -544,7 +544,7 @@ static int8_t disconnectClient(void) {
     int8_t returnError = EXIT_SUCCESS;
 
     returnError = close(myClientSocket);
-    ERROR(returnError < 0, "[PostmanLOG] Error when closing the client socket.");
+    ERROR(returnError < 0, "[PostmanLOG] Error when closing the client socket");
 
     if (returnError >= 0) {
         setConnectionState(DISCONNECTED);
@@ -583,7 +583,7 @@ static int8_t tearDownMq(void) {
         returnError = mq_close(myMq);
         ERROR(returnError < 0, "[PostmanLOG] Error when closing the queue");
     } else {
-        ERROR(true, "[PostmanLOG] Error when unlinking the queue.");
+        ERROR(true, "[PostmanLOG] Error when unlinking the queue");
     }
 
     return returnError;
@@ -594,7 +594,7 @@ static int8_t mqSendMessage(MqMsg* message) {
     errno = 0;
 
     returnError = mq_send(myMq, (char*) message, sizeof(MqMsg), 0); // put char to avoid a warning
-    ERROR(returnError < 0, "PostmanLOG] Error when sending the message in the queue.");
+    ERROR(returnError < 0, "[PostmanLOG] Error when sending the message in the queue");
 
     return returnError;
 }
@@ -603,7 +603,7 @@ static int8_t mqReadMessage(MqMsg* dest) {
     int8_t returnError = EXIT_SUCCESS;
 
     returnError = mq_receive(myMq, (char*) dest, sizeof(MqMsg), NULL); // put char to avoid a warning
-    ERROR(returnError < 0, "[PostmanLOG] Error when reading the message in the queue.");
+    ERROR(returnError < 0, "[PostmanLOG] Error when reading the message in the queue");
 
     return returnError;
 }
@@ -707,7 +707,7 @@ static void* run(void* _) {
             } else if (msg.flag == STOP) {
                 setKeepGoing(false);
             } else {
-                LOG("[PostmanLOG] Unknown message in the message queue, flag's value %d ... Ignore it.%s", msg.flag, "\n");
+                LOG("[PostmanLOG] Unknown message in the message queue, flag's value: %d ... Ignore it.%s", msg.flag, "\n");
             }
         }
     }
