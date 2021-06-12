@@ -66,17 +66,17 @@ int32_t tearDown(void** state);
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-int32_t setUp(void** state){
+static int32_t setUp(void** state){
 	pthread_barrier_init(&barrier_scenario, NULL, 2);
 	return 0; 
 }
 
-static int tear_down(void **state) {
+static int32_t tear_down(void **state) {
 	pthread_barrier_destroy(&barrier_scenario);
 	return 0;
 }
 
-extern int geographer_run_tests(void) {
+extern int32_t geographer_run_tests(void) {
     return cmocka_run_group_tests_name("Test of the Geographer module", NULL, NULL, NULL);
 }
 
