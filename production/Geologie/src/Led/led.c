@@ -156,7 +156,7 @@ extern int8_t Led_ledOff(void) {
 
 #ifndef NDEBUG
     } else {
-        LOG("Can't use the LED%s", "\n");
+        LOG("[LED] Can't use the LED%s", "\n");
         returnError = EXIT_SUCCESS;
     }
 #endif

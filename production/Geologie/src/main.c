@@ -90,13 +90,9 @@ int main() {
 
     ManagerLOG_startGEOLOGIE();
 
+    atexit(errorHandler);
+
     pthread_cond_wait(&cond, &mutex);
-
-    ManagerLOG_stopGEOLOGIE();
-
-    tearDown();
-
-    LOG(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> GEOLOGIE is stopped <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<%s", "\n\n");
 
     return 0;
 }
@@ -118,9 +114,6 @@ static void setUp(void) {
     assert(returnError >= 0);
 
     returnError = pthread_cond_init(&cond, NULL);
-    assert(returnError >= 0);
-
-    returnError = atexit(errorHandler);
     assert(returnError >= 0);
 }
 
@@ -150,5 +143,13 @@ static void intHandler(int _) {
 static void errorHandler(void) {
     TRACE("Catch an error%s", "\n");
 
+    int8_t returnError = EXIT_SUCCESS;
+
+    pthread_cond_signal(&cond); // in case of the function is called by an exit
+
     ManagerLOG_stopGEOLOGIE();
+
+    tearDown();
+
+    LOG("\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> GEOLOGIE is stopped <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<%s", "\n\n");
 }
