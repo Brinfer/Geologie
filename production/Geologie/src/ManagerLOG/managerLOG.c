@@ -45,7 +45,17 @@ extern void ManagerLOG_startGEOLOGIE(void) {
     int8_t returnError = EXIT_SUCCESS;
 
     returnError = UI_new();
-    assert(returnError >= 0);
+    if (returnError < 0) {
+        LOG("[ManagerLOG] Fail to init UI ... Retry%s", "\n");
+
+        UI_free();
+        returnError = UI_new();
+
+        if (returnError < 0) {
+            LOG("[ManagerLOG] Fail to init UI ... Exit%s", "\n");
+            exit(1);
+        }
+    }
 
     returnError = PostmanLOG_new();
     if (returnError < 0) {
@@ -66,9 +76,14 @@ extern void ManagerLOG_startGEOLOGIE(void) {
     returnError = DispatcherLOG_new();
     if (returnError < 0) {
         LOG("[ManagerLOG] Fail to init DispatcherLOG ... Retry%s", "\n");
+
+        DispatcherLOG_free();
         returnError = DispatcherLOG_new();
-        ERROR(returnError < 0, "[ManagerLOG] Fail to init DispatcherLOG ... Exit");
-        exit(1);
+
+        if (returnError < 0) {
+            LOG("[ManagerLOG] Fail to init DispatcherLOG ... Exit%s", "\n");
+            exit(1);
+        }
     }
 
     /* Start */
@@ -92,7 +107,16 @@ extern void ManagerLOG_startGEOLOGIE(void) {
 
 
     returnError = UI_askSignalBeginningGEOLOGIE();
-    assert(returnError >= 0);
+    if (returnError < 0) {
+        LOG("[ManagerLOG] Fail to start UI ... Retry%s", "\n");
+
+        returnError = UI_askSignalBeginningGEOLOGIE();
+
+        if (returnError < 0) {
+            LOG("[ManagerLOG] Fail to start UI ... Exit%s", "\n");
+            exit(1);
+        }
+    }
 }
 
 extern void ManagerLOG_stopGEOLOGIE(void) {
@@ -114,7 +138,12 @@ extern void ManagerLOG_stopGEOLOGIE(void) {
     assert(returnError >= 0);
 
     returnError = UI_askSignalEndingGEOLOGIE();
-    assert(returnError >= 0);
+    if (returnError < 0) {
+        LOG("[ManagerLOG] Fail to stop UI ... Retry%s", "\n");
+
+        returnError = UI_askSignalEndingGEOLOGIE();
+        ERROR(returnError < 0, "[ManagerLOG] Fail to stop UI ... Continue");
+    }
 
     /* Free */
 
@@ -138,5 +167,10 @@ extern void ManagerLOG_stopGEOLOGIE(void) {
     }
 
     returnError = UI_free();
-    assert(returnError >= 0);
+    if (returnError < 0) {
+        LOG("[ManagerLOG] Fail to destroy UI ... Retry%s", "\n");
+
+        returnError = UI_free();
+        ERROR(returnError < 0, "[ManagerLOG] Fail to destroy UI ... Continue");
+    }
 }
