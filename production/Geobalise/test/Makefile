@@ -7,7 +7,7 @@
 # Packages.
 PACKAGES = Geographer \
 	ManagerLOG \
-	Mathematician \
+	MathematicianLOG \
 	UI
 
 #################################################################################

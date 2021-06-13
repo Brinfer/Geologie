@@ -65,6 +65,7 @@ typedef uint8_t ExperimentalPositionId;
  *
  */
 typedef uint8_t ExperimentalTrajectId;
+
 typedef struct {
     uint32_t X;
     uint32_t Y;

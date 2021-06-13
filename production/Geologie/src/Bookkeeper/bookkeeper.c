@@ -24,21 +24,21 @@
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-/**
- * @fn static float getCurrentProcessorLoad(void)
- * @brief Calcule la charge processeur.
- *
- * @return float entre 1 et 100.
- */
-static float Bookkeeper_getCurrentProcessorLoad(void);
+// /**
+//  * @fn static float getCurrentProcessorLoad(void)
+//  * @brief Calcule la charge processeur.
+//  *
+//  * @return float entre 1 et 100.
+//  */
+// static float Bookkeeper_getCurrentProcessorLoad(void);
 
-/**
- * @fn static  float getCurrentProcessorLoad(void)
- * @brief Calcule la charge mémoire.
- *
- * @return float entre 1 et 100.
- */
-static float Bookkeeper_getCurrentMemoryLoad(void);
+// /**
+//  * @fn static  float getCurrentProcessorLoad(void)
+//  * @brief Calcule la charge mémoire.
+//  *
+//  * @return float entre 1 et 100.
+//  */
+// static float Bookkeeper_getCurrentMemoryLoad(void);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //

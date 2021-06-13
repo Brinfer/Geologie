@@ -56,7 +56,7 @@
 
 #include "../Bookkeeper/bookkeeper.h"
 
-#include "../Mathematician/mathematician.h"
+#include "../MathematicianLOG/mathematicianLOG.h"
 
 #include "../common.h"
 
