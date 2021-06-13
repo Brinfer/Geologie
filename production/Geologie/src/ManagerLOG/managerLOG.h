@@ -23,13 +23,18 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * @brief Demande le demarrage de GEOLOGIE.
+ * @brief Demande le demarrage de GEOLOGIE.7
  *
+ * Dans le cas ou un module de GEOLOGIE echoue a demarrer, alors une deuxieme tentative est faite.
+ * Si la deuxieme tentative echoue elle aussi le programme s'arrete.
  */
 extern void ManagerLOG_startGEOLOGIE(void);
 
 /**
  * @brief Demande l'arret de GEOLOGIE.
+ *
+ * Dans le cas ou un module de GEOLOGIE echoue a s'arreter, alors une deuxieme tentative est faite.
+ * Si la deuxieme tentative echoue elle aussi le programme continue.
  *
  */
 extern void ManagerLOG_stopGEOLOGIE(void);

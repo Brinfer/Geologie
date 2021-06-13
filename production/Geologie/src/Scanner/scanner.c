@@ -105,16 +105,12 @@ typedef struct {
 static Transition_SCANNER stateMachine[NB_STATE][NB_EVENT_SCANNER] =
 {
     [S_BEGINNING] [E_TIME_OUT] = {S_WAITING_DATA_BEACONS, A_ASK_BEACONS_SIGNAL}, //
-    [S_BEGINNING] [E_STOP] = {S_DEATH, A_STOP}, //
 
     [S_WAITING_DATA_BEACONS][E_SET_BEACONS_SIGNAL] = {S_COMPUTE_POSITION, A_SET_CURRENT_POSITION}, //
-    [S_WAITING_DATA_BEACONS][E_STOP] = {S_DEATH, A_STOP}, //
 
     [S_COMPUTE_POSITION][E_SET_PROCESSOR_AND_MEMORY] = {S_COMPUTE_LOAD, A_SET_CURRENT_PROCESSOR_AND_MEMORY}, //
-    [S_COMPUTE_POSITION][E_STOP] = {S_DEATH, A_STOP}, //
 
     [S_COMPUTE_LOAD][E_TIME_OUT] = {S_WAITING_DATA_BEACONS, A_ASK_BEACONS_SIGNAL}, //
-    [S_COMPUTE_LOAD][E_STOP] = {S_DEATH, A_STOP}, //
 
     [S_WAITING_DATA_BEACONS][E_ASK_UPDATE_COEF_FROM_POSITION] = {S_COMPUTE_CALIBRATION_POSITION, A_ASK_CALIBRATION_FROM_POSITION}, // a tout moment on peut demander la calibration
     [S_WAITING_DATA_BEACONS][E_ASK_AVERAGE_CALCUL] = {S_COMPUTE_CALIBRATION_AVERAGE, A_ASK_CALIBRATION_AVERAGE},
@@ -125,11 +121,27 @@ static Transition_SCANNER stateMachine[NB_STATE][NB_EVENT_SCANNER] =
     [S_COMPUTE_LOAD][E_ASK_UPDATE_COEF_FROM_POSITION] = {S_COMPUTE_CALIBRATION_POSITION, A_ASK_CALIBRATION_FROM_POSITION},// a tout moment on peut demander la calibration
     [S_COMPUTE_LOAD][E_ASK_AVERAGE_CALCUL] = {S_COMPUTE_CALIBRATION_AVERAGE, A_ASK_CALIBRATION_AVERAGE},
 
+    [S_COMPUTE_LOAD][E_STOP] = {S_DEATH, A_STOP}, //
+    [S_COMPUTE_POSITION][E_STOP] = {S_DEATH, A_STOP}, //
+    [S_WAITING_DATA_BEACONS][E_STOP] = {S_DEATH, A_STOP}, //
+    [S_BEGINNING] [E_STOP] = {S_DEATH, A_STOP}, //
     [S_COMPUTE_CALIBRATION_POSITION][E_STOP] = {S_DEATH, A_STOP}, //
     [S_COMPUTE_CALIBRATION_AVERAGE][E_STOP] = {S_DEATH, A_STOP}, //
 
 };
+    // [S_BEGINNING] [E_TIME_OUT] = {S_WAITING_DATA_BEACONS, A_ASK_BEACONS_SIGNAL},
 
+    // [S_WAITING_DATA_BEACONS] [E_SET_BEACONS_SIGNAL] = {S_COMPUTE_POSITION, A_SET_CURRENT_POSITION},
+    // [S_WAITING_DATA_BEACONS] [E_ASK_UPDATE_COEF_FROM_POSITION] = {S_COMPUTE_CALIBRATION_POSITION, A_ASK_CALIBRATION_FROM_POSITION},
+    // [S_WAITING_DATA_BEACONS] [E_ASK_AVERAGE_CALCUL] = {S_COMPUTE_CALIBRATION_AVERAGE, A_ASK_CALIBRATION_AVERAGE},
+
+    // [S_COMPUTE_POSITION] [E_SET_PROCESSOR_AND_MEMORY] = {S_COMPUTE_LOAD, A_SET_CURRENT_PROCESSOR_AND_MEMORY},
+
+    // [S_COMPUTE_LOAD] [E_TIME_OUT] = {S_WAITING_DATA_BEACONS, A_ASK_BEACONS_SIGNAL},
+
+    // [S_COMPUTE_CALIBRATION_POSITION][E_TIME_OUT] = {S_WAITING_DATA_BEACONS, A_ASK_BEACONS_SIGNAL},
+
+    // [S_COMPUTE_CALIBRATION_AVERAGE][E_TIME_OUT] = {S_WAITING_DATA_BEACONS, A_ASK_BEACONS_SIGNAL}
 typedef struct {
     Event_SCANNER event;
     BeaconSignal* beaconsSignal;
@@ -139,13 +151,13 @@ typedef struct {
 }MqMsg;
 
 static State_SCANNER myState;
-static pthread_t myThread;
+static pthread_t myThreadMq;
 
 static const char BAL[] = "/BALScanner";
 static mqd_t descripteur;
 static struct mq_attr attr;
 
-Watchdog* wtd_TMaj;
+static Watchdog * wtd_TMaj;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -233,7 +245,19 @@ static void perform_askCalibrationFromPosition(MqMsg* msg);
 static void perform_askCalibrationAverage(MqMsg* msg);
 
 /**
- * @fn static void scanner_performAction(Action_SCANNER action, MqMsg * msg)
+ * @fn static void perform_stop()
+ * @brief perform_action dans le cas de A_STOP
+*/
+static void perform_stop();
+
+/**
+ * @fn static void perform_askBeaconsSignal()
+ * @brief perform_action dans le cas de A_ASK_BEACONS_SIGNAL
+*/
+static void perform_askBeaconsSignal();
+
+/**
+ * @fn static void performAction(Action_SCANNER action, MqMsg * msg)
  * @brief execute les fonctions a realiser en fonction du parametre action
  *
  * @param action action a executer
@@ -291,8 +315,9 @@ static void translateBeaconsSignalToBeaconsData(BeaconSignal* beaconSignal, Beac
         data.power = beaconSignal[i].rssi;
         data.coefficientAverage = 0;
 
-        for (j = 0; j < NbBeaconsAvailable; j++) {
-            if (data.ID == calibrationData[j].beaconId) {
+        for (j = 0; j < NbBeaconsAvailable; j++)
+        {
+            if(strcmp((char *)data.ID, (char*)calibrationData[j].beaconId) == 0){
                 data.coefficientAverage = calibrationData[j].coefficientAverage;
             }
         }
@@ -323,14 +348,6 @@ static void sortBeaconsCoefficientId(BeaconCoefficients* beaconsCoefficient) {
             }
         }
     }
-}
-
-//////////////////////////////////
-
-static void perform_stop() {
-    Receiver_ask4StopReceiver();
-    Bookkeeper_askStopBookkeeper();
-    pthread_join(myThread, NULL);
 }
 
 
@@ -379,24 +396,24 @@ static void perform_askCalibrationAverage(MqMsg* msg) {
 
         BeaconCoefficients* coef = calloc(1, index_coef);
 
-        for (uint32_t j = 0; j < NbBeaconsCoefficients; j++)    //check sizeOf
-        {
-            if (beaconsCoefficient[j].beaconId[2] == beaconsIds[index_balise]) {
-                coef[index_coef] = beaconsCoefficient[j];   //check
-                memcpy(cd.beaconId, beaconsCoefficient[j].beaconId, sizeof(beaconsCoefficient[j].beaconId));
+            for (uint32_t j = 0; j < NbBeaconsCoefficients; j++)
+            {
+                if(beaconsCoefficient[j].beaconId[2] == beaconsIds[index_balise]){
+                    coef[index_coef] = beaconsCoefficient[j];
+                    memcpy(cd.beaconId, beaconsCoefficient[j].beaconId, sizeof(beaconsCoefficient[j].beaconId));
+                }
             }
         }
-
-        cd.beaconCoefficient = coef;
-        cd.nbCoefficient = index_coef;
-        cd.coefficientAverage = Mathematician_getAverageCalcul(coef, cd.nbCoefficient);
-    }
-    Geographer_signalEndAverageCalcul(calibrationData, sizeof(calibrationData));    //check sizeOf
+        Geographer_signalEndAverageCalcul(calibrationData, sizeof(calibrationData));
 }
 
-static void perform_askBeaconsSignal() {
-    Receiver_ask4BeaconsSignal();
+static void perform_stop(){
+    Receiver_ask4StopReceiver();
+    Bookkeeper_askStopBookkeeper();
+}
 
+static void perform_askBeaconsSignal(){
+    Receiver_ask4BeaconsSignal();
 }
 static void perform_init() {
     Receiver_ask4BeaconsSignal();
@@ -476,6 +493,12 @@ void __real_Scanner_transitionFct(MqMsg msg)
     }else{
         TRACE("MAE, perte evenement %i  \n",nextState);
 
+        if (stateMachine[myState][msg.event].destinationState != S_FORGET)
+        {
+            action = stateMachine[myState][msg.event].action;
+            performAction(action, &msg);
+            myState =  stateMachine[myState][msg.event].destinationState;
+        }
     }
 }
 /**
@@ -537,16 +560,18 @@ extern void Scanner_ask4StartScanner() {
     // };
     //sendMsg(&msg);
     Watchdog_start(wtd_TMaj);
-    pthread_create(&myThread, NULL, &run, NULL);
+    pthread_create(&myThreadMq, NULL, &run, NULL);
 }
 
-extern void Scanner_ask4StopScanner() {
-
+extern void Scanner_ask4StopScanner(){
+    Receiver_ask4StopReceiver();
+    Bookkeeper_askStopBookkeeper();
     MqMsg msg = {
-            .event = E_STOP,
-    };
+            .event = E_STOP
+            };
 
     sendMsg(&msg);
+    pthread_join(myThreadMq, NULL);
 }
 
 
@@ -580,11 +605,11 @@ extern void Scanner_setAllBeaconsSignal(BeaconSignal* beaconsSignal, uint32_t Nb
 }
 
 
-extern void Scanner_setCurrentProcessorAndMemoryLoad(ProcessorAndMemoryLoad currentPAndMLoad) {
+extern void Scanner_setCurrentProcessorAndMemoryLoad(ProcessorAndMemoryLoad* currentPAndMLoad){
     MqMsg msg = {
                 .event = E_SET_PROCESSOR_AND_MEMORY,
-                .currentProcessorAndMemoryLoad = currentPAndMLoad
-    };
+                .currentProcessorAndMemoryLoad = *currentPAndMLoad
+                };
 
     sendMsg(&msg);
 }
