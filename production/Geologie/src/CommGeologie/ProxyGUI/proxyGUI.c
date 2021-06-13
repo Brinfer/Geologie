@@ -77,8 +77,8 @@ extern int8_t ProxyGUI_setCalibrationPositions(CalibrationPosition* calibrationP
 
     uint16_t sizeTrame = TranslatorLOG_getTrameSize(REP_CALIBRATION_POSITIONS, nbCalibrationPosition);
 
-    trame = malloc(sizeTrame);
-    TranslatorLOG_translateForRepCalibrationPosition(sizeTrame, calibrationPositions, trame);
+    trame = malloc(sizeTrame * sizeof(Trame));
+    TranslatorLOG_translateForRepCalibrationPosition(nbCalibrationPosition, calibrationPositions, trame);
 
     returnError = sendMsg(trame, sizeTrame);
 

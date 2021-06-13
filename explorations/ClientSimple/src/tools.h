@@ -20,7 +20,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#define DEBUG_FILE_PATH "./debug.log"
+#define DEBUG_FILE_PATH "./ClientSimple.log"
 
 /**
  * @def LOG
