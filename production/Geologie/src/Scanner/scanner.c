@@ -492,13 +492,6 @@ void __real_Scanner_transitionFct(MqMsg msg)
         myState = nextState;
     }else{
         TRACE("MAE, perte evenement %i  \n",nextState);
-
-        if (stateMachine[myState][msg.event].destinationState != S_FORGET)
-        {
-            action = stateMachine[myState][msg.event].action;
-            performAction(action, &msg);
-            myState =  stateMachine[myState][msg.event].destinationState;
-        }
     }
 }
 /**
