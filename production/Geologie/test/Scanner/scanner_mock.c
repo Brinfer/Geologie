@@ -72,12 +72,12 @@ extern void __wrap_Receiver_new() {
 extern int8_t __wrap_Receiver_ask4StopReceiver() {
 	TRACE("__wrap_Receiver_ask4StopReceiver %s", "\n");
 	function_called();
-	return (int8_t) mock();
+	//return (int8_t) mock();
 }
 extern int8_t __wrap_Bookkeeper_askStopBookkeeper() {
 	TRACE("__wrap_Bookkeeper_askStopBookkeeper %s", "\n");
 	function_called();
-	return (int8_t) mock();
+	//return (int8_t) mock();
 }
 /// action set current position
 extern void __wrap_Mathematician_getCurrentPosition(const BeaconData* beaconsData, uint8_t nbBeacon, Position* currentPosition) {
@@ -113,8 +113,7 @@ extern int8_t __wrap_Geographer_dateAndSendData(BeaconData* beaconsData, int8_t 
 	// check_expected(currentProcessorAndMemoryLoad);
 
 	// Retour d'une valeur bouchonnée.
-	return (int8_t) mock();
-
+	//return (int8_t) mock();
 }
 
 //action askCalibrationFromPosition
@@ -130,7 +129,7 @@ extern AttenuationCoefficient __wrap_Mathematician_getAttenuationCoefficient(con
 		// check_expected(calibrationPosition);
 
 		// Retour d'une valeur bouchonnée.
-	return (AttenuationCoefficient) mock();
+	//return (AttenuationCoefficient) mock();
 }
 
 extern int8_t __wrap_Geographer_signalEndUpdateAttenuation() {
@@ -139,7 +138,7 @@ extern int8_t __wrap_Geographer_signalEndUpdateAttenuation() {
 	function_called();
 
 		// Retour d'une valeur bouchonnée.
-	return (int8_t) mock();
+	//return (int8_t) mock();
 }
 
 //Action askCalibrationAverage
@@ -154,7 +153,7 @@ extern AttenuationCoefficient __wrap_Mathematician_getAverageCalcul(const Beacon
 
 
 	// Retour d'une valeur bouchonnée.
-	return (AttenuationCoefficient) mock();
+	//return (AttenuationCoefficient) mock();
 }
 //Action askBeaconsSignal
 
@@ -165,7 +164,7 @@ extern int8_t __wrap_Receiver_ask4BeaconsSignal() {
 
 
 		// Retour d'une valeur bouchonnée.
-	return (int8_t) mock();
+	//return (int8_t) mock();
 }
 extern void __wrap_Watchdog_start(Watchdog* this) {
 	TRACE("__wrap_Watchdog_start %s", "\n");
@@ -187,7 +186,7 @@ extern int8_t __wrap_Geographer_signalEndAverageCalcul(CalibrationData* calibrat
 
 
 		// Retour d'une valeur bouchonnée.
-	return (int8_t) mock();
+	//return (int8_t) mock();
 }
 
 // static void __wrap_scanner_performAction(Action_SCANNER action, MqMsg* msg){
