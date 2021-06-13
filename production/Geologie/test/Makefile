@@ -5,7 +5,7 @@
 #################################################################################
 
 # Packages.
-PACKAGES = Geographer ManagerLOG UI Scanner CommGeologie Led TranslatorBeacon
+PACKAGES = Geographer ManagerLOG UI CommGeologie Led TranslatorBeacon Scanner 
 
 #################################################################################
 #																				#
@@ -27,8 +27,30 @@ export GCOVR = gcovr
 
 # Wrap des mthodes du Stock pour bouchonage.
 #exemple LDWRAP  = -Wl,--wrap=<symbol>
-LDWRAP =
+LDWRAP += -Wl,--wrap=Scanner_transitionFct
+LDWRAP += -Wl,--wrap=ScannerTime_out
+# LDWRAP += -Wl,--wrap=Scanner_new();
+LDWRAP += -Wl,--wrap=Bookkeeper_new
+LDWRAP += -Wl,--wrap=Bookkeeper_free
+LDWRAP += -Wl,--wrap=Bookkeeper_askStartBookkeeper
+LDWRAP += -Wl,--wrap=Receiver_free
+LDWRAP += -Wl,--wrap=Receiver_ask4StartReceiver
+LDWRAP += -Wl,--wrap=Receiver_new
+LDWRAP += -Wl,--wrap=Receiver_ask4StopReceiver
+LDWRAP += -Wl,--wrap=Bookkeeper_askStopBookkeeper
+LDWRAP += -Wl,--wrap=Mathematician_getCurrentPosition
+LDWRAP += -Wl,--wrap=Bookkeeper_ask4CurrentProcessorAndMemoryLoad
+LDWRAP += -Wl,--wrap=Geographer_dateAndSendData
+LDWRAP += -Wl,--wrap=Mathematician_getAttenuationCoefficient
+LDWRAP += -Wl,--wrap=Geographer_signalEndUpdateAttenuation
+LDWRAP += -Wl,--wrap=Mathematician_getAverageCalcul
+LDWRAP += -Wl,--wrap=Receiver_ask4BeaconsSignal
+LDWRAP += -Wl,--wrap=Watchdog_start
+LDWRAP += -Wl,--wrap=Geographer_signalEndAverageCalcul
+LDWRAP += -Wl,--wrap=Watchdog_construct
+LDWRAP += -Wl,--wrap=Watchdog_destroy
 
+CCFLAGS += -D_TESTING_MODE
 # Inclusion depuis le niveau du package.
 CCFLAGS += -I$(CMOCKA)/include
 
