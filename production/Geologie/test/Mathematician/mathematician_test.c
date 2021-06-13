@@ -6,6 +6,7 @@
  * @version 1.0
  * @date 11/05/2021
  * @author BRIENT Nathan
+ * @author MOLARD Simon
  * @copyright ESD 2-clauses
  *
  * @see ReceptionistLOG/mathematician.h
@@ -17,6 +18,7 @@
 //                                              Include
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#include <stdint.h>
 #include <string.h>
 #include <stdarg.h>
 #include <stddef.h>
@@ -32,6 +34,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #define EPSILON (0.0001)
+#define EPSILONPOSITION (1)
 /**
  * @struct ParametersTestCalculDistancePosition
  * 
@@ -61,11 +64,41 @@ typedef struct {
  * @brief Structure des donnees passees en parametre des fonctions de test pour le calcul des moyennes des coefficients d'atténuation. 
  */
 
+
 typedef struct {
-    BeaconCoefficients *  beaconCoefficients;  /**< les coefficients des balises */
-    u_int8_t nbCoefficient;           /**< Le nombre de coefficient */
+    uint8_t nbCoefficient;           /**< Le nombre de coefficient */
+    uint8_t nbBeaconInput;      /**< Le nombre de balises donnee en entree. */
+    BeaconCoefficients * beaconCoefficientInput; /**< Les donnees balises donnees en entree. */
     float expectedAverage;    /**< Le resultat de la conversion attendue */
 } ParametersTestGetAverageCalcul;
+
+/**
+ * @struct ParametersTestGetAttenuation
+ *
+ * @brief Structure des donnees passees en parametre des fonctions de test pour le calcul d'un coefficient d'attenuation. 
+ */
+
+
+typedef struct {
+    Power power;            /**< La Puissance a convertir */
+    Position beaconPosition; /**< la position de la balise . */
+    CalibrationPosition calibrationPosition;/**< la position de calibration . */
+    float expectedAttenuationCoefficient;    /**< Le resultat de la conversion attendue */
+} ParametersTestGetAttenuationCoefficient;
+
+/**
+ * @struct ParametersTestGetCurrentPosition
+ *
+ * @brief Structure des donnees passees en parametre des fonctions de test pour le calcul de la position actuelle.
+ */
+
+
+typedef struct {
+    BeaconData * beaconsData;            /**< Les données balises données en entrée */
+    uint8_t nbBeacon;               /**< nombre de balise. */
+    Position currentPosition; /**< la position actuelle . */
+    Position expectedCurrentPosition;    /**< Le resultat de la conversion attendue */
+} ParametersTestGetCurrentPosition;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -73,11 +106,19 @@ typedef struct {
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//                                              Fonctions static
+//
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 /**
  * @brief Tableau contenant les donnees de test pour la conversion des Position.
  *
  */
-ParametersTestCalculDistancePosition parametersTestCalculDistancePosition[] = {
+static ParametersTestCalculDistancePosition parametersTestCalculDistancePosition[] = {
     //                                                                     | <---------X---------> | <---------Y---------> |
     {.positionTested = {{.X = 0, .Y = 0 },{.X = 1, .Y = 1 }},    .expectedResult = 1.414213562},
     {.positionTested = {{.X = 0, .Y = 0 },{.X = 0, .Y = 1 }},    .expectedResult = 1},
@@ -99,57 +140,99 @@ ParametersTestCalculDistancePosition parametersTestCalculDistancePosition[] = {
  * @brief Tableau contenant les donnees de test pour la conversion des Puissances.
  *
  */
-ParametersTestCalculDistancePower parametersTestCalculDistancePower[] = {
-    {.attenuationCoefficient = 1,.power = -40,   .expectedDistance = 0.10000},
-    {.attenuationCoefficient = 1,.power = -50,   .expectedDistance = 1.0000},
-    {.attenuationCoefficient = 2,.power = -50,   .expectedDistance = 1.0000},
-    {.attenuationCoefficient = 2,.power = -80,   .expectedDistance = 31.62277},
-    {.attenuationCoefficient = 2,.power = -100,   .expectedDistance = 316.227766},
-    {.attenuationCoefficient = 3,.power = -50,   .expectedDistance = 1},
-    {.attenuationCoefficient = 3,.power = -70,   .expectedDistance = 4.64158},
-    {.attenuationCoefficient = 3,.power = -90,   .expectedDistance = 21.54434},
-    {.attenuationCoefficient = 4,.power = -40,   .expectedDistance = 0.562341},
-    {.attenuationCoefficient = 4,.power = -60,   .expectedDistance = 1.778279},
-    {.attenuationCoefficient = 4,.power = -90,   .expectedDistance = 10.00000},
-    {.attenuationCoefficient = 5,.power = -70,   .expectedDistance = 2.511886},
-    {.attenuationCoefficient = 5,.power = -100,   .expectedDistance = 10.000},
-    {.attenuationCoefficient = 6,.power = -60,   .expectedDistance = 1.467799},
-    {.attenuationCoefficient = 6,.power = -80,   .expectedDistance = 3.162277}
+static ParametersTestCalculDistancePower parametersTestCalculDistancePower[] = {
+    {.attenuationCoefficient = 1,.power = -40,   .expectedDistance = 10.0000},
+    {.attenuationCoefficient = 1,.power = -50,   .expectedDistance = 100.00},
+    {.attenuationCoefficient = 2,.power = -50,   .expectedDistance = 100.00},
+    {.attenuationCoefficient = 2,.power = -80,   .expectedDistance = 3162.277588},
+    {.attenuationCoefficient = 2,.power = -100,   .expectedDistance = 31622.7766},
+    {.attenuationCoefficient = 3,.power = -50,   .expectedDistance = 100},
+    {.attenuationCoefficient = 3,.power = -70,   .expectedDistance = 464.158905},
+    {.attenuationCoefficient = 3,.power = -90,   .expectedDistance = 2154.434814},
+    {.attenuationCoefficient = 4,.power = -40,   .expectedDistance = 56.2341},
+    {.attenuationCoefficient = 4,.power = -60,   .expectedDistance = 177.8279},
+    {.attenuationCoefficient = 4,.power = -90,   .expectedDistance = 1000.000},
+    {.attenuationCoefficient = 5,.power = -70,   .expectedDistance = 251.1886},
+    {.attenuationCoefficient = 5,.power = -100,   .expectedDistance = 1000.0},
+    {.attenuationCoefficient = 6,.power = -60,   .expectedDistance = 146.7799},
+    {.attenuationCoefficient = 6,.power = -80,   .expectedDistance = 316.2277}
 };
 
 /**
- * @brief Tableau contenant les donnees de test pour le calcul de la moyenne des coefficients d'atténuation.
- *
- */
-ParametersTestGetAverageCalcul parametersTestGetAverageCalcul[] = {
-
-    {.beaconCoefficients = {{.positionId = 0, .attenuationCoefficient = 2 },{.positionId = 1,.attenuationCoefficient = 2 }},    .expectedAverage = 2},
-    {.beaconCoefficients = {{.positionId = 3, .attenuationCoefficient = 2 },{.positionId = 4,.attenuationCoefficient = 5 },{.positionId = 5,.attenuationCoefficient = 3 }}    .expectedAverage = 3.333333},
-    {.beaconCoefficients = {{.positionId = 6, .attenuationCoefficient = 3 },{.positionId = 7,.attenuationCoefficient = 2 },{.positionId = 8,.attenuationCoefficient = 4 }},    .expectedAverage = 3},
-    {.beaconCoefficients = {{.positionId = 9, .attenuationCoefficient = 3 },{.positionId = 10,.attenuationCoefficient = 4 }},    .expectedAverage = 3.5},
-    {.beaconCoefficients = {{.positionId = 11, .attenuationCoefficient = 4 },{.positionId = 12,.attenuationCoefficient = 4 }},    .expectedAverage = 4},
-    {.beaconCoefficients = {{.positionId = 12, .attenuationCoefficient = 3 },{.positionId = 13,.attenuationCoefficient = 3 },{.positionId = 14,.attenuationCoefficient = 3 }},    .expectedAverage = 3},
-    {.beaconCoefficients = {{.positionId = 15, .attenuationCoefficient = 4 },{.positionId = 16,.attenuationCoefficient = 2 }},    .expectedAverage = 3},
-    {.beaconCoefficients = {{.positionId = 17, .attenuationCoefficient = 4 },{.positionId = 18,.attenuationCoefficient = 2 },{.positionId = 18,.attenuationCoefficient = 2 }},    .expectedAverage = 2.666666},
-    {.beaconCoefficients = {{.positionId = 19, .attenuationCoefficient = 3 },{.positionId = 20,.attenuationCoefficient = 2 }},    .expectedAverage = 2.5},
-    {.beaconCoefficients = {{.positionId = 21, .attenuationCoefficient = 4 },{.positionId = 22,.attenuationCoefficient = 3 }},    .expectedAverage = 3.5},
-    {.beaconCoefficients = {{.positionId = 23, .attenuationCoefficient = 3 },{.positionId = 24,.attenuationCoefficient = 4 }},    .expectedAverage = 3.5},
-    {.beaconCoefficients = {{.positionId = 25, .attenuationCoefficient = 3 }},    .expectedAverage = 3}
-};
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-//                                              Fonctions static
-//
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-/**
- * @brief Teste le calcul d'une distance avec deux position
+ * @brief Teste le calcul d'une distance avec deux positions.
  *
  * @param state
  */
 static void test_distanceCalculWithPosition(void** state);
+
+/**
+ * @brief Teste la position actuelle en Y en fonction de plusieurs paramètres.
+ *
+ * @param state
+ */
+
+static void test_getCurrentPositionY(void** state);
+/**
+ * @brief Teste la position actuelle en X en fonction de plusieurs paramètre.
+ *
+ * @param state
+ */
+
+static void test_getCurrentPositionX(void** state);
+/**
+ * @brief Teste le calcul du coefficient d'atténuation pour une balise
+ *
+ * @param state
+ */
+static void test_getAttenuationCoefficient(void** state);
+
+/**
+ * @brief les données coefficients des données balises du test A
+ * 
+**/
+static BeaconCoefficients beaconsDataTest_A[3] = {
+    {
+        .positionId = 01,
+        .attenuationCoefficient = 2
+    },
+    {
+        .positionId = 02,
+        .attenuationCoefficient = 3
+    },
+    {
+        .positionId = 03,
+        .attenuationCoefficient = 4
+    }
+};
+
+/**
+ * @brief les données coefficients des données balises du test B
+ * 
+**/
+
+static BeaconCoefficients beaconsDataTest_B[5] = {
+    {
+        .positionId = 4,
+        .attenuationCoefficient = 2
+    },
+    {
+        .positionId = 5,
+        .attenuationCoefficient = 3
+    },
+    {
+        .positionId = 6,
+        .attenuationCoefficient = 4
+    },
+    {
+        .positionId = 7,
+        .attenuationCoefficient = 4
+    },
+    {
+        .positionId = 8,
+        .attenuationCoefficient = 3
+    }
+};
+
 
 /**
  * @brief Teste le calcul d'une distance avec une puissance
@@ -158,6 +241,194 @@ static void test_distanceCalculWithPosition(void** state);
  */
 static void test_distanceCalculWithPower(void** state);
 
+/**
+ * @brief Teste le calcul de la position actuelle
+ *
+ * @param state
+ */
+
+static void test_getCurrentPosition(void** state);
+
+/**
+ * @brief Ensemble des donnees de tests pour le calcul des moyennes des coefficient d'attenuation.
+ */
+static ParametersTestGetAverageCalcul parameterTest[] = {
+
+    {
+        .nbBeaconInput = 3,
+        .beaconCoefficientInput = beaconsDataTest_A,
+        .expectedAverage = 3,
+    },
+    {
+        .nbBeaconInput = 5,
+        .beaconCoefficientInput = beaconsDataTest_B,
+        .expectedAverage = 3.2,
+    }
+};
+
+
+
+/**
+ * @brief Ensemble des donnees de tests pour le calcul des moyennes d'un' coefficient d'attenuation.
+*/
+
+static ParametersTestGetAttenuationCoefficient parametersTestGetAttenuationCoefficientA[1] = {
+    {
+        .power = -60,
+        .beaconPosition = { .X = 4700, .Y= 8200},
+        .calibrationPosition.position = { .X = 600, .Y= 8380},
+        .expectedAttenuationCoefficient = 0.619885
+    }
+};
+
+/**
+ * @brief Ensemble des donnees de tests pour le calcul des moyennes d'un' coefficient d'attenuation.
+*/
+
+static ParametersTestGetAttenuationCoefficient parametersTestGetAttenuationCoefficientB[1] = {
+
+    {
+        .power = -60,
+        .beaconPosition = { .X = 800, .Y= 400},
+        .calibrationPosition.position = { .X = 500, .Y= 400},
+        .expectedAttenuationCoefficient = 2.095903
+    }
+};
+
+/**
+ * @brief Ensemble des donnees de tests pour le calcul de la position actuelle.
+*/
+
+static BeaconData parametersTestGetCurrentPositionA[3] = {
+
+    {
+        .position = { .X = 400, .Y= 700},
+        .power = -69.51544993,
+        .coefficientAverage = 3,
+    },
+    {
+        .position = { .X = 900, .Y= 100},
+        .power = -68.45673382,
+        .coefficientAverage = 3,
+    },
+    {
+        .position = { .X = 1300, .Y= 800},
+        .power = -72.97218376,
+        .coefficientAverage = 3,
+    }
+};
+
+/**
+ * @brief Ensemble des donnees de tests pour le calcul de la position actuelle.
+*/
+
+static BeaconData parametersTestGetCurrentPositionB[4] = {
+
+    {
+        .position = { .X = 300, .Y= 1100},
+        .power = -83.060425027,
+        .coefficientAverage = 4,
+    },
+    {
+        .position = { .X = 1500, .Y= 1100},
+        .power = -91.36371724,
+        .coefficientAverage = 4,
+    },
+    {
+        .position = { .X = 1400, .Y= 100},
+        .power = -88.06179975,
+        .coefficientAverage = 4,
+    },
+    {
+        .position = { .X = 1600, .Y= 1700},
+        .power = -98,
+        .coefficientAverage = 4,
+    }
+};
+
+/**
+ * @brief Ensemble des donnees de tests pour le calcul de la position actuelle.
+*/
+
+static BeaconData parametersTestGetCurrentPositionC[4] = {
+
+    {
+        .position = { .X = 300, .Y= 1100},
+        .power = -83.060425027,
+        .coefficientAverage = 4,
+    },
+    {
+        .position = { .X = 1400, .Y= 100},
+        .power = -88.06179975,
+        .coefficientAverage = 4,
+    },
+    {
+        .position = { .X = 1500, .Y= 1100},
+        .power = -91.36371724,
+        .coefficientAverage = 4,
+    },
+};
+
+/**
+ * @brief Ensemble des donnees de tests pour le calcul de la position actuelle.
+*/
+
+static BeaconData parametersTestGetCurrentPositionD[4] = {
+
+    {
+        .position = { .X = 1400, .Y= 100},
+        .power = -88.06179975,
+        .coefficientAverage = 4,
+    },
+    {
+        .position = { .X = 1500, .Y= 1100},
+        .power = -91.36371724,
+        .coefficientAverage = 4,
+    },
+    {
+        .position = { .X = 300, .Y= 1100},
+        .power = -83.060425027,
+        .coefficientAverage = 4,
+    },
+};
+
+/**
+ * @brief Ensemble des donnees de tests pour le calcul de la position actuelle.
+ */
+static ParametersTestGetCurrentPosition parameterTestCurrentPosition[] = {
+
+    {
+        .nbBeacon = 3,
+        .beaconsData = parametersTestGetCurrentPositionA,
+        .currentPosition = { .X = 0, .Y= 0},
+        .expectedCurrentPosition = { .X = 800, .Y= 500},
+    },
+    {
+        .nbBeacon = 4,
+        .beaconsData = parametersTestGetCurrentPositionB,
+        .currentPosition = { .X = 0, .Y= 0},
+        .expectedCurrentPosition = { .X = 600, .Y= 500},
+    },
+    {
+        .nbBeacon = 3,
+        .beaconsData = parametersTestGetCurrentPositionC,
+        .currentPosition = { .X = 0, .Y= 0},
+        .expectedCurrentPosition = { .X = 600, .Y= 500},
+    },
+    {
+        .nbBeacon = 3,
+        .beaconsData = parametersTestGetCurrentPositionD,
+        .currentPosition = { .X = 0, .Y= 0},
+        .expectedCurrentPosition = { .X = 600, .Y= 500},
+    }
+};
+
+/**
+ * @brief Teste la moyenne des coefficient d'attenuation avec différentes balises
+ *
+ * @param state
+ */
+static void test_getAverageCalcul(void** state);
 
 /**
  * @brief Suite de test de la conversion des structures de donnees en tableau d'octet.
@@ -198,21 +469,28 @@ static const struct CMUnitTest tests[] =
     cmocka_unit_test_prestate(test_distanceCalculWithPower, &(parametersTestCalculDistancePower[13])),
     cmocka_unit_test_prestate(test_distanceCalculWithPower, &(parametersTestCalculDistancePower[14])),
 
-        // Calcul de la moyenne des coefficients
+    // Calcul du coefficient d'attenuation
 
-    cmocka_unit_test_prestate(test_distanceCalculWithPower, &(parametersTestGetAverageCalcul[0])),
-    cmocka_unit_test_prestate(test_distanceCalculWithPower, &(parametersTestGetAverageCalcul[1])),
-    cmocka_unit_test_prestate(test_distanceCalculWithPower, &(parametersTestGetAverageCalcul[2])),
-    cmocka_unit_test_prestate(test_distanceCalculWithPower, &(parametersTestGetAverageCalcul[3])),
-    cmocka_unit_test_prestate(test_distanceCalculWithPower, &(parametersTestGetAverageCalcul[4])),
-    cmocka_unit_test_prestate(test_distanceCalculWithPower, &(parametersTestGetAverageCalcul[5])),
-    cmocka_unit_test_prestate(test_distanceCalculWithPower, &(parametersTestGetAverageCalcul[6])),
-    cmocka_unit_test_prestate(test_distanceCalculWithPower, &(parametersTestGetAverageCalcul[7])),
-    cmocka_unit_test_prestate(test_distanceCalculWithPower, &(parametersTestGetAverageCalcul[8])),
-    cmocka_unit_test_prestate(test_distanceCalculWithPower, &(parametersTestGetAverageCalcul[9])),
-    cmocka_unit_test_prestate(test_distanceCalculWithPower, &(parametersTestGetAverageCalcul[10])),
-    cmocka_unit_test_prestate(test_distanceCalculWithPower, &(parametersTestGetAverageCalcul[11])),
+    cmocka_unit_test_prestate(test_getAverageCalcul, &(parameterTest[0])),
+    cmocka_unit_test_prestate(test_getAverageCalcul, &(parameterTest[1])),
+
+    // Calcul du coefficient d'attenuation
+
+    cmocka_unit_test_prestate(test_getAttenuationCoefficient, &(parametersTestGetAttenuationCoefficientA[0])),
+    cmocka_unit_test_prestate(test_getAttenuationCoefficient, &(parametersTestGetAttenuationCoefficientB[0])),
+
+    // Calcul la position actuelle
+
+    cmocka_unit_test_prestate(test_getCurrentPosition, &(parameterTestCurrentPosition[0])),
+    cmocka_unit_test_prestate(test_getCurrentPosition, &(parameterTestCurrentPosition[1])),
+    cmocka_unit_test_prestate(test_getCurrentPosition, &(parameterTestCurrentPosition[2])),
+    cmocka_unit_test_prestate(test_getCurrentPosition, &(parameterTestCurrentPosition[3])),
+    
+
 };
+
+
+
 
 /**
  * @brief Lance la suite de test du module Mathematician.
@@ -238,4 +516,26 @@ static void test_distanceCalculWithPower(void** state) {
     result = distanceCalculWithPower(&param->power, &param->attenuationCoefficient);
     assert_float_equal(result, param->expectedDistance, EPSILON);
 }
+
+static void test_getAverageCalcul(void** state) {
+    ParametersTestGetAverageCalcul * param = (ParametersTestGetAverageCalcul*) *state;
+    float result;
+    result = Mathematician_getAverageCalcul(param->beaconCoefficientInput, param->nbBeaconInput);
+    assert_float_equal(result, param->expectedAverage, EPSILON);
+}
+
+static void test_getAttenuationCoefficient(void** state) {
+    ParametersTestGetAttenuationCoefficient * param = (ParametersTestGetAttenuationCoefficient*) *state;
+    float result;
+    result = Mathematician_getAttenuationCoefficient(&param->power, &param->beaconPosition,&param->calibrationPosition);
+    assert_float_equal(result, param->expectedAttenuationCoefficient, EPSILON);
+}
+
+static void test_getCurrentPosition(void** state) {
+    ParametersTestGetCurrentPosition  * param = (ParametersTestGetCurrentPosition *) *state;
+    Mathematician_getCurrentPosition(param->beaconsData, param->nbBeacon,&param->currentPosition);
+    assert_float_equal(param->currentPosition.X, param->expectedCurrentPosition.X,EPSILONPOSITION);
+    assert_float_equal(param->currentPosition.Y, param->expectedCurrentPosition.Y,EPSILONPOSITION);
+}
+
 

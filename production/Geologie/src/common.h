@@ -41,7 +41,7 @@
  */
 #define SIZE_BEACON_ID (3)
 #define NB_CALIBRATION_POSITIONS (10)
-#define ATT_COEFF_1_METER (6)
+#define POWER_1_METER (-50)
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //                                              include
