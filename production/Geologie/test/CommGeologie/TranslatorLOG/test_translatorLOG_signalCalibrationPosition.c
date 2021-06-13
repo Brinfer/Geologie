@@ -57,10 +57,10 @@ typedef struct {
  * @brief Ensemble des donnees de tests.
  */
 static ParameterTestCalibrationPosition parameterTest[] = {
-    {.idExpected = 0, .trameInput = { SIGNAL_CALIBRATION_POSITION, 0x00, 0x01, 0x00}},
-    {.idExpected = 255, .trameInput = { SIGNAL_CALIBRATION_POSITION, 0x00, 0x01, 0xFF}},
-    {.idExpected = 170, .trameInput = { SIGNAL_CALIBRATION_POSITION, 0x00, 0x01, 0xAA}},
-    {.idExpected = 85, .trameInput = { SIGNAL_CALIBRATION_POSITION, 0x00, 0x01, 0x55}}
+    {.idExpected = 0, .trameInput = { 0x00 }},
+    {.idExpected = 255, .trameInput = { 0xFF }},
+    {.idExpected = 170, .trameInput = { 0xAA }},
+    {.idExpected = 85, .trameInput = { 0x55 }}
 };
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
