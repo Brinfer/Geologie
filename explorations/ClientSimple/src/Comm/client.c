@@ -50,7 +50,7 @@ static struct sockaddr_in serverAdress;
 
 static pthread_t clientThread;
 
-static pthread_mutex_t viewMutex = PTHREAD_MUTEX_INITIALIZER;
+static pthread_mutex_t clientMutex = PTHREAD_MUTEX_INITIALIZER;
 
 static ConnectionState connectionState;
 
@@ -74,9 +74,9 @@ static void setKeepGoing(bool newValue);
 
 static bool getKeepGoing(void);
 
-static void setCalibrationPosition(CalibrationPosition* calibrationPosition, uint8_t nbCalibrationPosition);
+static void setCalibrationPosition(uint8_t nbCalibrationPosition);
 
-static CalibrationPosition* getCalibrationPosition(void);
+static void getCalibrationPosition(uint8_t index, CalibrationPosition* dest);
 
 static int8_t connection(void);
 
@@ -106,20 +106,18 @@ extern int8_t Client_new(void) {
     if (returnError == EXIT_SUCCESS) {
         returnError = setUpSocket();
     } else {
-            ERROR(true, "[Client] Error when initialising the server");
+        ERROR(true, "[Client] Error when initialising the server");
     }
 
     if (returnError == EXIT_SUCCESS) {
-        returnError = pthread_mutex_init(&viewMutex, NULL);
+        returnError = pthread_mutex_init(&clientMutex, NULL);
 
         if (returnError != EXIT_SUCCESS) {
             ERROR(true, "[Client] Error when initialising the mutex");
-        } else {
-            setKeepGoing(false);
-            setConnectionState(DISCONNECTED);
         }
+
     } else {
-            ERROR(true, "[Client] Error when initialising the client socket");
+        ERROR(true, "[Client] Error when initialising the client socket");
     }
 
     ERROR(returnError != EXIT_SUCCESS, "[Client] Error when creating the client");
@@ -130,14 +128,14 @@ extern int8_t Client_new(void) {
 extern int8_t Client_free(void) {
     int8_t returnError;
 
-    pthread_mutex_lock(&viewMutex);
+    pthread_mutex_lock(&clientMutex);
     free(calibrationPosition);
-    pthread_mutex_unlock(&viewMutex);
+    pthread_mutex_unlock(&clientMutex);
 
     returnError = tearDownSocket();
 
     if (returnError == EXIT_SUCCESS) {
-        returnError = pthread_mutex_destroy(&viewMutex);
+        returnError = pthread_mutex_destroy(&clientMutex);
         ERROR(returnError != EXIT_SUCCESS, "[Client] Error when destroying the mutex");
     }
 
@@ -177,17 +175,17 @@ extern int8_t Client_signalCalibrationPosition(uint8_t calibrationPositionIndex)
 
     CalibrationPositionId calibrationId = calibrationPosition[calibrationPositionIndex].id; // TODO Protect
 
-    Trame trame[SIZE_HEADER + 1] = { ASK_CALIBRATION_POSITIONS , 0x00, 0x01, calibrationId };
-    socketSendMessage(trame, SIZE_HEADER);
+    Trame trame[SIZE_HEADER + 1] = { SIGNAL_CALIBRATION_POSITION , 0x00, 0x01, calibrationId };
+    return socketSendMessage(trame, SIZE_HEADER + 1);
 }
 
 extern int8_t Client_askCalibrationPosition(void) {
     Trame trame[SIZE_HEADER] = { ASK_CALIBRATION_POSITIONS , 0x00, 0x00 };
-    socketSendMessage(trame, SIZE_HEADER);
+    return socketSendMessage(trame, SIZE_HEADER);
 }
 
-extern void Client_getCalibrationPosition(CalibrationPosition* dest) {
-    dest = getCalibrationPosition();
+extern void Client_getCalibrationPosition(uint8_t index, CalibrationPosition* dest) {
+    getCalibrationPosition(index, dest);
 }
 
 extern int8_t Client_getNbCalibrationPosition(void) {
@@ -201,36 +199,32 @@ extern int8_t Client_getNbCalibrationPosition(void) {
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-static void setCalibrationPosition(CalibrationPosition* calibrationPosition, uint8_t nbCalibrationPosition) {
-    pthread_mutex_lock(&viewMutex);
+static void setCalibrationPosition(uint8_t nbCalibrationPosition) {
+    pthread_mutex_lock(&clientMutex);
     free(calibrationPosition);
     calibrationPosition = malloc(nbCalibrationPosition);
-    calibrationPosition = calibrationPosition;
-    pthread_mutex_unlock(&viewMutex);
+    pthread_mutex_unlock(&clientMutex);
 }
 
-static CalibrationPosition* getCalibrationPosition(void) {
-    CalibrationPosition* returnValue;
-
-    pthread_mutex_lock(&viewMutex);
-    returnValue = calibrationPosition;
-    pthread_mutex_unlock(&viewMutex);
-
-    return returnValue;
+static void getCalibrationPosition(uint8_t index, CalibrationPosition* dest) {
+    pthread_mutex_lock(&clientMutex);
+    dest->id = calibrationPosition[index].id;
+    dest->position = calibrationPosition[index].position;
+    pthread_mutex_unlock(&clientMutex);
 }
 
 static void setNbCalibrationPosition(uint8_t nbPosition) {
-    pthread_mutex_lock(&viewMutex);
+    pthread_mutex_lock(&clientMutex);
     nbCalibrationPosition = nbPosition;
-    pthread_mutex_unlock(&viewMutex);
+    pthread_mutex_unlock(&clientMutex);
 }
 
 static uint8_t getNbCalibrationPosition(void) {
     uint8_t returnValue;
 
-    pthread_mutex_lock(&viewMutex);
+    pthread_mutex_lock(&clientMutex);
     returnValue = nbCalibrationPosition;
-    pthread_mutex_unlock(&viewMutex);
+    pthread_mutex_unlock(&clientMutex);
 
     return returnValue;
 }
@@ -238,7 +232,6 @@ static uint8_t getNbCalibrationPosition(void) {
 static int8_t setUpSocket(void) {
     TRACE("%sSet up the client socket%s", "\033[44m\033[37m", "\033[0m\n");
 
-    const struct hostent* l_hostInfo = gethostbyname(SERVER_IP);
     int8_t returnError;
 
     clientSocket = socket(AF_INET, SOCK_STREAM, 0);
@@ -281,25 +274,25 @@ static int8_t tearDownSocket(void) {
 }
 
 static void setKeepGoing(bool newValue) {
-    pthread_mutex_lock(&viewMutex);
+    pthread_mutex_lock(&clientMutex);
     keepGoing = newValue;
-    pthread_mutex_unlock(&viewMutex);
+    pthread_mutex_unlock(&clientMutex);
 }
 
 static bool getKeepGoing(void) {
     bool returnValue;
 
-    pthread_mutex_lock(&viewMutex);
+    pthread_mutex_lock(&clientMutex);
     returnValue = keepGoing;
-    pthread_mutex_unlock(&viewMutex);
+    pthread_mutex_unlock(&clientMutex);
 
     return returnValue;
 }
 
 static void setConnectionState(ConnectionState newValue) {
-    pthread_mutex_lock(&viewMutex);
+    pthread_mutex_lock(&clientMutex);
     connectionState = newValue;
-    pthread_mutex_unlock(&viewMutex);
+    pthread_mutex_unlock(&clientMutex);
 
     View_setConnectionStatus(newValue);
 }
@@ -307,9 +300,9 @@ static void setConnectionState(ConnectionState newValue) {
 static ConnectionState getConnectionState(void) {
     bool returnValue;
 
-    pthread_mutex_lock(&viewMutex);
+    pthread_mutex_lock(&clientMutex);
     returnValue = connectionState;
-    pthread_mutex_unlock(&viewMutex);
+    pthread_mutex_unlock(&clientMutex);
 
     return returnValue;
 }
@@ -343,14 +336,13 @@ static int8_t disconnection(void) {
 }
 
 static int8_t socketReadMessage(Trame* destTrame, uint16_t nbToRead) {
-    TRACE("%sRead a message%s", "\033[36m", "\033[0m\n");
     errno = 0;
 
     int16_t quantityReaddean = 0;
     int16_t returnError;
 
     if (getConnectionState() == CONNECTED) {
-        quantityReaddean = recv(clientSocket, &destTrame + quantityReaddean, nbToRead, MSG_WAITALL);
+        quantityReaddean = recv(clientSocket, destTrame, nbToRead, MSG_WAITALL);
 
         if (quantityReaddean < 0) {
             ERROR(errno != ECONNRESET, "[Client] Error when receiving the message in the socket");
@@ -370,10 +362,14 @@ static int8_t socketReadMessage(Trame* destTrame, uint16_t nbToRead) {
         returnError = EXIT_FAILURE;
     }
 
+    TRACE("%sRead a message%s", "\033[36m", "\033[0m\n");
+
     return returnError;
 }
 
 static int8_t socketSendMessage(Trame* trame, uint16_t nbToSend) {
+    TRACE("%sSend a message%s", "\033[36m", "\033[0m\n");
+
     int16_t quantityWritten = 0;
     int16_t quantityToWrite = nbToSend;
     int8_t returnError = EXIT_SUCCESS;
@@ -419,10 +415,26 @@ static void* runClient(void* _) {
             Translator_translateTrameToHeader(headerTrame, &header);
 
             /* Read the Data */
-            Trame dateTrame[header.size];
+            Trame dataTrame[header.size];
 
-            returnError = socketReadMessage(dateTrame, header.size);
+            returnError = socketReadMessage(dataTrame, header.size);
             // TODO exploit the data
+
+            if (header.commande == REP_CALIBRATION_POSITIONS) {
+                TRACE("[Client] Get the calibration data%s", "\n");
+                int8_t nbCalibrationData = dataTrame[0];
+
+                setNbCalibrationPosition(nbCalibrationData);
+                setCalibrationPosition(nbCalibrationData);
+
+                pthread_mutex_lock(&clientMutex);
+                Translator_translateForRepCalibrationPosition(dataTrame, calibrationPosition, nbCalibrationPosition);
+                pthread_mutex_unlock(&clientMutex);
+
+                View_signalGetCalibrationData();
+            }
         }
     }
+
+    return NULL;
 }

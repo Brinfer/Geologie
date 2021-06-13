@@ -367,7 +367,7 @@ extern void TranslatorLOG_translateForSendMemoryAndProcessorLoad(const Processor
 }
 
 extern CalibrationPositionId TranslatorLOG_translateForSignalCalibrationPosition(const Trame* trame) {
-    return trame[SIZE_HEADER];
+    return trame[0];
 }
 
 extern void TranslatorLOG_translateForSendExperimentalTrajects(const ExperimentalTraject* experimentalTrajects, uint8_t nbTraject, Trame* dest) {

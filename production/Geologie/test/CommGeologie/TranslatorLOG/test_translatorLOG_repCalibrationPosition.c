@@ -86,23 +86,29 @@ static Trame trameExpected_A[31] = {
 /**
  * @brief Les donnees de calibration du test B.
  */
-static CalibrationPosition calibrationPosition_B[1] = {
-    {.id = 170, .position = {.X = 2779096485, .Y = 1515870810 }}
+static CalibrationPosition calibrationPosition_B[2] = {
+    {.id = 170, .position = {.X = 2779096485, .Y = 1515870810 }},
+    {.id = 1, .position = {.X = 550, .Y = 200}},
 };
 
 /**
  * @brief La trame attendue du test B.
  */
-static Trame trameExpected_B[13] = {
+static Trame trameExpected_B[22] = {
     REP_CALIBRATION_POSITIONS,  // CMD
-    0x00, 0x0A,                 // Size - 10
+    0x00, 0x13,                 // Size - 19
 
-    0x01,                       // Nb CalibrationPosition - 1
+    0x02,                       // Nb CalibrationPosition - 1
 
     // CalibrationPosition 0
     0xAA,                       // ID CalibrationPosition
     0xA5, 0xA5, 0xA5, 0xA5,     // Position X 0
     0x5A, 0x5A, 0x5A, 0x5A,     // Position Y 0
+
+    // CalibrationPosition 1
+    0x01,                       // ID CalibrationPosition
+    0x00, 0x00, 0x02, 0x26,     // Position X 0
+    0x00, 0x00, 0x00, 0xC8,     // Position Y 0
 };
 
 /**
@@ -116,9 +122,9 @@ static ParameterTestCalibrationData parameterTest[] = {
         .trameExpected = trameExpected_A
     },
     {
-        .nbCalibrationPositionInput = 1,
+        .nbCalibrationPositionInput = 2,
         .calibrationPositionInput = calibrationPosition_B,
-        .sizeTrameExpected = 13,
+        .sizeTrameExpected = 22,
         .trameExpected = trameExpected_B
     },
 };

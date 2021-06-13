@@ -47,7 +47,7 @@ typedef enum {
 
 static bool keepGoing = false;
 
-static pthread_mutex_t viewMutex = PTHREAD_MUTEX_INITIALIZER;
+static pthread_mutex_t clientMutex = PTHREAD_MUTEX_INITIALIZER;
 
 static pthread_t viewThread;
 
@@ -73,7 +73,7 @@ static void executeCommand(char command);
 
 static void performCalibrationPosition(void);
 
-static void perform(uint8_t indexCalibrationPositio);
+static void perform(uint8_t indexCalibrationPosition);
 
 static void* runView(void* _);
 
@@ -96,7 +96,7 @@ static void displayMainScreen(void);
 extern int8_t View_new(void) {
     int8_t returnError;
 
-    returnError = pthread_mutex_init(&viewMutex, NULL);
+    returnError = pthread_mutex_init(&clientMutex, NULL);
 
     if (returnError != EXIT_SUCCESS) {
         ERROR(true, "[View] Error when initialising the mutex");
@@ -112,7 +112,7 @@ extern int8_t View_new(void) {
 extern int8_t View_free(void) {
     int8_t returnError;
 
-    returnError = pthread_mutex_destroy(&viewMutex);
+    returnError = pthread_mutex_destroy(&clientMutex);
     if (returnError != EXIT_SUCCESS) {
         ERROR(true, "[View] Error when destroying the mutex");
     }
@@ -155,6 +155,10 @@ extern void View_setConnectionStatus(ConnectionState state) {
     }
 }
 
+extern void View_signalGetCalibrationData(void) {
+    setScreen(CALIBRATION);
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //                                              Fonctions static
@@ -162,33 +166,33 @@ extern void View_setConnectionStatus(ConnectionState state) {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 static void setKeepGoing(bool newValue) {
-    pthread_mutex_lock(&viewMutex);
+    pthread_mutex_lock(&clientMutex);
     keepGoing = newValue;
-    pthread_mutex_unlock(&viewMutex);
+    pthread_mutex_unlock(&clientMutex);
 }
 
 static bool getKeepGoing(void) {
     bool returnValue;
 
-    pthread_mutex_lock(&viewMutex);
+    pthread_mutex_lock(&clientMutex);
     returnValue = keepGoing;
-    pthread_mutex_unlock(&viewMutex);
+    pthread_mutex_unlock(&clientMutex);
 
     return returnValue;
 }
 
 static void setScreen(IdScreen newScreen) {
-    pthread_mutex_lock(&viewMutex);
+    pthread_mutex_lock(&clientMutex);
     currentScreen = newScreen;
-    pthread_mutex_unlock(&viewMutex);
+    pthread_mutex_unlock(&clientMutex);
 }
 
 static IdScreen getScreen(void) {
-    bool returnValue;
+    IdScreen returnValue;
 
-    pthread_mutex_lock(&viewMutex);
+    pthread_mutex_lock(&clientMutex);
     returnValue = currentScreen;
-    pthread_mutex_unlock(&viewMutex);
+    pthread_mutex_unlock(&clientMutex);
 
     return returnValue;
 }
@@ -214,7 +218,7 @@ static void modeRaw(bool modeRaw) {
 static void executeCommand(char command) {
     switch (getScreen()) {
         case CALIBRATION:
-            perform(command);
+            perform(command - 48);  // char '0' == int 48
             break;
 
         case WAIT_CALIBRATION_SIGNAL:
@@ -238,11 +242,12 @@ static void executeCommand(char command) {
 static void performCalibrationPosition(void) {
     Client_askCalibrationPosition();
 
-    setScreen(CALIBRATION);
+    setScreen(WAIT_CALIBRATION_POSITION);
 }
 
 static void perform(uint8_t indexCalibrationPosition) {
-    Client_signalCalibrationPosition(indexCalibrationPosition - 1);
+    Client_signalCalibrationPosition(indexCalibrationPosition);
+    setScreen(WAIT_CALIBRATION_SIGNAL);
 }
 
 static void displayScreen(void) {
@@ -290,14 +295,14 @@ static void displayCalibrationScreen(void) {
     LOG("%s", "\033[2J\033[;H");
 
     uint8_t nbCalibrationPosition = Client_getNbCalibrationPosition();
-    CalibrationPosition calibrationPosition[nbCalibrationPosition];
-    Client_getCalibrationPosition(calibrationPosition);
 
     for (uint8_t i = 0; i < nbCalibrationPosition; i++) {
-        LOG("%d)\tCalibrationID: %d\tPosition: X=%d ; Y=%d\n", i, calibrationPosition[i].id, calibrationPosition[i].position.X, calibrationPosition[i].position.Y);
+        CalibrationPosition calibrationPosition;
+        Client_getCalibrationPosition(i, &calibrationPosition);
+        LOG("%d)\tCalibrationID: %d\tPosition: X=%d ; Y=%d\n", i, calibrationPosition.id, calibrationPosition.position.X, calibrationPosition.position.Y);
     }
 
-    LOG("\n\nPlease select a calibration position: (1, 2, ...)%s", "\n");
+    LOG("\n\nPlease select a calibration position: (1, 2, ...)%s", "\n\n");
 }
 
 static void displayConnectionScreen(void) {
@@ -317,14 +322,14 @@ static void* runView(void* _) {
         FD_ZERO(&env);
         FD_SET(STDIN_FILENO, &env);
 
-        modeRaw(true);
+        //modeRaw(true);
 
         if (select(FD_SETSIZE, &env, NULL, NULL, &l_timeout) == -1) {
             ERROR(true, "[View] Error with select() ... Exit");
             exit(EXIT_FAILURE);
         }
 
-        modeRaw(false);
+        //modeRaw(false);
 
         if (FD_ISSET(STDIN_FILENO, &env)) {
             char charInput[2]; // Size 2 for the null character

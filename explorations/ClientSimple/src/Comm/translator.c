@@ -164,6 +164,8 @@ static void composeHeaderCalibrationData(const CalibrationData* calibrationData,
  */
 static uint16_t convertBytesToUint16_t(const Trame* bytes);
 
+static uint16_t convertBytesToUint32_t(const Trame* bytes);
+
 /**
  * @brief Convertie un uint16_t en un tableau d'octet.
  *
@@ -337,20 +339,6 @@ extern void Translator_translateForSendCurrentPosition(const Position* currentPo
     convertPositionToByte(currentPosition, dest + SIZE_HEADER + SIZE_TIMESTAMP);
 }
 
-extern void Translator_translateForRepCalibrationPosition(uint8_t nbCalibrationPositions, const CalibrationPosition* calibrationPositions, Trame* dest) {
-     /* Header */
-    composeHeader(REP_CALIBRATION_POSITIONS, nbCalibrationPositions, dest);
-
-    /* Number of calibration position */
-    dest[SIZE_HEADER] = nbCalibrationPositions;
-
-    /* calibration position */
-    for (uint8_t i = 0; i < nbCalibrationPositions; i++) {
-        dest[SIZE_HEADER + 1 + (SIZE_CALIBRATION_POSITION * i)] = calibrationPositions[i].id;
-        convertPositionToByte(&(calibrationPositions[i].position), &(dest[SIZE_HEADER + 2 + (i * SIZE_CALIBRATION_POSITION)]));
-    }
-}
-
 extern void Translator_translateForSendMemoryAndProcessorLoad(const ProcessorAndMemoryLoad* processorAndMemoryLoad, Date currentDate, Trame* dest) {
      /* Header */
     composeHeader(SEND_MEMORY_PROCESSOR_LOAD, 0, dest);
@@ -430,6 +418,26 @@ extern void Translator_translateForSendCalibrationData(const CalibrationData* ca
     }
 }
 
+extern void Translator_translateForRepCalibrationPosition(const Trame* trame, CalibrationPosition* dest, uint8_t nbCalibration) {
+    uint16_t previousIndex = 1;
+
+    for (uint8_t i = 0; i < nbCalibration; i++) {
+        Position positionTemp;
+        uint8_t idTemp = trame[previousIndex];
+        previousIndex++;
+
+        positionTemp.X = convertBytesToUint32_t(trame + previousIndex);
+        previousIndex += SIZE_POSITION / 2;
+
+        positionTemp.Y = convertBytesToUint32_t(trame + previousIndex);
+        previousIndex += SIZE_POSITION / 2;
+
+        CalibrationPosition calibrationPositionTemp = { .id = idTemp, .position = positionTemp };
+
+        dest[i] = calibrationPositionTemp;
+    }
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //                                              Fonctions static
@@ -470,6 +478,9 @@ static uint16_t convertBytesToUint16_t(const Trame* bytes) {
     return ntohs(*(uint16_t*) bytes);
 }
 
+static uint16_t convertBytesToUint32_t(const Trame* bytes) {
+    return ntohl(*(uint32_t*) bytes);
+}
 static void convertUint16_tToBytes(uint16_t value, Trame* dest) {
     uint16_t bigEndian = htons(value);
 

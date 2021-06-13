@@ -41,7 +41,7 @@ static pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
  * @brief Le mutex associe a la variable condition.
  *
  */
-static pthread_mutex_t viewMutex = PTHREAD_MUTEX_INITIALIZER;
+static pthread_mutex_t clientMutex = PTHREAD_MUTEX_INITIALIZER;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -92,7 +92,7 @@ int main(int argc, char* argv[]) {
 
     atexit(errorHandler);
 
-    pthread_cond_wait(&cond, &viewMutex);
+    pthread_cond_wait(&cond, &clientMutex);
 
     return 0;
 }
@@ -112,7 +112,7 @@ static void setUp(void) {
         ERROR(true, "[Main] Error when seting up the signal");
         returnError = -1;
     } else {
-        returnError = pthread_mutex_init(&viewMutex, NULL);
+        returnError = pthread_mutex_init(&clientMutex, NULL);
         ERROR(returnError < 0, "[Main] Error when creating the mutex");
 
         if (returnError >= 0) {
@@ -130,7 +130,7 @@ static void setUp(void) {
 static void tearDown(void) {
     int8_t returnError = EXIT_SUCCESS;
 
-    returnError = pthread_mutex_destroy(&viewMutex);
+    returnError = pthread_mutex_destroy(&clientMutex);
     ERROR(returnError < 0, "[Main] Error when destroying the mutex");
 
     returnError -= pthread_cond_destroy(&cond);

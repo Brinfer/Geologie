@@ -136,20 +136,6 @@ extern void Translator_translateForSendAllBeaconsData(uint8_t nbBeacons, const B
 extern void Translator_translateForSendCurrentPosition(const Position* currentPosition, Date currentDate, Trame* dest);
 
 /**
- * @brief Traduit les donnees de calibration en une trame. Compose aussi le header.
- *
- * Traduit @a calibrationPosition en une #Trame et place la traduction dans @a dest.
- *
- * @param nbCalibrationPositions Le nombre de position de calibration a traduire.
- * @param calibrationPosition Les position de calibration a traduire.
- * @param dest La trame de destination de la traduction.
- *
- * @warning @a dest doit etre de la bonne taille.
- * @see #Translator_getTrameSize
- */
-extern void Translator_translateForRepCalibrationPosition(uint8_t nbCalibrationPositions, const CalibrationPosition* calibrationPositions, Trame* dest);
-
-/**
  * @brief Traduit la charge processeur et memoire en une trame. Compose aussi le header.
  *
  * Traduit @a processorAndMemoryLoad en une #Trame et place la traduction dans @a dest.
@@ -213,5 +199,9 @@ extern void Translator_translateForSignalCalibrationEndPosition(Trame* dest);
  * @see #Translator_getTrameSize
  */
 extern void Translator_translateForSendCalibrationData(const CalibrationData* calibrationsData, uint8_t nbCalibrationData, Trame* dest);
+
+
+extern void Translator_translateForRepCalibrationPosition(const Trame* trame, CalibrationPosition* dest, uint8_t nbCalibration);
+
 
 #endif // TRANSLATOR__
