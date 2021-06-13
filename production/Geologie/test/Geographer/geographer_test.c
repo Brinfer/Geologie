@@ -94,7 +94,7 @@ CalibrationPosition expectedCalibrationPosition;
 CalibrationData * expectedCalibrationData;
 uint8_t expectedNbCalibration;
 
-void __wrap_transitionFct(MqMsg msg)
+void __wrap_Geographer_transitionFct(MqMsg msg)
 {
     switch (msg.event)
     {
@@ -253,15 +253,82 @@ void __wrap_transitionFct(MqMsg msg)
 
 static pthread_t thread_scenario;
 
-
-
-/*static const struct CMUnitTest tests[] =
+static void *test_geographer_startCalibrationStop_scenario(void *arg)
 {
+    // First test
+    expectedFinalState = S_IDLE;
+    myState = S_WATING_FOR_CONNECTION;
+    Geographer_signalConnectionEstablished();
+    pthread_barrier_wait(&barrier_scenario);
 
+    //Second test
+    expectedFinalState = S_WAITING_FOR_BE_PLACED;
+    myState = S_IDLE;
+    Geographer_askCalibrationPositions();
+    pthread_barrier_wait(&barrier_scenario);
+
+    //Third test
+    expectedFinalState = S_WAITING_FOR_ATTENUATION_COEFFICIENT_FROM_POSITION;
+    myState = S_WAITING_FOR_BE_PLACED;
+    CalibrationPositionId calibrationPosition = 1;
+    Geographer_validatePosition(calibrationPosition);
+    pthread_barrier_wait(&barrier_scenario);
+
+    //Fourth test
+    expectedFinalState = S_WAITING_FOR_ATTENUATION_COEFFICIENT_FROM_POSITION;
+    myState = S_WAITING_FOR_ATTENUATION_COEFFICIENT_FROM_POSITION;
+    calibrationCounter = CALIBRATION_POSITION_NUMBER - 1;
+    Geographer_signalEndUpdateAttenuation();
+    pthread_barrier_wait(&barrier_scenario);
+
+    //Fifth test
+    expectedFinalState = S_WAITING_FOR_CALCUL_AVERAGE_COEFFICIENT;
+    myState = S_WAITING_FOR_ATTENUATION_COEFFICIENT_FROM_POSITION;
+    calibrationCounter = CALIBRATION_POSITION_NUMBER;
+    Geographer_signalEndUpdateAttenuation();
+    pthread_barrier_wait(&barrier_scenario);
+
+    //Sixth test
+    expectedFinalState = S_IDLE;
+    myState = S_WAITING_FOR_CALCUL_AVERAGE_COEFFICIENT;
+    CalibrationData * data;
+    int8_t nbCalibration = 3;
+    Geographer_signalEndAverageCalcul(data, nbCalibration);
+    pthread_barrier_wait(&barrier_scenario);
+
+    //Seventh test
+    expectedFinalState = S_DEATH;
+    myState = S_IDLE;
+    Geographer_askSignalStopGeographer();
+    pthread_barrier_wait(&barrier_scenario);
+
+    return NULL;
+}
+
+static void test_geographer_startCalibrationStop(void **state)
+{
+    Geographer_new();
+    Geographer_askSignalStartGeographer();
+    // Creation & execution of the thread scenario
+
+    if (pthread_create(&thread_scenario, NULL, test_geographer_startCalibrationStop_scenario, NULL) != 0)
+    {
+        TRACE("test scenario error %s\n", "pthread_create()");
+    }
+
+    pthread_detach(thread_scenario);
+
+    // Test thread run the active object
+    run(NULL);
+}
+
+static const struct CMUnitTest tests[] =
+{
+    cmocka_unit_test(test_geographer_startCalibrationStop)
 };
 
 extern int32_t geographer_run_tests(void) {
     return cmocka_run_group_tests_name("Test of the Geographer module", tests, setUp, tearDown);
-}*/
+}
 
 

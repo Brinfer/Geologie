@@ -41,9 +41,6 @@ export GCOVR = gcovr
 #																				#
 #################################################################################
 
-# Wrap des mthodes du Stock pour bouchonage.
-#exemple LDWRAP  = -Wl,--wrap=<symbol>
-LDWRAP =
 
 # Inclusion depuis le niveau du package.
 CCFLAGS += -I$(CMOCKA)/include
