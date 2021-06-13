@@ -471,7 +471,7 @@ static int8_t socketReadMessage(Trame* destTrame, uint8_t nbToRead) {
             returnError = -1;
 
         } else if (quantityReaddean == 0) {
-            LOG("[PostmanLOG] Client is disconnect .. Disconnection all.%s", "\n");
+            LOG("[PostmanLOG] Client is disconnect ... Disconnection all.%s", "\n");
             stopAll();
             returnError = -1;
         }
@@ -682,9 +682,9 @@ static void* run(void* _) {
             }
         }
 
-        if (returnError >= 0) {
+        if (returnError >= 0 && getKeepGoing() == true) {
             if (msg.flag == SEND) {
-                if (getConnectionState() == CONNECTED && getKeepGoing() == true) {
+                if (getConnectionState() == CONNECTED) {
                     returnError = socketSendMessage(msg.trame, msg.size);
                     if (returnError < 0) {
                         LOG("[PostmanLOG] Can't read the message in the socket ... Re set up the socket%s", "\n");

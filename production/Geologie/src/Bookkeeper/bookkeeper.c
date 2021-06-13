@@ -354,7 +354,7 @@ static int8_t updateProcessorLoad(void) {
     static uint64_t previousTotalIdle;
 
     FILE* file = NULL;
-    int8_t returnError = 0;
+    int8_t returnError;
     uint64_t currentTotalUser;
     uint64_t currentTotalUserLow;
     uint64_t currentTotalSys;
@@ -364,28 +364,34 @@ static int8_t updateProcessorLoad(void) {
     file = fopen("/proc/stat", "r");
     if (file == NULL) {
         ERROR(true, "[Bookkeeper] Error when opening /proc/stat file");
+        returnError = -1;
     } else {
         returnError = fscanf(file, "cpu %lu %lu %lu %lu", &currentTotalUser, &currentTotalUserLow, &currentTotalSys, &currentTotalIdle);
-        returnError = fclose(file);
-
         if (returnError < 0) {
-            ERROR(true, "[Bookkeeper] Error when closing /proc/stat file");
+            ERROR(true, "[Bookkeeper] Error when parsing /proc/stat file");
+            fclose(file); // Don't get the error message to not overwrite the value
         } else {
-            if (currentTotalUser < previousTotalUser || currentTotalUserLow < previousTotalUserLow
-                || currentTotalSys < previousTotalSys || currentTotalIdle < previousTotalIdle) {
-                // NOTE can arrive at the start up when it's the first runMq
-                ERROR(true, "[Bookkeeper] Overflown detection ... Skip the value and continue");
+            returnError = fclose(file);
+
+            if (returnError < 0) {
+                ERROR(true, "[Bookkeeper] Error when closing /proc/stat file");
             } else {
-                currentTotal = (currentTotalUser - previousTotalUser) + (currentTotalUserLow - previousTotalUserLow)
-                    + (currentTotalSys - previousTotalSys);
+                if (currentTotalUser < previousTotalUser || currentTotalUserLow < previousTotalUserLow
+                    || currentTotalSys < previousTotalSys || currentTotalIdle < previousTotalIdle) {
+                    // NOTE can arrive at the start up when it's the first runMq
+                    ERROR(true, "[Bookkeeper] Overflown detection ... Skip the value and continue");
+                } else {
+                    currentTotal = (currentTotalUser - previousTotalUser) + (currentTotalUserLow - previousTotalUserLow)
+                        + (currentTotalSys - previousTotalSys);
 
-                setPercentProcessorLoad((currentTotal / (currentTotal + (currentTotalIdle - previousTotalIdle))) * 100);
+                    setPercentProcessorLoad((currentTotal / (currentTotal + (currentTotalIdle - previousTotalIdle))) * 100);
+                }
+
+                previousTotalUser = currentTotalUser;
+                previousTotalUserLow = currentTotalUserLow;
+                previousTotalSys = currentTotalSys;
+                previousTotalIdle = currentTotalIdle;
             }
-
-            previousTotalUser = currentTotalUser;
-            previousTotalUserLow = currentTotalUserLow;
-            previousTotalSys = currentTotalSys;
-            previousTotalIdle = currentTotalIdle;
         }
     }
 
@@ -494,7 +500,7 @@ static bool getKeepGoing(void) {
 }
 
 static void* runMq(void* _) {
-    int8_t returnError = 0;
+    int8_t returnError;
 
     while (getKeepGoing()) {
         MqMsg msg;
@@ -557,7 +563,7 @@ static void* runUpdate(void* _) {
                 setPercentProcessorLoad(-1);
             }
 
-        } else if (alreadyFailMemory >= MAX_ERROR_READING && alreadyFailProcessor >= MAX_ERROR_READING){
+        } else if (alreadyFailMemory >= MAX_ERROR_READING && alreadyFailProcessor >= MAX_ERROR_READING) {
             LOG("[Bookeeper] Error when reading the systement ressource ... Stopping the processus%s", "\n");
             break; // Not setKeepGoing to let the Mq processus to run
         }

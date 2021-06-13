@@ -57,7 +57,7 @@ static struct gpiohandle_request request;
  */
 static struct gpiohandle_data data;
 
-#ifndef NDEBUG
+#ifdef NLED
 /**
  * @brief Indique si la LED a pus etre correctement initialisee.
  *
@@ -78,12 +78,14 @@ extern int8_t Led_new(void) {
     int returnError = EXIT_SUCCESS;
     int deviceFile;
 
+#ifdef NLED
     isFunctional = true;
+#endif
 
     /*  Open device */
     deviceFile = open(LED_NAME, 0);
     if (deviceFile < 0) {
-#ifndef NDEBUG
+#ifdef NLED
         LOG("[LED] Failed to open %s, the program is still running\n", LED_NAME);
         isFunctional = false;
 #else
@@ -101,7 +103,7 @@ extern int8_t Led_new(void) {
 
         returnError = ioctl(deviceFile, GPIO_GET_LINEHANDLE_IOCTL, &request);
         if (returnError < 0) {
-#ifndef NDEBUG
+#ifdef NLED
             LOG("[LED] Failed to issue GET LINEHANDLE IOCTL, the program is still running%s", "\n");
             isFunctional = false;
 #else
@@ -111,7 +113,7 @@ extern int8_t Led_new(void) {
 
         returnError = close(deviceFile);
         if (returnError < 0) {
-#ifndef NDEBUG
+#ifdef NLED
             LOG("[LED] Failed to close GPIO character device file, the program is still running%s", "\n");
             isFunctional = false;
 #else
@@ -127,14 +129,14 @@ extern int8_t Led_new(void) {
 extern int8_t Led_ledOn(void) {
     int returnError;
 
-#ifndef NDEBUG
+#ifdef NLED
     if (isFunctional) {
 #endif
         data.values[0] = ON;
         returnError = ioctl(request.fd, GPIOHANDLE_SET_LINE_VALUES_IOCTL, &data);
         ERROR(returnError < 0, "[LED] Error when turning on the LED");
 
-#ifndef NDEBUG
+#ifdef NLED
     } else {
         LOG("[LED] Can't use the LED%s", "\n");
         returnError = EXIT_SUCCESS;
@@ -147,14 +149,14 @@ extern int8_t Led_ledOn(void) {
 extern int8_t Led_ledOff(void) {
     int returnError;
 
-#ifndef NDEBUG
+#ifdef NLED
     if (isFunctional) {
 #endif
         data.values[0] = OFF;
         returnError = ioctl(request.fd, GPIOHANDLE_SET_LINE_VALUES_IOCTL, &data);
         ERROR(returnError < 0, "[LED] Error when turning on the LED");
 
-#ifndef NDEBUG
+#ifdef NLED
     } else {
         LOG("[LED] Can't use the LED%s", "\n");
         returnError = EXIT_SUCCESS;
@@ -167,13 +169,13 @@ extern int8_t Led_ledOff(void) {
 extern int8_t Led_free(void) {
     int returnError;
 
-#ifndef NDEBUG
+#ifdef NLED
     if (isFunctional) {
 #endif
         returnError = close(request.fd);
         ERROR(returnError < 0, "[LED] Error when closing the LED");
 
-#ifndef NDEBUG
+#ifdef NLED
     } else {
         LOG("[LED] Can't use the LED%s", "\n");
         returnError = EXIT_SUCCESS;

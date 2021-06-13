@@ -76,9 +76,8 @@
                 perror(fmt);                                                \
                 errno = 0;                                                  \
             } else {                                                        \
-                fprintf(stderr, fmt);                                       \
+                fprintf(stderr, "%s\n", fmt);                               \
             }                                                               \
-            fprintf(stderr, "\n");                                          \
         }                                                                   \
     } while (0)
 #else
@@ -87,7 +86,8 @@
         if (error_condition) {                                              \
             FILE *stream = fopen(DEBUG_FILE_PATH, "a");                     \
             if (errno != 0) {                                               \
-                fprintf(stream, "%s : %s\n", fmt, strerror_r(errno));       \
+                char bufferError[128];                                      \
+                fprintf(stream, "%s : %s\n", fmt, strerror_r(errno, bufferError, 128));       \
                 errno = 0;                                                  \
             } else {                                                        \
                 fprintf(stream,"%s\n", fmt);                                \
@@ -95,37 +95,6 @@
             fclose(stream);                                                 \
         }                                                                   \
     } while (0)
-#endif
-
-/**
- * @def STOP_ON_ERROR
- *
- * @brief Arrete l'execution en cas d'erreur et fournit des informations utiles.
- * sur l'erreur.
- *
- * Cette macro est utile pour evacuer la gestion des erreurs pour les experimentations.
- *
- * @param error_condition doit etre vrai pour signifier qu'il y a une erreur, alors
- * l'execution s'arrete avec un message d'erreur, rien n'est fait si la condition est fausse.
- *
- * @warning Cette macro ne doit pas etre utilisee dans du code de production
- * ni dans aucun code pouvant arriver a un etat de production car
- * c'est un moyen de ne pas gerer les erreurs. C'est pourquoi vous obtiendrez
- * une erreur de preprocesseur si vous definissez la macro NDEBUG.
- */
-#ifndef NDEBUG
-#define STOP_ON_ERROR(error_condition)                            \
-    do {                                                          \
-        if (error_condition) {                                    \
-            fprintf(stderr, "*** Error (%s) at %s:%d\nExiting\n", \
-                    #error_condition, __FILE__, __LINE__);        \
-            fflush(stderr);                                       \
-            perror("");                                           \
-            _exit(1);                                             \
-        }                                                         \
-    } while (0)
-#else
-#define STOP_ON_ERROR(error_condition) #error "STOP_ON_ERROR must not be used in release builds"
 #endif
 
 /**
@@ -148,7 +117,8 @@
 			__func__, ##__VA_ARGS__);                              \
     } while (0)
 #else
-#define TRACE(fmt, ...)
+#define TRACE(fmt, ...)                                             \
+    ;
 #endif
 
 /**
