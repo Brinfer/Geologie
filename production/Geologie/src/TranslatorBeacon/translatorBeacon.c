@@ -88,7 +88,7 @@ extern BeaconSignal TranslatorBeacon_translateChannelToBeaconsSignal(BeaconsChan
 
 	sscanf(posY, "%d", (int32_t*) &(bs.position.Y));
 
-	bs.rssi = (int8_t) info->data[info->length];
+	bs.rssi = (int8_t) info->data[info->length - 1];
 
     return bs;
 

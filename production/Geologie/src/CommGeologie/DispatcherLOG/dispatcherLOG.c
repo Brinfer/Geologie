@@ -1,12 +1,15 @@
 /**
  * @file dispatcherLOG.c
  *
- * @version 1.0
- * @date 06/06/21
- * @author Nathan BRIENT
- * @copyright BSD 2-clauses
+ * @brief Recoit les trames sur la socket et execute des actions
  *
+ * @version 1.0
+ * @date 06-06-2021
+ * @author BRIENT Nathan
+ * @copyright Geo-Boot
+ * @license BSD 2-clauses
  */
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //                                              Define
@@ -21,12 +24,12 @@
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <stdlib.h>
-#include <unistd.h> // Macros, type Posix and co
-#include <pthread.h>
-#include <mqueue.h>
-#include <time.h>
 #include <errno.h>
+#include <mqueue.h>
+#include <pthread.h>
+#include <stdlib.h>
+#include <time.h>
+#include <unistd.h>
 
 #include "dispatcherLOG.h"
 #include <stdint.h>
@@ -58,9 +61,10 @@ static bool keepGoing = false;
  *
  */
 static pthread_mutex_t myMutex = PTHREAD_MUTEX_INITIALIZER;
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//                                              Fonctions privee
+//                                              Prototypes de fonctions
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -101,6 +105,90 @@ static void setKeepGoing(bool newValue);
  */
 static int16_t readHeader(Header* header);
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//                                              Fonctions publiques
+//
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+extern int8_t DispatcherLOG_new() {
+    int8_t returnError = EXIT_SUCCESS;
+
+    returnError = pthread_mutex_init(&myMutex, NULL);
+    ERROR(returnError < 0, "[DispatcheurLOG] Error when creating the mutex");
+
+    if (returnError < 0) {
+        setKeepGoing(false);
+    }
+
+    return returnError;
+}
+
+extern int8_t DispatcherLOG_free() {
+    int8_t returnError = EXIT_SUCCESS;
+
+    returnError = pthread_mutex_destroy(&myMutex);
+    ERROR(returnError < 0, "[DispatcheurLOG] Error when destroying the mutex");
+
+    return returnError;
+}
+
+extern int8_t DispatcherLOG_start() {
+    int8_t returnError = EXIT_FAILURE;
+    setKeepGoing(true);
+
+    returnError = pthread_create(&myThreadListen, NULL, &readMsg, NULL);
+
+    if (returnError >= 0) {
+        setKeepGoing(false);
+    } else {
+        ERROR(true, "[DispatcheurLOG] Error when creating the processus");
+        returnError = pthread_create(&myThreadListen, NULL, &readMsg, NULL);
+        ERROR(returnError < 0, "[DispatcheurLOG] Error when creating the processus ... Abondement");
+    }
+
+    return returnError;
+}
+
+extern int8_t DispatcherLOG_stop() {
+    int8_t returnError = EXIT_SUCCESS;
+    setKeepGoing(false);
+
+    returnError = pthread_join(myThreadListen, NULL);
+    if (returnError >= 0) {
+        setKeepGoing(false);
+    } else {
+        ERROR(true, "[DispatcheurLOG] Error when joining the processus");
+        returnError = pthread_join(myThreadListen, NULL);
+        ERROR(returnError < 0, "[DispatcheurLOG] Error when joining the processus ... Abondement");
+    }
+
+    return returnError;
+}
+
+extern int8_t DispatcherLOG_setConnectionState(ConnectionState connectionState) {
+    int8_t returnError = EXIT_FAILURE;
+
+    if (connectionState == CONNECTED) {
+        Geographer_signalConnectionEstablished();
+        returnError = DispatcherLOG_start();
+        ERROR(returnError < 0, "[DispatcheurLOG] Error when starting the processus");
+
+    } else {
+        Geographer_signalConnectionDown();
+        returnError = DispatcherLOG_stop();
+        ERROR(returnError < 0, "[DispatcheurLOG] Error when stopping the processus");
+    }
+
+    return returnError;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//                                              Fonctions privee
+//
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 static bool getKeepGoing(void) {
     bool returnValue;
     pthread_mutex_lock(&myMutex);
@@ -135,18 +223,15 @@ static void dispatch(Trame* trame, Header* header) {
         case SIGNAL_CALIRATION_END:
             break;
     }
-
-    free(trame);
-    free(header);
 }
 
 static int16_t readHeader(Header* header) {
-    Trame* headerTrame;
-    headerTrame = malloc(SIZE_HEADER);
+    Trame headerTrame[SIZE_HEADER];
     int16_t returnError;
+
     returnError = PostmanLOG_readMsg(headerTrame, SIZE_HEADER);//on lit la trame contenant le header
 
-    if (returnError == 0) {
+    if (returnError >= 0) {
         TranslatorLOG_translateTrameToHeader(headerTrame, header); //on traduit la trame header en header
     }
 
@@ -162,73 +247,20 @@ static void* readMsg() {
         returnError = readHeader(&header);
 
         if (returnError < 0) {
-            LOG("Error on reading communication%s", "\n");
-            DispatcherLOG_stop();
+            ERROR(true, "[DispatcheurLOG] Can't read the header ... Stop the processus");
+            setKeepGoing(false);
         } else {
-            Trame* trame;
-            trame = malloc(header.size);
+            Trame trame[header.size];
 
-            PostmanLOG_readMsg(trame, header.size);
+            returnError = PostmanLOG_readMsg(trame, header.size);
 
-            dispatch(trame, &header);
+            if (returnError < 0) {
+                ERROR(true, "[DispatcheurLOG] Can't read the message");
+                setKeepGoing(true);
+            } else {
+                dispatch(trame, &header);
+            }
         }
-    }
-
-    return 0;
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-//                                              Fonctions publiques
-//
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-extern int8_t DispatcherLOG_new() {
-    int8_t returnError = EXIT_SUCCESS;
-
-    returnError = pthread_mutex_init(&myMutex, NULL);
-    setKeepGoing(false);
-
-    return returnError;
-}
-
-extern int8_t DispatcherLOG_free() {
-    /* Nothing to do */
-    return EXIT_SUCCESS;
-}
-
-extern int8_t DispatcherLOG_start() {
-    int8_t returnError = EXIT_FAILURE;
-    setKeepGoing(true);
-
-    returnError = pthread_create(&myThreadListen, NULL, &readMsg, NULL);
-        // premier thread pour recevoir
-    if (returnError != EXIT_SUCCESS) {
-        setKeepGoing(false);
-    }
-
-    return returnError;
-}
-
-extern int8_t DispatcherLOG_stop() {
-    int8_t returnError = EXIT_SUCCESS;
-    setKeepGoing(false);
-
-    returnError = pthread_join(myThreadListen, NULL);
-
-    return returnError;
-}
-
-extern int8_t DispatcherLOG_setConnectionState(ConnectionState connectionState) {
-
-    if (connectionState == CONNECTED) {
-        Geographer_signalConnectionEstablished();
-        DispatcherLOG_start();
-
-    } else {
-        Geographer_signalConnectionDown();
-        DispatcherLOG_stop();
     }
 
     return 0;
