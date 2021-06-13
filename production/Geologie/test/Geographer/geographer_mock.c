@@ -57,8 +57,8 @@ void __wrap_ProxyLoggerMOB_setCurrentPosition(const Position * currentPosition, 
 	function_called();
 
     // Vérification du paramètre.
-	check_expected(experimentalTrajects);
-    check_expected(NbExperimentalTrajects);
+	check_expected(currentPosition);
+    check_expected(currentDate);
 }
 
 void __wrap_ProxyLoggerMOB_setProcessorAndMemoryLoad(const ProcessorAndMemoryLoad * processorAndMemoryLoad, Date currentDate){
@@ -79,12 +79,12 @@ void __wrap_ProxyGUI_setCalibrationPositions(CalibrationPosition * calibrationPo
     check_expected(size);
 }
 
-void __wrap_Scanner_ask4UpdateAttenuationCoefficientFromPosition(CalibrationPosition calibrationPositions){
+void __wrap_Scanner_ask4UpdateAttenuationCoefficientFromPosition(CalibrationPosition calibrationPosition){
 	// Vérification de l'appel de function.
 	function_called();
 
     // Vérification du paramètre.
-	check_expected(calibrationPositions);
+	//check_expected(calibrationPosition);
 }
 
 void __wrap_ProxyGUI_signalEndCalibrationPosition(){
