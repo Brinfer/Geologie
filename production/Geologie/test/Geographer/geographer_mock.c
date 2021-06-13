@@ -107,3 +107,52 @@ void __wrap_ProxyGUI_signalEndCalibration(){
 	function_called();
 }
 
+void __wrap_ProxyGUI_new(){
+	// Vérification de l'appel de function.
+	function_called();
+}
+
+void __wrap_ProxyLoggerMOB_new(){
+	// Vérification de l'appel de function.
+	function_called();
+}
+
+void __wrap_Scanner_new(){
+	// Vérification de l'appel de function.
+	function_called();
+}
+
+void __wrap_ProxyGUI_start(){
+	// Vérification de l'appel de function.
+	function_called();
+}
+
+void __wrap_ProxyLoggerMOB_start(){
+	// Vérification de l'appel de function.
+	function_called();
+}
+
+void __wrap_Scanner_ask4StartScanner(){
+	// Vérification de l'appel de function.
+	function_called();
+}
+
+void __wrap_Scanner_free(){
+	// Vérification de l'appel de function.
+	function_called();
+}
+
+void __wrap_ProxyLoggerMOB_free(){
+	// Vérification de l'appel de function.
+	function_called();
+}
+
+void __wrap_ProxyGUI_free(){
+	// Vérification de l'appel de function.
+	function_called();
+}
+
+void __wrap_Scanner_ask4AverageCalcul(){
+	// Vérification de l'appel de function.
+	function_called();
+}

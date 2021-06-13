@@ -308,7 +308,15 @@ static void *test_geographer_startCalibrationStop_scenario(void *arg)
 static void test_geographer_startCalibrationStop(void **state)
 {
     Geographer_new();
+    expect_function_call(__wrap_ProxyGUI_new);
+    expect_function_call(__wrap_ProxyLoggerMOB_new);
+    expect_function_call(__wrap_Scanner_new);
+
     Geographer_askSignalStartGeographer();
+    expect_function_call(__wrap_ProxyGUI_start);
+    expect_function_call(__wrap_ProxyLoggerMOB_start);
+    expect_function_call(__wrap_Scanner_ask4StartScanner);
+
     // Creation & execution of the thread scenario
 
     if (pthread_create(&thread_scenario, NULL, test_geographer_startCalibrationStop_scenario, NULL) != 0)
@@ -327,7 +335,7 @@ static const struct CMUnitTest tests[] =
     cmocka_unit_test(test_geographer_startCalibrationStop)
 };
 
-extern int32_t geographer_run_tests(void) {
+extern int geographer_run_tests(void) {
     return cmocka_run_group_tests_name("Test of the Geographer module", tests, setUp, tearDown);
 }
 

@@ -7,15 +7,17 @@
 #include "cmocka.h"
 
 /** Nombre de suites de tests a excuter. */
-#define NB_SUITE_TESTS (2)
+#define NB_SUITE_TESTS (3)
 
 extern int translatorLOG_run_tests(void);
 extern int translatorBeacon_run_tests(void);
+extern int geographer_run_tests(void);
 
 /** Liste des suites de tests a excuter. */
 static int (*suite_tests[])(void) = {
     translatorLOG_run_tests,
-    translatorBeacon_run_tests
+    translatorBeacon_run_tests,
+    geographer_run_tests
 };
 
 /**

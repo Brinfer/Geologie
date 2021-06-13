@@ -31,6 +31,17 @@ LDWRAP += -Wl,--wrap=Scanner_ask4UpdateAttenuationCoefficientFromPosition
 LDWRAP += -Wl,--wrap=ProxyGUI_signalEndCalibrationPosition
 LDWRAP += -Wl,--wrap=ProxyLoggerMOB_setCalibrationData
 LDWRAP += -Wl,--wrap=ProxyGUI_signalEndCalibration
+LDWRAP += -Wl,--wrap=ProxyGUI_new
+LDWRAP += -Wl,--wrap=ProxyLoggerMOB_new
+LDWRAP += -Wl,--wrap=Scanner_new
+LDWRAP += -Wl,--wrap=ProxyGUI_start
+LDWRAP += -Wl,--wrap=ProxyLoggerMOB_start
+LDWRAP += -Wl,--wrap=Scanner_ask4StartScanner
+LDWRAP += -Wl,--wrap=Scanner_free
+LDWRAP += -Wl,--wrap=ProxyLoggerMOB_free
+LDWRAP += -Wl,--wrap=ProxyGUI_free
+LDWRAP += -Wl,--wrap=Scanner_ask4AverageCalcul
+
 
 # Couverture du code
 export GCOVR = gcovr
