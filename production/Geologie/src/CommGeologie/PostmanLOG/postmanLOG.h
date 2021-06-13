@@ -55,6 +55,9 @@ extern int8_t PostmanLOG_start(void);
 /**
  * @brief Envoie un message.
  *
+ * En cas d'erreur pendant l'envoie, retente d'envoyer le message apres avoir re-initialiser
+ * le socket.
+ *
  * @param trame La trame a envoyer.
  * @param size La taille de la trame a envoyer.
  * @return int8_t -1 en cas d'erreur, 0 sinon.
@@ -65,6 +68,9 @@ extern int8_t PostmanLOG_sendMsg(Trame* trame, uint16_t size);
 
 /**
  * @brief Lie sur le socket le nombre d'octet indique.
+ *
+ * En cas d'erreur pendant la lecture, retente de lire le message apres avoir re-initialiser
+ * le socket.
  *
  * @param destTrame La trame ou ecrire le message lue.
  * @param nbToRead Le nombre d'octet a lire.

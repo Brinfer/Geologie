@@ -44,6 +44,7 @@
  * @return uint16_t La taille que la trame doit avoir pour pouvoir envoyer le message.
  *
  * @warning Pour la commande #SEND_EXPERIMENTAL_TRAJECTS, il faut utiliser #TranslatorLOG_getTrameSizeExperimentalTraject.
+ * @warning Pour la commande #SEND_CALIBRATION_DATA, il faut utiliser #TranslatorLOG_getTrameSizeCalibrationData.
  */
 extern uint16_t TranslatorLOG_getTrameSize(Commande cmd, uint8_t nbElements);
 
@@ -55,6 +56,15 @@ extern uint16_t TranslatorLOG_getTrameSize(Commande cmd, uint8_t nbElements);
  * @return uint16_t La taille que la trame doit avoir pour pouvoir envoyer le message.
  */
 extern uint16_t TranslatorLOG_getTrameSizeExperimentalTraject(const ExperimentalTraject* experimentalTrajects, uint8_t nbExperimentalTrajects);
+
+/**
+ * @brief  Donne la taille de la trame necessaire pour envoyer le message de la commande #SEND_CALIBRATION_DATA.
+ *
+ * @param calibrationsData Les donnees de calibration a envoyer.
+ * @param nbCalibrationsData Le nombre de donnee de calibration
+ * @return uint16_t La taille que la trame doit avoir pour pouvoir envoyer le message.
+ */
+extern uint16_t TranslatorLOG_getTrameSizeCalibrationData(const CalibrationData* calibrationsData, uint8_t nbCalibrationsData);
 
 /**
  * @brief Traduit la trame en un #Header.
