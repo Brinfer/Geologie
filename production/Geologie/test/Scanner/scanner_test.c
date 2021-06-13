@@ -65,17 +65,17 @@ static int tear_down(void** state) {
 // pour la configuration des mocks et des asserts
 int scanner_expected_p, scanner_mock_ret, scanner_expected_internal_value;
 
-static Action_SCANNER expectedAction;
-static Event_SCANNER expectedEvent;
-static State_SCANNER expectedState;
-static MqMsg expectedMsg;
-static BeaconData expectedBeaconsData;
-static Position expectedPosition;
-static int8_t expectedReturn;
-static AttenuationCoefficient expectedAttenuationCoefficient;
-static ProcessorAndMemoryLoad expectedCurrentProcessorAndMemoryLoad;
+Action_SCANNER expectedAction;
+Event_SCANNER expectedEvent;
+State_SCANNER expectedState;
+MqMsg expectedMsg;
+BeaconData expectedBeaconsData;
+Position expectedPosition;
+int8_t expectedReturn;
+AttenuationCoefficient expectedAttenuationCoefficient;
+ProcessorAndMemoryLoad expectedCurrentProcessorAndMemoryLoad;
 
-static int8_t returnValue;
+int8_t returnValue;
 void __wrap_ScannerTime_out() { // je fais ca pour avoir ma methode en externe et l'appeler dans mon test
     __real_ScannerTime_out();
 }
@@ -89,7 +89,7 @@ void __wrap_Scanner_transitionFct(MqMsg msg) {
         case E_TIME_OUT:
             // Vérification appel à __wrap_mod1_call.
             expect_function_call(__wrap_Receiver_ask4BeaconsSignal);
-    	    will_return(__wrap_Receiver_ask4BeaconsSignal, returnValue);
+            will_return(__wrap_Receiver_ask4BeaconsSignal, returnValue);
 
             __real_Scanner_transitionFct(msg);
 
@@ -115,6 +115,8 @@ void __wrap_Scanner_transitionFct(MqMsg msg) {
         case E_SET_PROCESSOR_AND_MEMORY:
             //test currentProcessorAndMemoryLoad
             expect_function_call(__wrap_Geographer_dateAndSendData);
+            will_return(__wrap_Geographer_dateAndSendData, returnValue);
+
             expect_function_call(__wrap_Watchdog_start);
 
             __real_Scanner_transitionFct(msg);
@@ -128,13 +130,17 @@ void __wrap_Scanner_transitionFct(MqMsg msg) {
             break;
 
         case E_STOP:
-            expect_function_call(__wrap_Receiver_free);
+            expect_function_call(__wrap_Receiver_ask4StopReceiver);
+            expect_function_call(__wrap_Bookkeeper_askStopBookkeeper);
 
             __real_Scanner_transitionFct(msg);
+            pthread_barrier_wait(&barrier_scenario);
+
             break;
         case E_ASK_UPDATE_COEF_FROM_POSITION:
             //TODO tester valeur de retour et internes
             expect_function_call(__wrap_Mathematician_getAttenuationCoefficient);
+
             expect_function_call(__wrap_Geographer_signalEndUpdateAttenuation);
 
             __real_Scanner_transitionFct(msg);
@@ -157,86 +163,6 @@ void __wrap_Scanner_transitionFct(MqMsg msg) {
     }
 }
 
-    // switch (action) {
-    //     case A_NOP:
-    //         break;
-    //     case A_STOP:
-    //         // Vérification appel à __wrap_mod1_call.
-    //         expect_function_call(__wrap_actionCaseStop);
-
-    //         __real_Scanner_transitionFct(msg);
-    //         break;
-
-    //     case A_ASK_BEACONS_SIGNAL:
-    //         // Vérification appel à __wrap_mod1_call.
-    //         expect_function_call(__wrap_perform_askBeaconsSignal);
-
-    //         // Vérification paramètre de l'appel à __wrap_mod1_call.
-    //         //expect_value(TODO, , scanner_expected_p);
-
-    //         // Définition de la valeur de retour bouchonnée.
-    //         //will_return(__wrap_mod1_call, scanner_mock_ret);
-
-    //         __real_Scanner_transitionFct(msg);
-    //         break;
-
-    //     case A_SET_CURRENT_POSITION:
-    //         // Vérification appel à __wrap_mod1_call.
-    //         expect_function_call(__wrap_perform_setCurrentPosition);
-
-    //         // Vérification paramètre de l'appel à __wrap_mod1_call.
-    //         expect_value(__wrap_perform_setCurrentPosition, msg.event, expectedEvent);
-
-    //         // Définition de la valeur de retour bouchonnée.
-    //         //will_return(__wrap_mod1_call, scanner_mock_ret);
-
-    //         __real_Scanner_transitionFct(msg);
-    //         break;
-
-    //     case A_SET_CURRENT_PROCESSOR_AND_MEMORY:
-    //         // Vérification appel à __wrap_mod1_call.
-    //         expect_function_call(__wrap_perform_setCurrentProcessorAndMemoryLoad);
-
-    //         // Vérification paramètre de l'appel à __wrap_mod1_call.
-    //         expect_value(__wrap_perform_setCurrentProcessorAndMemoryLoad, msg.event, expectedEvent);
-
-    //         // Définition de la valeur de retour bouchonnée.
-    //         //will_return(__wrap_mod1_call, scanner_mock_ret);
-
-    //         __real_Scanner_transitionFct(msg);
-    //         break;
-
-    //     case A_ASK_CALIBRATION_FROM_POSITION:
-    //         // Vérification appel à __wrap_mod1_call.
-    //         expect_function_call(__wrap_perform_askCalibrationFromPosition);
-
-    //         // Vérification paramètre de l'appel à __wrap_mod1_call.
-    //         expect_value(__wrap_perform_askCalibrationFromPosition, msg.event, expectedEvent);
-
-    //         // Définition de la valeur de retour bouchonnée.
-    //         //will_return(__wrap_mod1_call, scanner_mock_ret);
-
-    //         __real_Scanner_transitionFct(msg);
-    //         break;
-
-    //     case A_ASK_CALIBRATION_AVERAGE:
-    //         // Vérification appel à __wrap_mod1_call.
-    //         expect_function_call(__wrap_perform_askCalibrationAverage);
-
-    //         // Vérification paramètre de l'appel à __wrap_mod1_call.
-    //         expect_value(__wrap_perform_askCalibrationAverage, msg.event, expectedEvent);
-
-    //         // Définition de la valeur de retour bouchonnée.
-    //         //will_return(__wrap_mod1_call, scanner_mock_ret);
-
-    //         __real_Scanner_transitionFct(msg);
-    //         break;
-
-    //     default:
-    //         break;
-    // }
-
-
 
 /**
  * Fonctions et thread de scénario
@@ -247,35 +173,71 @@ void __wrap_Scanner_transitionFct(MqMsg msg) {
 static pthread_t pthread_scenario;
 
 static void* test_scanner_state_machine_scenario(void* arg) {
-    returnValue=0;
+    //initialisation des variables internes a scanner
+    currentProcessorAndMemoryLoad.memoryLoad = 0;
+    currentProcessorAndMemoryLoad.processorLoad = 0;
+    currentPosition.X = 34;
+    currentPosition.Y = 48;
+    nbBeaconsAvailable = 3;
+
+    BeaconSignal beaconsSignalTest[] = {
+        {.name = {'B','1','\00'},
+        .uuid = {24,26},
+        .rssi = -50,
+        .position = {.X = 0,.Y = 100}
+        },
+        {.name = {'B','2','\00'},
+        .uuid = {24,26},
+        .rssi = -97,
+        .position = {.X = 35,.Y = 22}
+        },
+        {.name = {'B','3','\00'},
+        .uuid = {24,26},
+        .rssi = -50,
+        .position = {.X = 100,.Y = 0}
+        }
+    };
+
+    returnValue = 0;
+
     myState = S_BEGINNING;
     expectedState = S_WAITING_DATA_BEACONS;
+    TRACE("ScannerTime_out %s", "\n");
 
     ScannerTime_out();
     pthread_barrier_wait(&barrier_scenario);
 
 
-    expectedState = S_COMPUTE_LOAD;
-    Scanner_setAllBeaconsSignal(NULL, 0);    //TODO, changer NULL par des parametres
+    expectedState = S_COMPUTE_POSITION;
+    TRACE("Scanner_setAllBeaconsSignal %s", "\n");
+
+    Scanner_setAllBeaconsSignal(beaconsSignalTest, nbBeaconsAvailable);    //TODO, changer NULL par des parametres
     pthread_barrier_wait(&barrier_scenario);
 
-    expectedState = S_COMPUTE_POSITION;
+    expectedState = S_COMPUTE_LOAD;
+    returnValue = 0;
+
     ProcessorAndMemoryLoad testProcessorAndMemoryLoad = { .memoryLoad = 25.1,.processorLoad = 64.5 };
+    TRACE("Scanner_setCurrentProcessorAndMemoryLoad %s", "\n");
     Scanner_setCurrentProcessorAndMemoryLoad(&testProcessorAndMemoryLoad);
     pthread_barrier_wait(&barrier_scenario);
 
     expectedState = S_WAITING_DATA_BEACONS;
+    TRACE("ScannerTime_out %s", "\n");
+
     ScannerTime_out();
     pthread_barrier_wait(&barrier_scenario);
 
+
     // arret de l'objet actif
     Scanner_ask4StopScanner();
+    pthread_barrier_wait(&barrier_scenario);
 
     return NULL;
 }
 
 static void test_scanner_state_machine(void** state) {
-    TRACE("je suis dans le début du test %s","\n");
+    TRACE("je suis dans le début du test %s", "\n");
     expect_function_call(__wrap_Watchdog_construct);
     expect_function_call(__wrap_Receiver_new);
     expect_function_call(__wrap_Bookkeeper_new);
