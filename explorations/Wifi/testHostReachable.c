@@ -53,7 +53,7 @@ static void intHandler(int p_dummy);
 
 static char s_ip[16]; // 15 => Size of 000.000.000.000 + EOF
 static int s_port;
-static struct sockaddr_in s_serverAdress;
+static struct sockaddr_in serverAdress;
 static int s_socket;
 static int s_keepGoing = 1;
 
@@ -113,9 +113,9 @@ static int setServerAdress(void) {
     if (l_hostInfo == NULL) {
         printf("%sThe host is not reachable%s\n", "\033[41m", "\033[0m");
     } else {
-        s_serverAdress.sin_port = htons(s_port);
-        s_serverAdress.sin_family = AF_INET;
-        s_serverAdress.sin_addr = *((struct in_addr*) l_hostInfo->h_addr_list[0]);
+        serverAdress.sin_port = htons(s_port);
+        serverAdress.sin_family = AF_INET;
+        serverAdress.sin_addr = *((struct in_addr*) l_hostInfo->h_addr_list[0]);
 
         l_returnValue = EXIT_SUCCESS;
     }
@@ -158,7 +158,7 @@ static int connection(void) {
     while (l_attemptCounter < MAX_CONNECTION_ATTEMPT) {
         l_attemptCounter++;
 
-        if (connect(s_socket, (struct sockaddr*) &s_serverAdress, sizeof(s_serverAdress)) < 0) {
+        if (connect(s_socket, (struct sockaddr*) &serverAdress, sizeof(serverAdress)) < 0) {
             printf("%s%s%sConnection failure, attempt %d / %d%s\n",
                 "\033[1A", "\033[K", "\033[33m", l_attemptCounter, MAX_CONNECTION_ATTEMPT, "\033[0m");
 
