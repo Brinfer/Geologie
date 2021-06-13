@@ -53,7 +53,7 @@ LDWRAP += -Wl,--wrap=Watchdog_construct
 LDWRAP += -Wl,--wrap=Watchdog_destroy
 
 
-LDWRAP = -Wl,--wrap=Geographer_transitionFct
+LDWRAP += -Wl,--wrap=Geographer_transitionFct
 LDWRAP += -Wl,--wrap=Scanner_ask4StopScanner
 LDWRAP += -Wl,--wrap=ProxyLoggerMOB_stop
 LDWRAP += -Wl,--wrap=ProxyGUI_stop

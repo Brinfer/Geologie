@@ -16,11 +16,12 @@
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include <limits.h>
-#include <setjmp.h>
+#include <string.h>
 #include <stdarg.h>
 #include <stddef.h>
-#include <string.h>
+#include <setjmp.h>
+#include <limits.h>
+#include "../../src/tools.h"
 
 #include "cmocka.h"
 
@@ -54,11 +55,11 @@ static pthread_barrier_t barrier_scenario;
  *
  * @return int32_t 0 en cas de succes ou le numero du test qui a echoue.
  */
-static int32_t geographer_run_tests();
 
 static int32_t setUp(void** state);
 
 static int32_t tearDown(void** state);
+
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -75,6 +76,8 @@ static int32_t tearDown(void **state) {
 	pthread_barrier_destroy(&barrier_scenario);
 	return 0;
 }
+
+extern int32_t geographer_run_tests();
 
 State_GEOGRAPHER expectedFinalState;
 int8_t expectedCalibrationCounter;
@@ -338,5 +341,3 @@ static const struct CMUnitTest tests[] =
 extern int geographer_run_tests(void) {
     return cmocka_run_group_tests_name("Test of the Geographer module", tests, setUp, tearDown);
 }
-
-
