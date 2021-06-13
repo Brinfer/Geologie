@@ -398,7 +398,7 @@ static void performAction(Action_GEOGRAPHER action, MqMsg* msg);
  */
 
 #ifndef _TESTING_MODE
-static void transitionFct(MqMsg msg);
+static void Geographer_transitionFct(MqMsg msg);
 #endif
 
 static int8_t sendMsg(MqMsg* msg);
@@ -444,10 +444,10 @@ static void mqReceive(MqMsg* this) {
 }
 
 #ifndef _TESTING_MODE
-static void transitionFct(MqMsg msg)
+static void Geographer_transitionFct(MqMsg msg)
 #else
-void transitionFct(MqMsg msg);
-void __real_transitionFct(MqMsg msg)
+void Geographer_transitionFct(MqMsg msg);
+void __real_Geographer_transitionFct(MqMsg msg)
 #endif
 {
     Action_GEOGRAPHER act;
@@ -473,7 +473,7 @@ static void* run() {
             TRACE("MAE, perte evenement %s  \n", Event_Geographer_getName(msg.event));
         } else
         {
-            transitionFct(msg);
+            Geographer_transitionFct(msg);
         }
         TRACE("fin boucle while %s ", "\n");
     }

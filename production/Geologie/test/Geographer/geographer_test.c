@@ -71,7 +71,7 @@ static int32_t setUp(void** state){
 	return 0; 
 }
 
-static int32_t tear_down(void **state) {
+static int32_t tearDown(void **state) {
 	pthread_barrier_destroy(&barrier_scenario);
 	return 0;
 }
@@ -105,7 +105,7 @@ void __wrap_transitionFct(MqMsg msg)
 		expect_function_call(__wrap_ProxyGUI_stop);
 
         //Is running the real function
-        __real_transitionFct(msg);
+        __real_Geographer_transitionFct(msg);
 
         //Test side effect
         assert_int_equal(expectedFinalState, myState);
@@ -127,7 +127,7 @@ void __wrap_transitionFct(MqMsg msg)
 		expect_value(__wrap_ProxyLoggerMOB_setExperimentalTrajects, experimentalTrajects, expectedExperimentalTrajects);
 		expect_value(__wrap_ProxyLoggerMOB_setExperimentalTrajects, EXP_TRAJECT_NUMBER, expectedNbExperimentalTrajects);
 
-        __real_transitionFct(msg);
+        __real_Geographer_transitionFct(msg);
 
         assert_int_equal(expectedFinalState, myState);
 		assert_int_equal(expectedConnectionState, connectionState);
@@ -137,7 +137,7 @@ void __wrap_transitionFct(MqMsg msg)
 
     case E_DATE_AND_SEND_DATA_ELSE:
 
-        __real_transitionFct(msg);
+        __real_Geographer_transitionFct(msg);
 
         assert_int_equal(expectedFinalState, myState);
 		pthread_barrier_wait(&barrier_scenario);
@@ -159,7 +159,7 @@ void __wrap_transitionFct(MqMsg msg)
 		expect_value(__wrap_ProxyLoggerMOB_setProcessorAndMemoryLoad, expectedProcessorAndMemoryLoad, expectedProcessorAndMemoryLoad);
 		expect_value(__wrap_ProxyLoggerMOB_setProcessorAndMemoryLoad, currentDate, expectedCurrentDate);
 
-        __real_transitionFct(msg);
+        __real_Geographer_transitionFct(msg);
 
         assert_int_equal(expectedFinalState, myState);
         pthread_barrier_wait(&barrier_scenario);
@@ -173,19 +173,21 @@ void __wrap_transitionFct(MqMsg msg)
 		expect_value(__wrap_ProxyGUI_setCalibrationPositions, calibrationPositions, expectedNbCalibrationPositions);
 		expect_value(__wrap_ProxyGUI_setCalibrationPositions, CALIBRATION_POSITION_NUMBER, expectedNbCalibrationPositions);
 
-		__real_transitionFct(msg);
+		__real_Geographer_transitionFct(msg);
 
         assert_int_equal(expectedFinalState, myState);
 		assert_int_equal(expectedCalibrationCounter, calibrationCounter);
+        pthread_barrier_wait(&barrier_scenario);
 
         break;
 
     case E_CONNECTION_DOWN:
 
-		__real_transitionFct(msg);
+		__real_Geographer_transitionFct(msg);
 
         assert_int_equal(expectedFinalState, myState);
 		assert_int_equal(expectedConnectionState, connectionState);		
+        pthread_barrier_wait(&barrier_scenario);
 
         break;
 
@@ -195,9 +197,10 @@ void __wrap_transitionFct(MqMsg msg)
 
 		//expect_value(__wrap_Scanner_ask4UpdateAttenuationCoefficientFromPosition, calibrationPositions[calibrationCounter], expectedCalibrationPosition);
 
-		__real_transitionFct(msg);
+		__real_Geographer_transitionFct(msg);
 
         assert_int_equal(expectedFinalState, myState);
+        pthread_barrier_wait(&barrier_scenario);
 
         break;
 
@@ -205,10 +208,11 @@ void __wrap_transitionFct(MqMsg msg)
 
 		expect_function_call(__wrap_ProxyGUI_signalEndCalibrationPosition);
 
-		__real_transitionFct(msg);
+		__real_Geographer_transitionFct(msg);
 
         assert_int_equal(expectedFinalState, myState);
 		assert_int_equal(expectedCalibrationCounter, calibrationCounter+1);
+        pthread_barrier_wait(&barrier_scenario);
 
         break;
 
@@ -220,9 +224,10 @@ void __wrap_transitionFct(MqMsg msg)
 		expect_value(__wrap_ProxyLoggerMOB_setCalibrationData, msg.calibrationData, expectedCalibrationData);
 		expect_value(__wrap_ProxyLoggerMOB_setCalibrationData, msg.nbCalibration, expectedNbCalibration);
 
-		__real_transitionFct(msg);
+		__real_Geographer_transitionFct(msg);
 
         assert_int_equal(expectedFinalState, myState);
+        pthread_barrier_wait(&barrier_scenario);
 
         break;
 
@@ -234,9 +239,10 @@ void __wrap_transitionFct(MqMsg msg)
 		expect_value(__wrap_ProxyLoggerMOB_setCalibrationData, msg.calibrationData, expectedCalibrationData);
 		expect_value(__wrap_ProxyLoggerMOB_setCalibrationData, msg.nbCalibration, expectedNbCalibration);
 
-		__real_transitionFct(msg);
+		__real_Geographer_transitionFct(msg);
 
         assert_int_equal(expectedFinalState, myState);
+        pthread_barrier_wait(&barrier_scenario);
 
         break;
 
@@ -245,8 +251,17 @@ void __wrap_transitionFct(MqMsg msg)
     }
 }
 
+static pthread_t thread_scenario;
+
+
+
+/*static const struct CMUnitTest tests[] =
+{
+
+};
+
 extern int32_t geographer_run_tests(void) {
-    return cmocka_run_group_tests_name("Test of the Geographer module", NULL, NULL, NULL);
-}
+    return cmocka_run_group_tests_name("Test of the Geographer module", tests, setUp, tearDown);
+}*/
 
 
