@@ -15,8 +15,10 @@
 #ifndef DEBUG_TOOLS_
 #define DEBUG_TOOLS_
 
-#include <unistd.h>
+#include <errno.h>
 #include <stdio.h>
+#include <string.h>
+#include <unistd.h>
 
 #define DEBUG_FILE_PATH "./debug.log"
 
@@ -47,6 +49,51 @@
         FILE *stream = fopen(DEBUG_FILE_PATH, "a");             \
         fprintf(stream, fmt, ##__VA_ARGS__);                    \
         fclose(stream);                                         \
+    } while (0)
+#endif
+
+/**
+ * @def ERROR
+ *
+ * @brief Affiche un message message si la condition passe est vrai.
+ *
+ * Dans le cas ou errno est different de 0, alors le message liee a errno est lui
+ * aussi affiche.
+ *
+ * Suite a l'affiche, errno est remis a 0.
+ *
+ * Le flux peut etre redirige vers un fichier si la macro NDEBUG
+ * est defini.
+ *
+ * @param error_condition La condition pour qu'il y est une erreur est que le message soit affiche.
+ * @param fmt chaine de charactere  formatee, voir la documentation de #printf.
+ */
+#ifndef NDEBUG
+#define ERROR(error_condition, fmt)                                         \
+    do {                                                                    \
+        if (error_condition) {                                              \
+            if (errno != 0) {                                               \
+                perror(fmt);                                                \
+                errno = 0;                                                  \
+            } else {                                                        \
+                fprintf(stderr, fmt);                                       \
+            }                                                               \
+            fprintf(stderr, "\n");                                          \
+        }                                                                   \
+    } while (0)
+#else
+#define ERROR(error_condition, fmt)                                         \
+    do {                                                                    \
+        if (error_condition) {                                              \
+            FILE *stream = fopen(DEBUG_FILE_PATH, "a");                     \
+            if (errno != 0) {                                               \
+                fprintf(stream, "%s : %s\n", fmt, strerror_r(errno));       \
+                errno = 0;                                                  \
+            } else {                                                        \
+                fprintf(stream,"%s\n", fmt);                                \
+            }                                                               \
+            fclose(stream);                                                 \
+        }                                                                   \
     } while (0)
 #endif
 

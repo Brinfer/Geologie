@@ -108,7 +108,7 @@ struct hci_request ble_hci_request(uint16_t ocf, uint8_t clen, void * status, vo
 }
 
 State_RECEIVER myState;
-static pthread_t myThread;
+static pthread_t myThreadMq;
 
 static const char BAL[] = "/BALReceiver";
 static mqd_t descripteur;
@@ -464,14 +464,14 @@ extern int8_t Receiver_ask4StartReceiver(){
                 .event = E_MAJ_BEACONS_CHANNEL
                 };
     sendMsg(&msg);
-    returnError = pthread_create(&myThread, NULL, &run, NULL);
+    returnError = pthread_create(&myThreadMq, NULL, &run, NULL);
 	assert(returnError >= 0);
 	return returnError;
 }
 
 extern int8_t Receiver_ask4StopReceiver(){
     int8_t returnError = EXIT_FAILURE;
-	returnError = pthread_join(myThread, NULL);
+	returnError = pthread_join(myThreadMq, NULL);
 	return returnError;
 }
 

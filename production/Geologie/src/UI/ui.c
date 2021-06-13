@@ -56,7 +56,7 @@ extern int8_t UI_new(void) {
     int8_t returnError = EXIT_SUCCESS;
 
     returnError = Led_new();
-    assert(returnError >= 0);
+    ERROR(returnError < 0, "[UI] Error when setting up the LED");
 
     return returnError;
 }
@@ -65,7 +65,7 @@ extern int8_t UI_askSignalBeginningGEOLOGIE(void) {
     int8_t returnError = EXIT_SUCCESS;
 
     returnError = signalBeginningGEOLOGIE();
-    assert(returnError >= 0);
+    ERROR(returnError < 0, "[UI] Error when signaling the begining");
 
     return returnError;
 }
@@ -74,7 +74,7 @@ extern int8_t UI_askSignalEndingGEOLOGIE(void) {
     int8_t returnError = EXIT_SUCCESS;
 
     returnError = signalEndingGEOLOGIE();
-    assert(returnError >= 0);
+    ERROR(returnError < 0, "[UI] Error when signaling the end");
 
     return returnError;
 }
@@ -98,7 +98,6 @@ static int8_t signalBeginningGEOLOGIE(void) {
     int8_t returnError = EXIT_SUCCESS;
 
     returnError = Led_ledOn();
-    assert(returnError >= 0);
 
     return returnError;
 }

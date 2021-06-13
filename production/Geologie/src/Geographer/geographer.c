@@ -1,12 +1,15 @@
 /**
  * @file geographer.c
  *
- * @version 1.0
- * @date 03/06/21
- * @author Nathan BRIENT
- * @copyright BSD 2-clauses
+ * @brief Est en quelque sorte le chef d'orchestre de Geologie
  *
+ * @version 1.0
+ * @date 03-06-2021
+ * @author BRIENT Nathan
+ * @copyright Geo-Boot
+ * @license BSD 2-clauses
  */
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //                                              Define
@@ -44,7 +47,7 @@
 * @brief Tableau contenant les positions experimentales
 *
 */
-static ExperimentalPosition experimentalPositions[] = {
+static ExperimentalPosition experimentalPositions[EXP_POSITION_NUMBER] = {
     {.id = 1, .position = {.X = 550, .Y = 200}},
     {.id = 2, .position = {.X = 550, .Y = 400}},
     {.id = 3, .position = {.X = 550, .Y = 480}},
@@ -75,7 +78,7 @@ static ExperimentalPosition experimentalPositions[] = {
 * @brief Tableau contenant les positions de calibration
 *
 */
-static CalibrationPosition calibrationPositions[] = {
+static CalibrationPosition calibrationPositions[CALIBRATION_POSITION_NUMBER] = {
     {.id = 1, .position = {.X = 550, .Y = 200}},
     {.id = 2, .position = {.X = 550, .Y = 400}},
     {.id = 3, .position = {.X = 550, .Y = 480}},
@@ -136,7 +139,7 @@ Position traject3[] = {
 * @brief Tableau contenant les trajets experimentaux
 *
 */
-static ExperimentalTraject experimentalTrajects[] = {
+static ExperimentalTraject experimentalTrajects[EXP_TRAJECT_NUMBER] = {
     {.id = 1, .traject = traject1, .nbPosition = 5},
     {.id = 2, .traject = traject2, .nbPosition = 2},
     {.id = 3, .traject = traject3, .nbPosition = 3}

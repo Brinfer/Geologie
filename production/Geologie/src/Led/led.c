@@ -83,8 +83,13 @@ extern int8_t Led_new(void) {
     /*  Open device */
     deviceFile = open(LED_NAME, 0);
     if (deviceFile < 0) {
-        LOG("Failed to open %s, the program is still running\n", LED_NAME);
+#ifndef NDEBUG
+        LOG("[LED] Failed to open %s, the program is still running\n", LED_NAME);
         isFunctional = false;
+#else
+        LOG("[LED] Failed to open %s\n", LED_NAME);
+        returnError = -1;
+#endif
 
     } else {
         /* request GPIO line */
@@ -97,24 +102,25 @@ extern int8_t Led_new(void) {
         returnError = ioctl(deviceFile, GPIO_GET_LINEHANDLE_IOCTL, &request);
         if (returnError < 0) {
 #ifndef NDEBUG
-            LOG("Failed to issue GET LINEHANDLE IOCTL, the program is still running%s", "\n");
+            LOG("[LED] Failed to issue GET LINEHANDLE IOCTL, the program is still running%s", "\n");
             isFunctional = false;
 #else
-            LOG("Failed to issue GET LINEHANDLE IOCTL%s", "\n");
+            LOG("[LED] Failed to issue GET LINEHANDLE IOCTL%s", "\n");
 #endif
         }
 
         returnError = close(deviceFile);
         if (returnError < 0) {
 #ifndef NDEBUG
-            LOG("Failed to close GPIO character device file, the program is still running%s", "\n");
+            LOG("[LED] Failed to close GPIO character device file, the program is still running%s", "\n");
             isFunctional = false;
 #else
-            LOG("Failed to close GPIO character device file%s", "\n");
+            LOG("[LED] Failed to close GPIO character device file%s", "\n");
 #endif
             Led_free();
         }
     }
+
     return returnError;
 }
 
@@ -126,13 +132,11 @@ extern int8_t Led_ledOn(void) {
 #endif
         data.values[0] = ON;
         returnError = ioctl(request.fd, GPIOHANDLE_SET_LINE_VALUES_IOCTL, &data);
-        if (returnError < 0) {
-            LOG("Failed to turn ON the LED%s", "\n");
-        }
+        ERROR(returnError < 0, "[LED] Error when turning on the LED");
 
 #ifndef NDEBUG
     } else {
-        LOG("Can't use the LED%s", "\n");
+        LOG("[LED] Can't use the LED%s", "\n");
         returnError = EXIT_SUCCESS;
     }
 #endif
@@ -148,13 +152,11 @@ extern int8_t Led_ledOff(void) {
 #endif
         data.values[0] = OFF;
         returnError = ioctl(request.fd, GPIOHANDLE_SET_LINE_VALUES_IOCTL, &data);
-        if (returnError < 0) {
-            LOG("Failed to turn OFF the LED%s", "\n");
-        }
+        ERROR(returnError < 0, "[LED] Error when turning on the LED");
 
 #ifndef NDEBUG
     } else {
-        LOG("Can't use the LED%s", "\n");
+        LOG("[LED] Can't use the LED%s", "\n");
         returnError = EXIT_SUCCESS;
     }
 #endif
@@ -169,13 +171,11 @@ extern int8_t Led_free(void) {
     if (isFunctional) {
 #endif
         returnError = close(request.fd);
-        if (returnError < 0) {
-            LOG("Failed to close GPIO LINEHANDLE device file%s", "\n");
-        }
+        ERROR(returnError < 0, "[LED] Error when closing the LED");
 
 #ifndef NDEBUG
     } else {
-        LOG("Can't use the LED%s", "\n");
+        LOG("[LED] Can't use the LED%s", "\n");
         returnError = EXIT_SUCCESS;
     }
 #endif

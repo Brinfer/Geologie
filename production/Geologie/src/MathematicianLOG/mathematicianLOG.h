@@ -1,6 +1,6 @@
 
 /**
- * @file mathematician.h
+ * @file mathematicianLOG.h
  *
  * @brief Module permettant d'effectuer des calculs de positions et de coefficients
  *
@@ -70,8 +70,9 @@ extern AttenuationCoefficient Mathematician_getAverageCalcul(const BeaconCoeffic
 * @brief calcule la position actuelle de la carte mere
 *
 * @param  beaconsData tableau contenant les informations des balises
-* @return la position actuelle de la carte
+* @param  nbBeacon nombre de beacons
+* @param  currentPosition position actuelle a changer
 */
-extern Position Mathematician_getCurrentPosition(const BeaconData * beaconsData,  uint8_t nbBeacon);
+extern void  Mathematician_getCurrentPosition(const BeaconData * beaconsData,  uint8_t nbBeacon, Position * currentPosition);
 
 #endif
