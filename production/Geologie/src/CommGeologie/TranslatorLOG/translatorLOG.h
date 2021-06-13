@@ -172,7 +172,7 @@ extern void TranslatorLOG_translateForSendMemoryAndProcessorLoad(const Processor
  * @param trame La trame a traduire.
  * @return CalibrationPositionId -1 en cas d'erreur, l'identifiant de la position de calibration sinon
  *
- * @warning @a trame doit contenir le #Header.
+ * @warning @a trame ne doit pas contenir le #Header.
  * @see #TranslatorLOG_getTrameSize
  */
 extern CalibrationPositionId TranslatorLOG_translateForSignalCalibrationPosition(const Trame* trame);

@@ -50,4 +50,4 @@ extern int8_t Client_askCalibrationPosition(void);
 
 extern int8_t Client_getNbCalibrationPosition(void);
 
-extern void Client_getCalibrationPosition(CalibrationPosition* dest);
+extern void Client_getCalibrationPosition(uint8_t index, CalibrationPosition* dest);
