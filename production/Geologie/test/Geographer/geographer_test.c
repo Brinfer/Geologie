@@ -333,6 +333,90 @@ static void test_geographer_startCalibrationStop(void **state)
     run(NULL);
 }
 
+static void *test_geographer_connectionDown_scenario(void *arg)
+{
+    // First test
+    expectedFinalState = S_IDLE;
+    myState = S_WATING_FOR_CONNECTION;
+    Geographer_signalConnectionEstablished();
+    pthread_barrier_wait(&barrier_scenario);
+
+    //Second test
+    expectedFinalState = S_WATING_FOR_CONNECTION;
+    myState = S_IDLE;
+    Geographer_signalConnectionDown();
+    pthread_barrier_wait(&barrier_scenario);
+
+    return NULL;
+}
+
+static void test_geographer_connectionDown(void **state)
+{
+    Geographer_new();
+    expect_function_call(__wrap_ProxyGUI_new);
+    expect_function_call(__wrap_ProxyLoggerMOB_new);
+    expect_function_call(__wrap_Scanner_new);
+
+    Geographer_askSignalStartGeographer();
+    expect_function_call(__wrap_ProxyGUI_start);
+    expect_function_call(__wrap_ProxyLoggerMOB_start);
+    expect_function_call(__wrap_Scanner_ask4StartScanner);
+
+    // Creation & execution of the thread scenario
+
+    if (pthread_create(&thread_scenario, NULL, test_geographer_connectionDown_scenario, NULL) != 0)
+    {
+        TRACE("test scenario error %s\n", "pthread_create()");
+    }
+
+    pthread_detach(thread_scenario);
+
+    // Test thread run the active object
+    run(NULL);
+}
+
+static void *test_geographer_datationAndSendingData_scenario(void *arg)
+{
+    // First test
+    expectedFinalState = S_IDLE;
+    myState = S_WATING_FOR_CONNECTION;
+    Geographer_signalConnectionEstablished();
+    pthread_barrier_wait(&barrier_scenario);
+
+    //Second test
+    expectedFinalState = S_IDLE;
+    myState = S_IDLE;
+    Geographer_dateAndSendData();
+    pthread_barrier_wait(&barrier_scenario);
+
+    return NULL;
+}
+
+static void test_geographer_datationAndSendingData(void **state)
+{
+    Geographer_new();
+    expect_function_call(__wrap_ProxyGUI_new);
+    expect_function_call(__wrap_ProxyLoggerMOB_new);
+    expect_function_call(__wrap_Scanner_new);
+
+    Geographer_askSignalStartGeographer();
+    expect_function_call(__wrap_ProxyGUI_start);
+    expect_function_call(__wrap_ProxyLoggerMOB_start);
+    expect_function_call(__wrap_Scanner_ask4StartScanner);
+
+    // Creation & execution of the thread scenario
+
+    if (pthread_create(&thread_scenario, NULL, test_geographer_datationAndSendingData_scenario, NULL) != 0)
+    {
+        TRACE("test scenario error %s\n", "pthread_create()");
+    }
+
+    pthread_detach(thread_scenario);
+
+    // Test thread run the active object
+    run(NULL);
+}
+
 static const struct CMUnitTest tests[] =
 {
     cmocka_unit_test(test_geographer_startCalibrationStop)
