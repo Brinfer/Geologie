@@ -115,13 +115,11 @@ typedef struct {
 
 /**
  * @brief Socket serveur qui ecoute les connexions sur le port #ROBOT_PORT.
- *
  */
 static int32_t myServerSocket;
 
 /**
  * @brief Socket client utilise par GEOMOBILE pour communiquer avec GEOLOGIE.
- *
  */
 static int32_t myClientSocket;
 
@@ -146,6 +144,9 @@ static pthread_mutex_t myMutex = PTHREAD_MUTEX_INITIALIZER;
  */
 static ConnectionState connectionState = DISCONNECTED;
 
+/**
+ * @brief Boolean indiquant a Bookkeeper s'il doit continuer son processus.
+ */
 static bool keepGoing = false;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

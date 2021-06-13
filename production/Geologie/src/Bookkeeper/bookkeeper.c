@@ -255,7 +255,7 @@ extern int8_t Bookkeeper_free(void) {
 
     if (returnError >= 0) {
         returnError = pthread_mutex_destroy(&myMutex);
-        ERROR(returnError < 0, "[Bookkeeper] Error when distroying the mutex");
+        ERROR(returnError < 0, "[Bookkeeper] Error when destroying the mutex");
     }
 
     ERROR(returnError < 0, "[Bookkeeper] Error during the destruction");

@@ -1,10 +1,10 @@
 /**
- * @file main.c
+ * @file mockClient.c
  *
- * @brief Fichier main du de GEOLOGIE
+ * @brief Simule un client simple.
  *
  * @version 2.0
- * @date 03-06-2021
+ * @date 13-06-2021
  * @author GAUTIER Pierre-Louis
  * @copyright Geo-Boot
  * @license BSD 2-clauses
@@ -22,7 +22,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "ManagerLOG/managerLOG.h"
+#include "Comm/client.h"
+#include "View/view.h"
 #include "tools.h"
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -77,18 +78,16 @@ static void tearDown(void);
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-/**
- * @brief Fonction main de GEOLOGIE
- *
- * @return int 0
- */
+
 int main(int argc, char* argv[]) {
-    TRACE("%s", "\033[2J\033[;H");
-    LOG(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> GEOLOGIE is launched <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<%s", "\n\n");
 
     setUp();
 
-    ManagerLOG_startGEOLOGIE();
+    Client_new();
+    Client_start();
+
+    View_new();
+    View_start();
 
     atexit(errorHandler);
 
@@ -122,7 +121,7 @@ static void setUp(void) {
     }
 
     if (returnError < 0) {
-        LOG("[Main] Error when setting up GEOLOGIE ... Exit%s", "\n");
+        LOG("[Main] Error when setting up the Client ... Exit%s", "\n");
         exit(1);
     }
 }
@@ -153,9 +152,11 @@ static void errorHandler(void) {
 
     pthread_cond_signal(&cond); // in case of the function is called by an exit
 
-    ManagerLOG_stopGEOLOGIE();
+    Client_stop();
+    Client_free();
+
+    View_stop();
+    View_free();
 
     tearDown();
-
-    LOG("\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> GEOLOGIE is stopped <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<%s", "\n\n");
 }
