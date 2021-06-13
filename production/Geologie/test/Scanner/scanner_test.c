@@ -261,7 +261,7 @@ static void* test_scanner_state_machine_scenario(void* arg) {
 
     expectedState = S_COMPUTE_POSITION;
     ProcessorAndMemoryLoad testProcessorAndMemoryLoad = { .memoryLoad = 25.1,.processorLoad = 64.5 };
-    Scanner_setCurrentProcessorAndMemoryLoad(testProcessorAndMemoryLoad);
+    Scanner_setCurrentProcessorAndMemoryLoad(&testProcessorAndMemoryLoad);
     pthread_barrier_wait(&barrier_scenario);
 
     expectedState = S_WAITING_DATA_BEACONS;
