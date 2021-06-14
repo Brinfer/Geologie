@@ -121,7 +121,7 @@ extern void Scanner_ask4StopScanner();
  * @return retourne 1 s'il y a une erreur dans l'execution de la méthode
 */
 
-extern void Scanner_ask4UpdateAttenuationCoefficientFromPosition(CalibrationPosition calibrationPosition);
+extern void Scanner_ask4UpdateAttenuationCoefficientFromPosition(const CalibrationPosition* calibrationPosition);
 
 /**
  * @fn extern int Scanner_ask4AverageCalcul()

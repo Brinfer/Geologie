@@ -191,7 +191,6 @@ typedef enum {
     SIGNAL_CALIBRATION_POSITION = 0x09,     /**< GEOMOBILE signale a GEOLOGIE qu’il est bien place a l’emplacement de calibrage. */
     SIGNAL_CALIRATION_END = 0x0A,           /**< GEOLOGIE signale a GEOMOBILE la fin du calibrage. */
     SIGNAL_CALIBRATION_END_POSITION = 0x0B, /**< GEOLOGIE signale a GEOMOBILE la fin du calibrage a la position actuelle */
-    SIGNAL_END_CALIBRATION_POSITION = 0x0C, /**< GEOLOGIE signale a GEOMOBILE la fin de la calibration a la position actuelle */
 
     NB_COMMANDE = 12,                       /**< Le nombre de commande */
 } Commande;

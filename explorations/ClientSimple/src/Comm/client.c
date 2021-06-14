@@ -434,7 +434,7 @@ static void* runClient(void* _) {
                 pthread_mutex_unlock(&clientMutex);
 
                 View_signalGetCalibrationData();
-            } else if (header.commande == SIGNAL_END_CALIBRATION_POSITION) {
+            } else if (header.commande ==  SIGNAL_CALIBRATION_END_POSITION) {
                 View_signalEndCalibrationPosition();
             } else if (header.commande == SIGNAL_CALIRATION_END) {
                 View_signalEndCalibration();
