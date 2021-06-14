@@ -81,7 +81,7 @@ static int32_t tearDown(void **state) {
 
 extern int32_t geographer_run_tests();
 
-State_GEOGRAPHER expectedFinalState;
+StateGeographer expectedFinalState;
 int8_t expectedCalibrationCounter;
 ConnectionState expectedConnectionState;
 ExperimentalPosition * expectedExperimentalPositions;
@@ -129,10 +129,10 @@ void __wrap_Geographer_transitionFct(MqMsg msg)
         expect_function_call(__wrap_ProxyLoggerMOB_setExperimentalTrajects);
 
 		expect_value(__wrap_ProxyLoggerMOB_setExperimentalPositions, experimentalPositions, expectedExperimentalPositions);
-		expect_value(__wrap_ProxyLoggerMOB_setExperimentalPositions, EXP_POSITION_NUMBER, expectedNbExperimentalPositions);
+		expect_value(__wrap_ProxyLoggerMOB_setExperimentalPositions, NB_EXPERIMENTAL_POSITION, expectedNbExperimentalPositions);
 
 		expect_value(__wrap_ProxyLoggerMOB_setExperimentalTrajects, experimentalTrajects, expectedExperimentalTrajects);
-		expect_value(__wrap_ProxyLoggerMOB_setExperimentalTrajects, EXP_TRAJECT_NUMBER, expectedNbExperimentalTrajects);
+		expect_value(__wrap_ProxyLoggerMOB_setExperimentalTrajects, NB_EXPERIMENTAL_TRAJECT, expectedNbExperimentalTrajects);
 
         __real_Geographer_transitionFct(msg);
 
@@ -142,7 +142,7 @@ void __wrap_Geographer_transitionFct(MqMsg msg)
 
         break;
 
-    case E_DATE_AND_SEND_DATA_ELSE:
+    case E_DATE_AND_SEND_DATA:
 
         __real_Geographer_transitionFct(msg);
 
@@ -221,13 +221,13 @@ void __wrap_Geographer_transitionFct(MqMsg msg)
 
         break;
 
-    case E_SIGNAL_END_UPDATE_ATTENUATION_ELSE:
+    case E_SIGNAL_END_UPDATE_ATTENUATION:
 
 		expect_function_call(__wrap_ProxyLoggerMOB_setCalibrationData);
 		expect_function_call(__wrap_ProxyGUI_signalEndCalibration);
 
 		expect_value(__wrap_ProxyLoggerMOB_setCalibrationData, msg.calibrationData, expectedCalibrationData);
-		expect_value(__wrap_ProxyLoggerMOB_setCalibrationData, msg.nbCalibration, expectedNbCalibration);
+		expect_value(__wrap_ProxyLoggerMOB_setCalibrationData, msg.nbCalibrationData, expectedNbCalibration);
 
 		__real_Geographer_transitionFct(msg);
 
@@ -242,7 +242,7 @@ void __wrap_Geographer_transitionFct(MqMsg msg)
 		expect_function_call(__wrap_ProxyGUI_signalEndCalibration);
 
 		expect_value(__wrap_ProxyLoggerMOB_setCalibrationData, msg.calibrationData, expectedCalibrationData);
-		expect_value(__wrap_ProxyLoggerMOB_setCalibrationData, msg.nbCalibration, expectedNbCalibration);
+		expect_value(__wrap_ProxyLoggerMOB_setCalibrationData, msg.nbCalibrationData, expectedNbCalibration);
 
 		__real_Geographer_transitionFct(msg);
 
@@ -280,7 +280,7 @@ static pthread_t thread_scenario;
  *  * Les quatieme et cinquieme tests vont verifier le comportement de l'objet lors des calculs des coefficent d'attenuation par position \n
  * -> L'un si il reste des positions à tester, l'autre si celles-ci ont déjà toutes été essayées
  * -> On demarre a l'etat S_WAITING_FOR_ATTENUATION_COEFFICIENT_FROM_POSITION \n
- * -> la fonction Geographer_signalEndUpdateAttenuation() intervient et engendre l'evenement E_SIGNAL_END_UPDATE_ATTENUATION_CALIBRATION ou E_SIGNAL_END_UPDATE_ATTENUATION_ELSE \n
+ * -> la fonction Geographer_signalEndUpdateAttenuation() intervient et engendre l'evenement E_SIGNAL_END_UPDATE_ATTENUATION_CALIBRATION ou E_SIGNAL_END_UPDATE_ATTENUATION \n
  * -> L'etat final est alors S_WAITING_FOR_ATTENUATION_COEFFICIENT_FROM_POSITION ou S_WAITING_FOR_CALCUL_AVERAGE_COEFFICIENT\n
  *
  * * Le sixieme test verifie le comportement a la fin du processus de calibrage
@@ -366,7 +366,7 @@ static void test_geographer_startCalibrationStop(void **state)
 
     pthread_detach(thread_scenario);
 
-    run(NULL);
+    runGeographer(NULL);
 }
 
 /**
@@ -410,7 +410,7 @@ static void test_geographer_connectionDown(void **state)
 
     pthread_detach(thread_scenario);
 
-    run(NULL);
+    runGeographer(NULL);
 }
 
 static const struct CMUnitTest tests[] =

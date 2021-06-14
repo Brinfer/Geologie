@@ -113,7 +113,7 @@ extern int8_t ProxyLoggerMOB_setCalibrationData(const CalibrationData* calibrati
     return returnError;
 }
 
-extern int8_t ProxyLoggerMOB_setAllBeaconsData(const BeaconData* beaconsData, unsigned short nbBeacons, Date currentDate) {
+extern int8_t ProxyLoggerMOB_setAllBeaconsData(const BeaconData* beaconsData, uint8_t nbBeacons, Date currentDate) {
     LOG("[ProxyLoggerMOB] Send the beacons data.%s", "\n");
 
     int8_t returnError;

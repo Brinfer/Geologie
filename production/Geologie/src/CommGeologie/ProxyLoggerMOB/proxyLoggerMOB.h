@@ -94,7 +94,7 @@ extern int8_t ProxyLoggerMOB_setCalibrationData(const CalibrationData* calibrati
  * @param currentDate La date a laquelle les donnees on ete relevee.
  * @return int8_t -1 en cas d'erreur, 0 sinon.
  */
-extern int8_t ProxyLoggerMOB_setAllBeaconsData(const BeaconData* beaconsData, unsigned short nbBeacons, Date currentDate);
+extern int8_t ProxyLoggerMOB_setAllBeaconsData(const BeaconData* beaconsData, uint8_t nbBeacons, Date currentDate);
 
 /**
  * @brief Envoie la position actuelle a LoggerMOB.
