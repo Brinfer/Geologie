@@ -115,13 +115,11 @@ typedef struct {
 
 /**
  * @brief Socket serveur qui ecoute les connexions sur le port #ROBOT_PORT.
- *
  */
 static int32_t myServerSocket;
 
 /**
  * @brief Socket client utilise par GEOMOBILE pour communiquer avec GEOLOGIE.
- *
  */
 static int32_t myClientSocket;
 
@@ -146,6 +144,9 @@ static pthread_mutex_t myMutex = PTHREAD_MUTEX_INITIALIZER;
  */
 static ConnectionState connectionState = DISCONNECTED;
 
+/**
+ * @brief Boolean indiquant a Bookkeeper s'il doit continuer son processus.
+ */
 static bool keepGoing = false;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -354,7 +355,8 @@ extern int8_t PostmanLOG_readMsg(Trame* destTrame, uint8_t nbToRead) {
 
     if (returnError < 0) {
         LOG("[PostmanLOG] Fail to read the message in the queue ... Re set up the queue%s", "\n");
-        returnError = setUpMq();
+        tearDownSocket();
+        returnError = setUpSocket();
 
         if (returnError < 0) {
             LOG("[PostmanLOG] Fail to re set up the queue ... Abandonment%s", "\n");
@@ -457,21 +459,19 @@ static int8_t tearDownSocket(void) {
 }
 
 static int8_t socketReadMessage(Trame* destTrame, uint8_t nbToRead) {
-    TRACE("%sRead a message%s", "\033[36m", "\033[0m\n");
     errno = 0;
 
-    int16_t quantityReaddean = 0;
     int16_t returnError = EXIT_SUCCESS;
 
     if (getConnectionState() == CONNECTED) {
-        quantityReaddean = recv(myClientSocket, &destTrame + quantityReaddean, nbToRead, RECV_FLAGS);
+        returnError = recv(myClientSocket, destTrame, nbToRead, RECV_FLAGS);
 
-        if (quantityReaddean < 0) {
+        if (returnError < 0) {
             ERROR(errno != ECONNRESET, "[PostmanLOG] Error when receiving the message in the socket");
             returnError = -1;
 
-        } else if (quantityReaddean == 0) {
-            LOG("[PostmanLOG] Client is disconnect .. Disconnection all.%s", "\n");
+        } else if (returnError == 0) {
+            LOG("[PostmanLOG] Client is disconnect ... Disconnection all.%s", "\n");
             stopAll();
             returnError = -1;
         }
@@ -479,7 +479,8 @@ static int8_t socketReadMessage(Trame* destTrame, uint8_t nbToRead) {
         DispatcherLOG_setConnectionState(DISCONNECTED);
     }
 
-    return returnError;
+    TRACE("%sRead a message%s", "\033[36m", "\033[0m\n");
+    return returnError >= 0 ? 0 : -1;
 }
 
 static int8_t socketSendMessage(Trame* trame, uint8_t size) {
@@ -493,12 +494,7 @@ static int8_t socketSendMessage(Trame* trame, uint8_t size) {
         quantityWritten = send(myClientSocket, trame + quantityWritten, quantityToWrite, SEND_FLAGS);
 
         if (quantityWritten < 0) {
-            if (errno == ECONNRESET) {
-                LOG("[PostmanLOG] The socket is shutdown%s", "\n");
-                returnError = 0;
-            } else {
-                ERROR(true, "[PostmanLOG] Error when sending the message");
-            }
+            ERROR(errno != ECONNRESET, "[PostmanLOG] Error when sending the message in the socket");
             returnError = -1;
         } else {
             quantityToWrite -= quantityWritten;
@@ -682,9 +678,9 @@ static void* run(void* _) {
             }
         }
 
-        if (returnError >= 0) {
+        if (returnError >= 0 && getKeepGoing() == true) {
             if (msg.flag == SEND) {
-                if (getConnectionState() == CONNECTED && getKeepGoing() == true) {
+                if (getConnectionState() == CONNECTED) {
                     returnError = socketSendMessage(msg.trame, msg.size);
                     if (returnError < 0) {
                         LOG("[PostmanLOG] Can't read the message in the socket ... Re set up the socket%s", "\n");

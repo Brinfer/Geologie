@@ -445,8 +445,6 @@ static void* run() {
     MqMsg msg;
     Action_GEOGRAPHER act;
     while (myState != S_DEATH) {
-        TRACE("début boucle while %s ", "\n");
-
         mqReceive(&msg); //Opération privée pour lire dans la BAL de Geographer
 
 
@@ -464,10 +462,7 @@ static void* run() {
             TRACE("MAE, va dans etat %s \n", State_Geographer_getName(myState));
 
         }
-        TRACE("fin boucle while %s ", "\n");
     }
-    TRACE("fin de chez fin boucle while %s ", "\n");
-
     return 0;
 }
 
@@ -476,7 +471,7 @@ static void performAction(Action_GEOGRAPHER anAction, MqMsg* msg) {
         case A_STOP:
 
             Scanner_ask4StopScanner();
-            
+
             ProxyLoggerMOB_stop();
 
             ProxyGUI_stop();

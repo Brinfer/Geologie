@@ -139,9 +139,7 @@ extern int8_t DispatcherLOG_start() {
 
     returnError = pthread_create(&myThreadListen, NULL, &readMsg, NULL);
 
-    if (returnError >= 0) {
-        setKeepGoing(false);
-    } else {
+    if (returnError < 0) {
         ERROR(true, "[DispatcheurLOG] Error when creating the processus");
         returnError = pthread_create(&myThreadListen, NULL, &readMsg, NULL);
         ERROR(returnError < 0, "[DispatcheurLOG] Error when creating the processus ... Abondement");
@@ -239,7 +237,6 @@ static int16_t readHeader(Header* header) {
 }
 
 static void* readMsg() {
-    TRACE("readMsg%s", "\n");
     while (getKeepGoing()) {
         Header header;
         int16_t returnError;
@@ -252,7 +249,9 @@ static void* readMsg() {
         } else {
             Trame trame[header.size];
 
-            returnError = PostmanLOG_readMsg(trame, header.size);
+            if (header.size > 0) {
+                returnError = PostmanLOG_readMsg(trame, header.size);
+            }
 
             if (returnError < 0) {
                 ERROR(true, "[DispatcheurLOG] Can't read the message");
@@ -263,5 +262,6 @@ static void* readMsg() {
         }
     }
 
+    TRACE("[Dispactcher] No more serving%s" "\n");
     return 0;
 }

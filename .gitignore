@@ -37,3 +37,6 @@
 
 # dossier utilise pour certain fichier template propre au projet
 !/template
+
+# Fichier log generer par les applications
+**/*.log
