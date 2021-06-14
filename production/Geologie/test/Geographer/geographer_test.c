@@ -65,7 +65,7 @@ static int32_t tearDown(void** state);
 
 static int32_t setUp(void** state){
 	pthread_barrier_init(&barrier_scenario, NULL, 2);
-	return 0; 
+	return 0;
 }
 
 static int32_t tearDown(void **state) {
@@ -116,7 +116,7 @@ void __wrap_Geographer_transitionFct(MqMsg msg)
 
         __real_Geographer_transitionFct(msg);
 
-        assert_int_equal(expectedFinalState, myState);
+        assert_int_equal(expectedFinalState, currentState);
 		assert_int_equal(expectedCalibrationCounter, calibrationCounter);
 		assert_int_equal(expectedConnectionState, connectionState);
         pthread_barrier_wait(&barrier_scenario);
@@ -136,7 +136,7 @@ void __wrap_Geographer_transitionFct(MqMsg msg)
 
         __real_Geographer_transitionFct(msg);
 
-        assert_int_equal(expectedFinalState, myState);
+        assert_int_equal(expectedFinalState, currentState);
 		assert_int_equal(expectedConnectionState, connectionState);
         pthread_barrier_wait(&barrier_scenario);
 
@@ -146,7 +146,7 @@ void __wrap_Geographer_transitionFct(MqMsg msg)
 
         __real_Geographer_transitionFct(msg);
 
-        assert_int_equal(expectedFinalState, myState);
+        assert_int_equal(expectedFinalState, currentState);
 		pthread_barrier_wait(&barrier_scenario);
         break;
 
@@ -168,7 +168,7 @@ void __wrap_Geographer_transitionFct(MqMsg msg)
 
         __real_Geographer_transitionFct(msg);
 
-        assert_int_equal(expectedFinalState, myState);
+        assert_int_equal(expectedFinalState, currentState);
         pthread_barrier_wait(&barrier_scenario);
 
         break;
@@ -182,7 +182,7 @@ void __wrap_Geographer_transitionFct(MqMsg msg)
 
 		__real_Geographer_transitionFct(msg);
 
-        assert_int_equal(expectedFinalState, myState);
+        assert_int_equal(expectedFinalState, currentState);
 		assert_int_equal(expectedCalibrationCounter, calibrationCounter);
         pthread_barrier_wait(&barrier_scenario);
 
@@ -192,8 +192,8 @@ void __wrap_Geographer_transitionFct(MqMsg msg)
 
 		__real_Geographer_transitionFct(msg);
 
-        assert_int_equal(expectedFinalState, myState);
-		assert_int_equal(expectedConnectionState, connectionState);		
+        assert_int_equal(expectedFinalState, currentState);
+		assert_int_equal(expectedConnectionState, connectionState);
         pthread_barrier_wait(&barrier_scenario);
 
         break;
@@ -204,7 +204,7 @@ void __wrap_Geographer_transitionFct(MqMsg msg)
 
 		__real_Geographer_transitionFct(msg);
 
-        assert_int_equal(expectedFinalState, myState);
+        assert_int_equal(expectedFinalState, currentState);
         pthread_barrier_wait(&barrier_scenario);
 
         break;
@@ -215,7 +215,7 @@ void __wrap_Geographer_transitionFct(MqMsg msg)
 
 		__real_Geographer_transitionFct(msg);
 
-        assert_int_equal(expectedFinalState, myState);
+        assert_int_equal(expectedFinalState, currentState);
 		assert_int_equal(expectedCalibrationCounter, calibrationCounter+1);
         pthread_barrier_wait(&barrier_scenario);
 
@@ -231,7 +231,7 @@ void __wrap_Geographer_transitionFct(MqMsg msg)
 
 		__real_Geographer_transitionFct(msg);
 
-        assert_int_equal(expectedFinalState, myState);
+        assert_int_equal(expectedFinalState, currentState);
         pthread_barrier_wait(&barrier_scenario);
 
         break;
@@ -246,7 +246,7 @@ void __wrap_Geographer_transitionFct(MqMsg msg)
 
 		__real_Geographer_transitionFct(msg);
 
-        assert_int_equal(expectedFinalState, myState);
+        assert_int_equal(expectedFinalState, currentState);
         pthread_barrier_wait(&barrier_scenario);
 
         break;
@@ -261,30 +261,30 @@ static pthread_t thread_scenario;
 /**
  * @brief StartCalibrationStop test : \n
  * Test du scénario qui consite à demarrer Geographer, effectuer le calibrage pour stopper l'objet
- * 
+ *
  * Le premier test va verifier le comportement de l'objet lors du signal de la connexion etablie avec l'android\n
  * -> On demarre a l'etat S_WATING_FOR_CONNECTION \n
  * -> la fonction Geographer_signalConnectionEstablished() intervient et engendre l'evenement E_CONNECTION_ESTABLISHED \n
  * -> L'etat final est S_IDLE \n
- * 
+ *
  *  * Le second test va verifier le comportement de l'objet lors du signal de la demande de calibrage\n
  * -> On demarre a l'etat S_IDLE \n
  * -> la fonction Geographer_askCalibrationPositions() intervient et engendre l'evenement E_ASK_CALIBRATION_POSITIONS \n
  * -> L'etat final est S_WAITING_FOR_BE_PLACED \n
- * 
+ *
  *  * Le troisieme test va verifier le comportement de l'objet lorsque le robot sera palce sur une position de calibrage \n
  * -> On demarre a l'etat S_WAITING_FOR_BE_PLACED \n
  * -> la fonction Geographer_validatePosition(CalibrationPositionId) intervient et engendre l'evenement E_VALIDATE_POSITION \n
  * -> L'etat final est S_WAITING_FOR_ATTENUATION_COEFFICIENT_FROM_POSITION \n
- * 
+ *
  *  * Les quatieme et cinquieme tests vont verifier le comportement de l'objet lors des calculs des coefficent d'attenuation par position \n
- * -> L'un si il reste des positions à tester, l'autre si celles-ci ont déjà toutes été essayées 
+ * -> L'un si il reste des positions à tester, l'autre si celles-ci ont déjà toutes été essayées
  * -> On demarre a l'etat S_WAITING_FOR_ATTENUATION_COEFFICIENT_FROM_POSITION \n
  * -> la fonction Geographer_signalEndUpdateAttenuation() intervient et engendre l'evenement E_SIGNAL_END_UPDATE_ATTENUATION_CALIBRATION ou E_SIGNAL_END_UPDATE_ATTENUATION_ELSE \n
  * -> L'etat final est alors S_WAITING_FOR_ATTENUATION_COEFFICIENT_FROM_POSITION ou S_WAITING_FOR_CALCUL_AVERAGE_COEFFICIENT\n
- * 
+ *
  * * Le sixieme test verifie le comportement a la fin du processus de calibrage
- * 
+ *
  * * Le septieme verifie la bonne extinction de l'objet Geographer
  */
 
@@ -292,40 +292,40 @@ static void *test_geographer_startCalibrationStop_scenario(void *arg)
 {
     // 1er test
     expectedFinalState = S_IDLE;
-    myState = S_WATING_FOR_CONNECTION;
+    currentState = S_WATING_FOR_CONNECTION;
     Geographer_signalConnectionEstablished();
     pthread_barrier_wait(&barrier_scenario);
 
     //2nd test
     expectedFinalState = S_WAITING_FOR_BE_PLACED;
-    myState = S_IDLE;
+    currentState = S_IDLE;
     Geographer_askCalibrationPositions();
     pthread_barrier_wait(&barrier_scenario);
 
     //3eme test
     expectedFinalState = S_WAITING_FOR_ATTENUATION_COEFFICIENT_FROM_POSITION;
-    myState = S_WAITING_FOR_BE_PLACED;
+    currentState = S_WAITING_FOR_BE_PLACED;
     CalibrationPositionId calibrationPosition = 1;
     Geographer_validatePosition(calibrationPosition);
     pthread_barrier_wait(&barrier_scenario);
 
     //4eme test
     expectedFinalState = S_WAITING_FOR_ATTENUATION_COEFFICIENT_FROM_POSITION;
-    myState = S_WAITING_FOR_ATTENUATION_COEFFICIENT_FROM_POSITION;
+    currentState = S_WAITING_FOR_ATTENUATION_COEFFICIENT_FROM_POSITION;
     calibrationCounter = CALIBRATION_POSITION_NUMBER - 1;
     Geographer_signalEndUpdateAttenuation();
     pthread_barrier_wait(&barrier_scenario);
 
     //5eme test
     expectedFinalState = S_WAITING_FOR_CALCUL_AVERAGE_COEFFICIENT;
-    myState = S_WAITING_FOR_ATTENUATION_COEFFICIENT_FROM_POSITION;
+    currentState = S_WAITING_FOR_ATTENUATION_COEFFICIENT_FROM_POSITION;
     calibrationCounter = CALIBRATION_POSITION_NUMBER;
     Geographer_signalEndUpdateAttenuation();
     pthread_barrier_wait(&barrier_scenario);
 
     //6eme test
     expectedFinalState = S_IDLE;
-    myState = S_WAITING_FOR_CALCUL_AVERAGE_COEFFICIENT;
+    currentState = S_WAITING_FOR_CALCUL_AVERAGE_COEFFICIENT;
     CalibrationData * data;
     int8_t nbCalibration = 3;
     Geographer_signalEndAverageCalcul(data, nbCalibration);
@@ -333,7 +333,7 @@ static void *test_geographer_startCalibrationStop_scenario(void *arg)
 
     //7eme test
     expectedFinalState = S_DEATH;
-    myState = S_IDLE;
+    currentState = S_IDLE;
     Geographer_askSignalStopGeographer();
     pthread_barrier_wait(&barrier_scenario);
 
@@ -378,13 +378,13 @@ static void *test_geographer_connectionDown_scenario(void *arg)
 {
     // Premier test
     expectedFinalState = S_IDLE;
-    myState = S_WATING_FOR_CONNECTION;
+    currentState = S_WATING_FOR_CONNECTION;
     Geographer_signalConnectionEstablished();
     pthread_barrier_wait(&barrier_scenario);
 
     //Second test
     expectedFinalState = S_WATING_FOR_CONNECTION;
-    myState = S_IDLE;
+    currentState = S_IDLE;
     Geographer_signalConnectionDown();
     pthread_barrier_wait(&barrier_scenario);
 
