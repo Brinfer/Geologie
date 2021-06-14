@@ -112,6 +112,7 @@ typedef enum {
     A_INCREASE_CALIBRATION_COUNTER,
     A_SIGNAL_END_CALIBRATION_POSITION,
     A_ASK_AVERAGE_CALCUL,
+    A_ASK_COMPUTE_ATTENUATION_COEFFICIENT,
     A_SET_CALIBRATION_POSITION,
 
     A_NB_ACTION,
@@ -165,7 +166,7 @@ static uint8_t calibrationCounter;
 * @brief Tableau contenant les positions experimentales
 *
 */
-static const ExperimentalPosition experimentalPositions[NB_EXPERIMENTAL_POSITION] = {
+static const ExperimentalPosition EXPERIMENTAL_POSITIONS[NB_EXPERIMENTAL_POSITION] = {
     {.id = 1, .position = {.X = 550, .Y = 200}},
     {.id = 2, .position = {.X = 550, .Y = 400}},
     {.id = 3, .position = {.X = 550, .Y = 480}},
@@ -197,7 +198,7 @@ static const ExperimentalPosition experimentalPositions[NB_EXPERIMENTAL_POSITION
 * @brief Tableau contenant les positions de calibration
 *
 */
-static const  CalibrationPosition calibrationPositions[NB_CALIBRATION_POSITION] = {
+static const  CalibrationPosition CALIBRATION_POSITION[NB_CALIBRATION_POSITION] = {
     {.id = 1, .position = {.X = 550, .Y = 200}},
     {.id = 2, .position = {.X = 550, .Y = 400}},
     {.id = 3, .position = {.X = 550, .Y = 480}},
@@ -229,7 +230,7 @@ static const  CalibrationPosition calibrationPositions[NB_CALIBRATION_POSITION] 
 * @brief Tableau contenant le premier trajet experimental
 *
 */
-static Position traject1[] = {
+static Position TRAJECT_1[] = {
     {.X = 100, .Y = 1300 },
     {.X = 1000, .Y = 1300 },
     {.X = 1000, .Y = 200 },
@@ -241,7 +242,7 @@ static Position traject1[] = {
 * @brief Tableau contenant le deuxieme trajet experimental
 *
 */
-static Position traject2[] = {
+static Position TRAJECT_2[] = {
     {.X = 50, .Y = 1300 },
     {.X = 1050, .Y = 1000 }
 };
@@ -250,7 +251,7 @@ static Position traject2[] = {
 * @brief Tableau contenant le troisieme trajet experimental
 *
 */
-static Position traject3[] = {
+static Position TRAJECT_3[] = {
     {.X = 950, .Y = 1000 },
     {.X = 350, .Y = 1200 },
     {.X = 50, .Y = 1000 }
@@ -260,10 +261,10 @@ static Position traject3[] = {
 * @brief Tableau contenant les trajets experimentaux
 *
 */
-static const ExperimentalTraject experimentalTrajects[NB_EXPERIMENTAL_TRAJECT] = {
-    {.id = 1, .traject = traject1, .nbPosition = 5},
-    {.id = 2, .traject = traject2, .nbPosition = 2},
-    {.id = 3, .traject = traject3, .nbPosition = 3}
+static const ExperimentalTraject EXPERIMENTAL_TRAJECTS[NB_EXPERIMENTAL_TRAJECT] = {
+    {.id = 1, .traject = TRAJECT_1, .nbPosition = 5},
+    {.id = 2, .traject = TRAJECT_2, .nbPosition = 2},
+    {.id = 3, .traject = TRAJECT_3, .nbPosition = 3}
 };
 
 static const TransitionGeographer stateMachine[S_NB_STATE][E_NB_EVENT] = {
@@ -275,8 +276,8 @@ static const TransitionGeographer stateMachine[S_NB_STATE][E_NB_EVENT] = {
     [S_IDLE][E_CONNECTION_DOWN] = {S_WATING_FOR_CONNECTION, A_NONE},
     [S_IDLE][E_STOP] = {S_DEATH, A_STOP},
 
-    [S_WAITING_FOR_BE_PLACED][E_VALIDATE_POSITION] = {S_WAITING_FOR_ATTENUATION_COEFFICIENT_FROM_POSITION, A_NONE},
-    [S_WAITING_FOR_BE_PLACED][E_CONNECTION_DOWN] = {S_WATING_FOR_CONNECTION, A_NONE},   
+    [S_WAITING_FOR_BE_PLACED][E_VALIDATE_POSITION] = {S_WAITING_FOR_ATTENUATION_COEFFICIENT_FROM_POSITION, A_ASK_COMPUTE_ATTENUATION_COEFFICIENT},
+    [S_WAITING_FOR_BE_PLACED][E_CONNECTION_DOWN] = {S_WATING_FOR_CONNECTION, A_NONE},
     [S_WAITING_FOR_BE_PLACED][E_STOP] = {S_DEATH, A_STOP},
 
     [S_WAITING_FOR_ATTENUATION_COEFFICIENT_FROM_POSITION][E_SIGNAL_END_UPDATE_ATTENUATION] = {S_TEST_IF_FINISH_ALL_POSITION, A_SIGNAL_END_CALIBRATION_POSITION},
@@ -355,9 +356,9 @@ static int8_t actionNone(void);
 
 static int8_t actionStop(void);
 
-static int8_t actionSendExperimentalData(void);
+static int8_t actionSendExperimentalData(const ExperimentalPosition* experimentalPositions, uint8_t nbExperimentalPosition, const ExperimentalTraject* experimentalTrajects, uint8_t nbExperimentalTraject);
 
-static int8_t actionSendAllData(const BeaconData* beaconData, uint8_t nbBeaconData, const Position* position, const ProcessorAndMemoryLoad* processorAndMemoryLoad);
+static int8_t actionSendAllData(BeaconData* beaconData, uint8_t nbBeaconData, Position* position, ProcessorAndMemoryLoad* processorAndMemoryLoad);
 
 static int8_t actionSetCalibrationPosition(const CalibrationPosition* calibrationPosition, uint8_t nbCalibrationPosition);
 
@@ -366,6 +367,8 @@ static int8_t actionIncreaseCalibrationCounter(void);
 static int8_t actionSignalEndCalibrationPosition(void);
 
 static int8_t actionAskAverageCalcul(void);
+
+static int8_t actionAskComputeAttenuationCoefficient(CalibrationPositionId calibrationPositionId);
 
 static int8_t actionSetCalibrationData(const CalibrationData* calibrationData, uint8_t nbCalibrationData);
 
@@ -620,7 +623,7 @@ static int8_t performAction(ActionGeographer action, const MqMsg* msg) {
             break;
 
         case A_SEND_EXPERIMENTAL_DATA:
-            returnError = actionSendExperimentalData();
+            returnError = actionSendExperimentalData(EXPERIMENTAL_POSITIONS, NB_EXPERIMENTAL_POSITION, EXPERIMENTAL_TRAJECTS, NB_EXPERIMENTAL_TRAJECT);
             break;
 
         case A_SEND_ALL_DATA:
@@ -644,7 +647,11 @@ static int8_t performAction(ActionGeographer action, const MqMsg* msg) {
             break;
 
         case A_SET_CALIBRATION_POSITION:
-            returnError = actionSetCalibrationPosition(calibrationPositions, NB_CALIBRATION_POSITION);
+            returnError = actionSetCalibrationPosition(CALIBRATION_POSITION, NB_CALIBRATION_POSITION);
+            break;
+
+        case A_ASK_COMPUTE_ATTENUATION_COEFFICIENT:
+            returnError = actionAskComputeAttenuationCoefficient(msg->data.calibrationPositionId);
             break;
     }
 
@@ -668,15 +675,15 @@ static int8_t actionStop() {
     return 0;
 }
 
-static int8_t actionSendExperimentalData(void) {
+static int8_t actionSendExperimentalData(const ExperimentalPosition* experimentalPositions, uint8_t nbExperimentalPosition, const ExperimentalTraject* experimentalTrajects, uint8_t nbExperimentalTraject) {
     int8_t returnErrorPosition;
     int8_t returnErrorTraject;
 
-    returnErrorPosition = ProxyLoggerMOB_setExperimentalPositions(experimentalPositions, NB_EXPERIMENTAL_POSITION);
+    returnErrorPosition = ProxyLoggerMOB_setExperimentalPositions(experimentalPositions, nbExperimentalPosition);
     if (returnErrorPosition < 0) {
         ERROR(true, "[Geographer] Fail to send the experimental positions ... Retry");
 
-        returnErrorPosition = ProxyLoggerMOB_setExperimentalPositions(experimentalPositions, NB_EXPERIMENTAL_POSITION);
+        returnErrorPosition = ProxyLoggerMOB_setExperimentalPositions(experimentalPositions, nbExperimentalPosition);
         ERROR(returnErrorPosition < 0, "[Geographer] Fail to send the experimental positions ... Abandonment");
     }
 
@@ -692,10 +699,10 @@ static int8_t actionSendExperimentalData(void) {
 
     ERROR((returnErrorTraject + returnErrorPosition) < 0, "[Geographer] Fail to send the experimental data ... Abandonment");
 
-    return (returnErrorTraject + returnErrorPosition) < 0 ? 0 : -1;
+    return (returnErrorTraject + returnErrorPosition) < 0 ? -1 : 0;
 }
 
-static int8_t actionSendAllData(const BeaconData* beaconData, uint8_t nbBeaconData, const Position* position, const ProcessorAndMemoryLoad* processorAndMemoryLoad) {
+static int8_t actionSendAllData(BeaconData* beaconData, uint8_t nbBeaconData, Position* position, ProcessorAndMemoryLoad* processorAndMemoryLoad) {
     Date currentDate = getCurrentDate();
     int8_t returnErrorBeaconData;
     int8_t returnErrorCurrentPosition;
@@ -724,6 +731,10 @@ static int8_t actionSendAllData(const BeaconData* beaconData, uint8_t nbBeaconDa
         }
     }
 
+    free(beaconData);
+    free(processorAndMemoryLoad);
+    free(position);
+
     ERROR((returnErrorBeaconData + returnErrorCurrentPosition + returnErrorLoad) < 0, "[Geographer] Fail to send a curent data ... Abandonment");
 
     return (returnErrorBeaconData + returnErrorCurrentPosition + returnErrorLoad) < 0 ? -1 : 0;
@@ -731,7 +742,6 @@ static int8_t actionSendAllData(const BeaconData* beaconData, uint8_t nbBeaconDa
 
 static int8_t actionSetCalibrationPosition(const CalibrationPosition* calibrationPosition, uint8_t nbCalibrationPosition) {
     int8_t returnErrorSetData;
-    int8_t returnErrorSignal;
 
     calibrationCounter = 0;
 
@@ -743,21 +753,13 @@ static int8_t actionSetCalibrationPosition(const CalibrationPosition* calibratio
         ERROR(returnErrorSetData < 0, "[Geographer] Fail to send the calibration data ... Abandonment");
     }
 
-    returnErrorSignal = ProxyGUI_signalEndCalibrationPosition();
-    if (returnErrorSignal < 0) {
-        ERROR(true, "[Geographer] Fail to signal the end of the calibration at the position ... Retry");
-
-        returnErrorSignal = ProxyGUI_signalEndCalibrationPosition();
-        ERROR(returnErrorSignal < 0, "[Geographer] Fail to signal the end of the calibration at the position ... Abandonment");
-    }
-
-    ERROR((returnErrorSignal + returnErrorSetData) < 0, "[Geographer] Fail to send the end the calibration at the position ... Abandonment");
-
-    return (returnErrorSignal + returnErrorSetData) < 0 ? -1 : 0;
+    return returnErrorSetData;
 }
 
 static int8_t actionIncreaseCalibrationCounter(void) {
-    calibrationCounter++;
+    calibrationCounter += 5; // TODO on release calibrationCounter++
+
+    TRACE("[Geographer] calibrate %d / %d%s", calibrationCounter, NB_CALIBRATION_POSITION, "\n");
     return 0;
 }
 
@@ -773,7 +775,7 @@ static int8_t actionSignalEndCalibrationPosition(void) {
         ERROR(returnErrorSignal < 0, "[Geographer] Fail to signal the end of the calibration at the position ... Abandonment");
     }
 
-    if (calibrationCounter >= NB_CALIBRATION_POSITION) {
+    if (calibrationCounter >= NB_CALIBRATION_POSITION - 1) {    // The increasing of the counter is made after
         returnErrorMq = signalFinishCalibrateAllPosition();
     } else {
         returnErrorMq = signalNotFinishCalibrateAllPosition();
@@ -782,7 +784,7 @@ static int8_t actionSignalEndCalibrationPosition(void) {
     if (returnErrorMq < 0) {
         ERROR(true, "[Geographer] Fail to emit the internal signal for the the next state ... Retry");
 
-        if (calibrationCounter >= NB_CALIBRATION_POSITION) {
+        if (calibrationCounter >= NB_CALIBRATION_POSITION - 1) {    // The increasing of the counter is made after
             returnErrorMq = signalFinishCalibrateAllPosition();
         } else {
             returnErrorMq = signalNotFinishCalibrateAllPosition();
@@ -819,6 +821,28 @@ static int8_t actionAskAverageCalcul(void) {
     Scanner_ask4AverageCalcul();
 
     return 0;
+}
+
+static int8_t actionAskComputeAttenuationCoefficient(CalibrationPositionId calibrationPositionId) {
+    int8_t returnError = -1;
+    CalibrationPosition calibrationPosition;
+
+    for (uint8_t i = 0; i < NB_CALIBRATION_POSITION; i++) {
+        if (CALIBRATION_POSITION[i].id == calibrationPositionId) {
+            calibrationPosition = CALIBRATION_POSITION[i];
+            returnError = 0;
+            break;
+        }
+    }
+
+    if (returnError < 0) {
+        ERROR(true, "[Geographer] Can't find a position associated to the id");
+    } else {
+        Scanner_ask4UpdateAttenuationCoefficientFromPosition(&calibrationPosition);
+    }
+
+
+    return returnError;
 }
 
 static int8_t actionSetCalibrationData(const CalibrationData* calibrationData, uint8_t nbCalibrationData) {

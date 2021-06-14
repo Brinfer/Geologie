@@ -106,26 +106,26 @@ typedef struct {
 
 static Transition_SCANNER stateMachine[NB_STATE][NB_EVENT_SCANNER] =
 {
-    [S_BEGINNING] [E_TIME_OUT] = {S_WAITING_DATA_BEACONS, A_ASK_BEACONS_SIGNAL}, 
-    [S_BEGINNING] [E_STOP] = {S_DEATH, A_STOP}, 
+    [S_BEGINNING] [E_TIME_OUT] = {S_WAITING_DATA_BEACONS, A_ASK_BEACONS_SIGNAL},
+    [S_BEGINNING] [E_STOP] = {S_DEATH, A_STOP},
 
-    [S_WAITING_DATA_BEACONS][E_SET_BEACONS_SIGNAL] = {S_COMPUTE_POSITION, A_SET_CURRENT_POSITION}, 
-    [S_WAITING_DATA_BEACONS][E_STOP] = {S_DEATH, A_STOP}, 
+    [S_WAITING_DATA_BEACONS][E_SET_BEACONS_SIGNAL] = {S_COMPUTE_POSITION, A_SET_CURRENT_POSITION},
+    [S_WAITING_DATA_BEACONS][E_STOP] = {S_DEATH, A_STOP},
     [S_WAITING_DATA_BEACONS] [E_ASK_UPDATE_COEF_FROM_POSITION] = {S_WAITING_DATA_BEACONS, A_ASK_CALIBRATION_FROM_POSITION},
     [S_WAITING_DATA_BEACONS] [E_ASK_AVERAGE_CALCUL] = {S_WAITING_DATA_BEACONS, A_ASK_CALIBRATION_AVERAGE},
 
-    [S_COMPUTE_POSITION][E_SET_PROCESSOR_AND_MEMORY] = {S_COMPUTE_LOAD, A_SET_CURRENT_PROCESSOR_AND_MEMORY}, 
-    [S_COMPUTE_POSITION][E_STOP] = {S_DEATH, A_STOP}, 
+    [S_COMPUTE_POSITION][E_SET_PROCESSOR_AND_MEMORY] = {S_COMPUTE_LOAD, A_SET_CURRENT_PROCESSOR_AND_MEMORY},
+    [S_COMPUTE_POSITION][E_STOP] = {S_DEATH, A_STOP},
     [S_COMPUTE_POSITION] [E_ASK_UPDATE_COEF_FROM_POSITION] = {S_COMPUTE_POSITION, A_ASK_CALIBRATION_FROM_POSITION},
     [S_COMPUTE_POSITION] [E_ASK_AVERAGE_CALCUL] = {S_COMPUTE_POSITION, A_ASK_CALIBRATION_AVERAGE},
 
-    [S_COMPUTE_LOAD][E_TIME_OUT] = {S_WAITING_DATA_BEACONS, A_ASK_BEACONS_SIGNAL}, 
-    [S_COMPUTE_LOAD][E_STOP] = {S_DEATH, A_STOP}, 
+    [S_COMPUTE_LOAD][E_TIME_OUT] = {S_WAITING_DATA_BEACONS, A_ASK_BEACONS_SIGNAL},
+    [S_COMPUTE_LOAD][E_STOP] = {S_DEATH, A_STOP},
     [S_COMPUTE_LOAD] [E_ASK_UPDATE_COEF_FROM_POSITION] = {S_COMPUTE_POSITION, A_ASK_CALIBRATION_FROM_POSITION_TIMER},
-    [S_COMPUTE_LOAD] [E_ASK_AVERAGE_CALCUL] = {S_COMPUTE_POSITION, A_ASK_CALIBRATION_AVERAGE_TIMER}, 
+    [S_COMPUTE_LOAD] [E_ASK_AVERAGE_CALCUL] = {S_COMPUTE_POSITION, A_ASK_CALIBRATION_AVERAGE_TIMER},
 
 };
- 
+
 typedef struct {
     Event_SCANNER event;
     BeaconSignal* beaconsSignal;
@@ -268,7 +268,7 @@ static void mqInit() {
     /* destruction de la BAL si toutefois préexistante */
 
     mq_unlink(BAL);
-    
+
 
     /* création et ouverture de la BAL */
 
@@ -488,7 +488,7 @@ static void* run() {
         if (msg.event == E_STOP) {
             perform_stop();
         }else if(msg.event>NB_EVENT_SCANNER){
-        
+
         }else{
             Scanner_transitionFct(msg);
         }
@@ -558,10 +558,10 @@ extern void Scanner_ask4StopScanner(){
 }
 
 
-extern void Scanner_ask4UpdateAttenuationCoefficientFromPosition(CalibrationPosition calibrationPosition) {
+extern void Scanner_ask4UpdateAttenuationCoefficientFromPosition(const CalibrationPosition* calibrationPosition) {
     MqMsg msg = {
                 .event = E_ASK_UPDATE_COEF_FROM_POSITION,
-                .calibrationPosition = calibrationPosition
+                .calibrationPosition = *calibrationPosition
     };
 
     sendMsg(&msg);

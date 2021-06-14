@@ -91,7 +91,7 @@ extern int8_t ProxyGUI_signalEndCalibrationPosition() {
     int8_t returnError = EXIT_FAILURE;
     Trame* trame;
 
-    u_int16_t sizeTrame = TranslatorLOG_getTrameSize(SIGNAL_END_CALIBRATION_POSITION, 0);
+    u_int16_t sizeTrame = TranslatorLOG_getTrameSize(SIGNAL_CALIBRATION_END_POSITION, 0);
 
     trame = malloc(sizeTrame);
     TranslatorLOG_translateForSignalCalibrationEndPosition(trame);

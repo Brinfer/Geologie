@@ -101,7 +101,8 @@
  */
 typedef enum {
     SEND = 0,   /**< Le message contenue doit etre envoye. */
-    STOP = 1    /**< Le message indique l'arret du processus. */
+    STOP,       /**< Le message indique l'arret du processus. */
+    WAKE_UP,    /**< Message uniquement destine a reveiller le thread bloque sur la lecture de la queue */
 } Flag;
 
 /**
@@ -200,11 +201,6 @@ static int8_t connectClient(void);
  * @return int8_t -1 en cas d'erreur, 0 sinon.
  */
 static int8_t disconnectClient(void);
-
-/**
- * @brief Arrete le processus de PostmanLOG.
- */
-static void stopAll(void);
 
 /**
  * @brief Initialise la queue #myMq.
@@ -471,8 +467,11 @@ static int8_t socketReadMessage(Trame* destTrame, uint8_t nbToRead) {
             returnError = -1;
 
         } else if (returnError == 0) {
-            LOG("[PostmanLOG] Client is disconnect ... Disconnection all.%s", "\n");
-            stopAll();
+            LOG("[PostmanLOG] Client is disconnect.%s", "\n");
+            disconnectClient();
+            MqMsg msg = { .size = 0, .trame = NULL, .flag = WAKE_UP };
+            returnError = mqSendMessage(&msg); // wake up the PostmanLOG's thread to stop him
+
             returnError = 1;
         } else {
             returnError = 0;
@@ -501,12 +500,6 @@ static int8_t socketSendMessage(Trame* trame, uint8_t size) {
         }
     }
     return returnError;
-}
-
-static void stopAll(void) {
-    disconnectClient();
-    MqMsg msg = { .size = 0, .trame = NULL, .flag = STOP };
-    mqSendMessage(&msg); // wake up the PostmanLOG's thread to stop him
 }
 
 static int8_t connectClient(void) {
@@ -642,7 +635,7 @@ static void* run(void* _) {
         MqMsg msg;
 
         if (getConnectionState() == DISCONNECTED) {
-            LOG("[PostmanLOG] Try to reconnect to the client%s", "\n");
+            LOG("[PostmanLOG] Try to connect to the client%s", "\n");
 
             returnError = connectClient();
 
@@ -702,7 +695,7 @@ static void* run(void* _) {
                 }
             } else if (msg.flag == STOP) {
                 setKeepGoing(false);
-            } else {
+            } else if (msg.flag != WAKE_UP){
                 LOG("[PostmanLOG] Unknown message in the message queue, flag's value: %d ... Ignore it.%s", msg.flag, "\n");
             }
         }
