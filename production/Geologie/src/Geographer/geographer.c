@@ -813,7 +813,7 @@ static int8_t actionSignalEndCalibrationPosition(void) {
     }
 
     ERROR((returnErrorMq + returnErrorSignal) < 0, "[Geographer] Fail to signal the end of the calibration at the position ... Abandonment");
-
+    //Scanner_ask4AverageCalcul();
     return (returnErrorMq + returnErrorSignal) < 0 ? -1 : 0;
 }
 
