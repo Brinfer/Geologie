@@ -323,7 +323,7 @@ static Transition_GEOGRAPHER stateMachine[NB_STATE_ - 1][NB_EVENT_GEOGRAPHER] =
     [S_WAITING_FOR_BE_PLACED][E_CONNECTION_DOWN] = {S_WATING_FOR_CONNECTION,A_CONNECTION_DOWN},
     [S_WAITING_FOR_BE_PLACED][E_STOP] = {S_DEATH,A_STOP},
 
-    [S_WAITING_FOR_ATTENUATION_COEFFICIENT_FROM_POSITION][E_SIGNAL_END_UPDATE_ATTENUATION_ELSE] = {S_WAITING_FOR_CALCUL_AVERAGE_COEFFICIENT,A_END_CALIBRATION},
+    [S_WAITING_FOR_ATTENUATION_COEFFICIENT_FROM_POSITION][E_SIGNAL_END_UPDATE_ATTENUATION_ELSE] = {S_WAITING_FOR_CALCUL_AVERAGE_COEFFICIENT,A_ASK_4_AVERAGE_CALCUL},
     [S_WAITING_FOR_ATTENUATION_COEFFICIENT_FROM_POSITION][E_SIGNAL_END_UPDATE_ATTENUATION_CALIBRATION] = {S_WAITING_FOR_BE_PLACED,A_CALIBRATION_COUNTER},
     [S_WAITING_FOR_ATTENUATION_COEFFICIENT_FROM_POSITION][E_CONNECTION_DOWN] = {S_WATING_FOR_CONNECTION,A_CONNECTION_DOWN},
     [S_WAITING_FOR_ATTENUATION_COEFFICIENT_FROM_POSITION][E_STOP] = {S_DEATH,A_STOP},
@@ -399,6 +399,11 @@ static void performAction(Action_GEOGRAPHER action, MqMsg* msg);
  * @param msg structure contenant les donnees a utiliser pour effectuer l'action
  * @return 1 si erreur 0 si
  */
+
+#ifndef _TESTING_MODE
+static void Geographer_transitionFct(MqMsg msg);
+#endif
+
 static int8_t sendMsg(MqMsg* msg);
 
 
@@ -441,9 +446,25 @@ static void mqReceive(MqMsg* this) {
     mq_receive(descripteur, (char*) this, sizeof(*this), NULL);
 }
 
+#ifndef _TESTING_MODE
+static void Geographer_transitionFct(MqMsg msg)
+#else
+void Geographer_transitionFct(MqMsg msg);
+void __real_Geographer_transitionFct(MqMsg msg)
+#endif
+{
+    Action_GEOGRAPHER act;
+    TRACE("MAE, traitement evenement %s \n", Event_Geographer_getName(msg.event));
+
+    act = stateMachine[myState][msg.event].action;
+    TRACE("MAE, traitement action %s \n", Action_Geographer_getName(act));
+    performAction(act, &msg);
+    myState = stateMachine[myState][msg.event].destinationState;
+    TRACE("MAE, va dans etat %s \n", State_Geographer_getName(myState));
+}
+
 static void* run() {
     MqMsg msg;
-    Action_GEOGRAPHER act;
     while (myState != S_DEATH) {
         mqReceive(&msg); //Opération privée pour lire dans la BAL de Geographer
 
@@ -453,81 +474,111 @@ static void* run() {
             TRACE("MAE, perte evenement %s  \n", Event_Geographer_getName(msg.event));
         } else
         {
-            TRACE("MAE, traitement evenement %s \n", Event_Geographer_getName(msg.event));
-
-            act = stateMachine[myState][msg.event].action;
-            TRACE("MAE, traitement action %s \n", Action_Geographer_getName(act));
-            performAction(act, &msg);
-            myState = stateMachine[myState][msg.event].destinationState;
-            TRACE("MAE, va dans etat %s \n", State_Geographer_getName(myState));
-
+            Geographer_transitionFct(msg);
         }
     }
     return 0;
 }
 
+//Commenter les actionAction
+
+static void actionStop(){
+    Scanner_ask4StopScanner();
+    ProxyLoggerMOB_stop();
+    ProxyGUI_stop();
+
+    calibrationCounter = 0;
+    connectionState = DISCONNECTED;
+    TRACE("debut arret thread geographer %s ", "\n");
+    pthread_join(threadGeographer, NULL);
+    TRACE("fin arret thread geographer %s ", "\n");
+}
+
+static void actionNop(){
+    //do nothing
+}
+
+static void actionConnectionEstablished(){
+    connectionState = CONNECTED;
+    ProxyLoggerMOB_setExperimentalPositions(experimentalPositions, EXP_POSITION_NUMBER);
+    ProxyLoggerMOB_setExperimentalTrajects(experimentalTrajects, EXP_TRAJECT_NUMBER);
+}
+
+static void actionConnectionDown(){
+    connectionState = DISCONNECTED;
+}
+
+static void actionSetAllData(MqMsg * msg){
+    currentDate = getCurrentDate();
+    ProxyLoggerMOB_setAllBeaconsData(msg->beaconsData, msg->beaconsDataSize, currentDate);
+    ProxyLoggerMOB_setCurrentPosition(msg->currentPosition, currentDate);
+    ProxyLoggerMOB_setProcessorAndMemoryLoad(msg->currentProcessorAndMemoryLoad, currentDate);
+}
+
+static void actionSetCalibrationPositions(){
+    calibrationCounter = 0;
+    ProxyGUI_setCalibrationPositions(calibrationPositions, CALIBRATION_POSITION_NUMBER);
+}
+
+static void actionAsk4UpdateAttenuationCoefficient(){
+    Scanner_ask4UpdateAttenuationCoefficientFromPosition(calibrationPositions[calibrationCounter]);
+}
+
+static void actionEndCalibration(MqMsg * msg){
+    ProxyLoggerMOB_setCalibrationData(msg->calibrationData, msg->nbCalibration);
+    ProxyGUI_signalEndCalibration();
+}
+
+static void actionCalibrationCounter(){
+    ProxyGUI_signalEndCalibrationPosition();
+    calibrationCounter++;
+}
+
+static void actionAsk4AverageCalcul(){
+    ProxyGUI_signalEndCalibrationPosition();
+    Scanner_ask4AverageCalcul();
+}
+
 static void performAction(Action_GEOGRAPHER anAction, MqMsg* msg) {
     switch (anAction) {
         case A_STOP:
-
-            Scanner_ask4StopScanner();
-
-            ProxyLoggerMOB_stop();
-
-            ProxyGUI_stop();
-
-
-            calibrationCounter = 0;
-            connectionState = DISCONNECTED;
-            TRACE("debut arret thread geographer %s ", "\n");
-            pthread_join(threadGeographer, NULL);
-            TRACE("fin arret thread geographer %s ", "\n");
+            actionStop();
             break;
 
         case A_NOP:
+            actionNop();
             break;
 
         case A_CONNECTION_ESTABLISHED:
-            connectionState = CONNECTED;
-            ProxyLoggerMOB_setExperimentalPositions(experimentalPositions, EXP_POSITION_NUMBER);
-            ProxyLoggerMOB_setExperimentalTrajects(experimentalTrajects, EXP_TRAJECT_NUMBER);
+            actionConnectionEstablished();
             break;
 
         case A_CONNECTION_DOWN:
-            connectionState = DISCONNECTED;
+            actionConnectionDown();
             break;
 
         case A_SET_ALL_DATA:
-            currentDate = getCurrentDate();
-            ProxyLoggerMOB_setAllBeaconsData(msg->beaconsData, msg->beaconsDataSize, currentDate);
-            ProxyLoggerMOB_setCurrentPosition(msg->currentPosition, currentDate);
-            ProxyLoggerMOB_setProcessorAndMemoryLoad(msg->currentProcessorAndMemoryLoad, currentDate);
+            actionSetAllData(msg);
             break;
 
         case A_SET_CALIBRATION_POSITIONS:
-            calibrationCounter = 0;
-            ProxyGUI_setCalibrationPositions(calibrationPositions, CALIBRATION_POSITION_NUMBER);
+            actionSetCalibrationPositions();
             break;
 
         case A_ASK_4_UPDATE_ATTENUATION_COEFFICIENT:
-            Scanner_ask4UpdateAttenuationCoefficientFromPosition(calibrationPositions[calibrationCounter]);
+            actionAsk4UpdateAttenuationCoefficient();
             break;
 
-
-
         case A_END_CALIBRATION:
-            ProxyLoggerMOB_setCalibrationData(msg->calibrationData, msg->nbCalibration);
-            ProxyGUI_signalEndCalibration();
+            actionEndCalibration(msg);
             break;
 
         case A_CALIBRATION_COUNTER:
-            ProxyGUI_signalEndCalibrationPosition();
-            calibrationCounter++;
+            actionCalibrationCounter();
             break;
 
         case A_ASK_4_AVERAGE_CALCUL:
-            ProxyGUI_signalEndCalibrationPosition();
-            Scanner_ask4AverageCalcul();
+            actionAsk4AverageCalcul();
             break;
 
         default:
