@@ -16,6 +16,8 @@ PACKAGES = Geographer ManagerLOG UI CommGeologie Led TranslatorBeacon Scanner
 # Framework de test CMocka.
 CMOCKA = $(realpath ../../../../cmocka-1.1.5_x86_64/)
 
+
+
 # Couverture du code
 export GCOVR = gcovr
 
@@ -49,6 +51,32 @@ LDWRAP += -Wl,--wrap=Watchdog_start
 LDWRAP += -Wl,--wrap=Geographer_signalEndAverageCalcul
 LDWRAP += -Wl,--wrap=Watchdog_construct
 LDWRAP += -Wl,--wrap=Watchdog_destroy
+
+
+LDWRAP += -Wl,--wrap=Geographer_transitionFct
+LDWRAP += -Wl,--wrap=Scanner_ask4StopScanner
+LDWRAP += -Wl,--wrap=ProxyLoggerMOB_stop
+LDWRAP += -Wl,--wrap=ProxyGUI_stop
+LDWRAP += -Wl,--wrap=ProxyLoggerMOB_setExperimentalPositions
+LDWRAP += -Wl,--wrap=ProxyLoggerMOB_setExperimentalTrajects
+LDWRAP += -Wl,--wrap=ProxyLoggerMOB_setAllBeaconsData
+LDWRAP += -Wl,--wrap=ProxyLoggerMOB_setCurrentPosition
+LDWRAP += -Wl,--wrap=ProxyLoggerMOB_setProcessorAndMemoryLoad
+LDWRAP += -Wl,--wrap=ProxyGUI_setCalibrationPositions
+LDWRAP += -Wl,--wrap=Scanner_ask4UpdateAttenuationCoefficientFromPosition
+LDWRAP += -Wl,--wrap=ProxyGUI_signalEndCalibrationPosition
+LDWRAP += -Wl,--wrap=ProxyLoggerMOB_setCalibrationData
+LDWRAP += -Wl,--wrap=ProxyGUI_signalEndCalibration
+LDWRAP += -Wl,--wrap=ProxyGUI_new
+LDWRAP += -Wl,--wrap=ProxyLoggerMOB_new
+LDWRAP += -Wl,--wrap=Scanner_new
+LDWRAP += -Wl,--wrap=ProxyGUI_start
+LDWRAP += -Wl,--wrap=ProxyLoggerMOB_start
+LDWRAP += -Wl,--wrap=Scanner_ask4StartScanner
+LDWRAP += -Wl,--wrap=Scanner_free
+LDWRAP += -Wl,--wrap=ProxyLoggerMOB_free
+LDWRAP += -Wl,--wrap=ProxyGUI_free
+LDWRAP += -Wl,--wrap=Scanner_ask4AverageCalcul
 
 CCFLAGS += -D_TESTING_MODE
 # Inclusion depuis le niveau du package.
