@@ -56,12 +56,13 @@
 static BeaconData* beaconsData;
 static Position currentPosition;
 static ProcessorAndMemoryLoad currentProcessorAndMemoryLoad;
-static BeaconCoefficients* beaconsCoefficient;
+static BeaconCoefficients* beaconsCoefficients;
 static BeaconSignal* beaconsSignal;
 static CalibrationData* calibrationData;
 static uint32_t beaconsIds[NB_BEACONS_MAX];
 static uint32_t nbBeaconsCoefficients;
 static uint32_t nbBeaconsAvailable;
+static uint32_t beaconsCoefficientsindex;
 
 typedef enum {
     S_FORGET,
@@ -189,12 +190,12 @@ static void mqReceive(MqMsg* this);
 static void translateBeaconsSignalToBeaconsData(BeaconSignal* beaconsSignal, BeaconData* dest);
 
 /**
- * @fn static void sortBeaconsCoefficientId(BeaconCoefficients * beaconsCoefficient)
+ * @fn static void sortBeaconsCoefficientId(BeaconCoefficients * beaconsCoefficients)
  * @brief recupère l'ensemble des identifiants des balises scannees
  *
- * @param beaconsCoefficient pointeur vers un tableau de beaconCoefficient a partir duquel seront extraits les identifiants
+ * @param beaconsCoefficients pointeur vers un tableau de beaconCoefficient a partir duquel seront extraits les identifiants
 */
-static void sortBeaconsCoefficientId(BeaconCoefficients* beaconsCoefficient);
+static void sortBeaconsCoefficientId(BeaconCoefficients* beaconsCoefficients);
 
 /**
  * @fn static void perform_setCurrentPosition(MqMsg * msg)
@@ -309,24 +310,24 @@ static void translateBeaconsSignalToBeaconsData(BeaconSignal* beaconsSignal, Bea
     }
 }
 
-static void sortBeaconsCoefficientId(BeaconCoefficients* beaconsCoefficient) {
+static void sortBeaconsCoefficientId(BeaconCoefficients* beaconsCoefficients) {
     uint32_t index_beaconCoef;
     uint32_t index_beaconsIds = 0;
     uint32_t j;
     bool idFind;
     for (index_beaconCoef = 0; index_beaconCoef < nbBeaconsCoefficients; index_beaconCoef++) {
         if (index_beaconCoef == 0) {
-            beaconsIds[index_beaconsIds] = beaconsCoefficient[index_beaconCoef].beaconId[2];
+            beaconsIds[index_beaconsIds] = beaconsCoefficients[index_beaconCoef].beaconId[2];
             index_beaconsIds++;
         } else {
             idFind = true;
             for (j = 0; j < nbBeaconsAvailable; j++) {
-                if (beaconsCoefficient[index_beaconCoef].beaconId[2] != beaconsIds[j]) {
+                if (beaconsCoefficients[index_beaconCoef].beaconId[2] != beaconsIds[j]) {
                     idFind = false;
                 }
             }
             if (idFind == false) {
-                beaconsIds[index_beaconsIds] = beaconsCoefficient[index_beaconCoef].beaconId[2];
+                beaconsIds[index_beaconsIds] = beaconsCoefficients[index_beaconCoef].beaconId[2];
                 index_beaconsIds++;
             }
         }
@@ -337,13 +338,13 @@ static void sortBeaconsCoefficientId(BeaconCoefficients* beaconsCoefficient) {
 
 static void perform_setCurrentPosition(MqMsg* msg) {
     // beaconsData = malloc(sizeof(beaconsData[3]));
-    // beaconsCoefficient = malloc(sizeof(beaconsCoefficient[25]));
+    // beaconsCoefficients = malloc(sizeof(beaconsCoefficients[25]));
     // beaconsSignal = malloc(sizeof(beaconsSignal[3]));
     // calibrationData = malloc(sizeof(CalibrationData[25]));
     nbBeaconsAvailable=msg->nbBeaconsAvailable;
 
     free(beaconsSignal); //on free
-    ree(beaconsData);
+    free(beaconsData);
 
     beaconsSignal=malloc(nbBeaconsAvailable*sizeof(BeaconSignal)); //on re alloue et on le met a jour
     beaconsSignal = msg->beaconsSignal;
@@ -365,24 +366,31 @@ static void perform_setCurrentProcessorAndMemoryLoad(MqMsg* msg) {
 }
 
 static void perform_askCalibrationFromPosition(MqMsg* msg) {
-    for (uint32_t index = 0; index < sizeof(beaconsData); index++) {
+
+    if(beaconsCoefficients==NULL){ //on fait ca pour pas redefinir a chaque fois qu'on retourne dans cette methode
+        beaconsCoefficients=malloc(25*nbBeaconsAvailable*sizeof(BeaconCoefficients)); //TODO TODO TODO METTRE UN DEFINE
+        nbBeaconsCoefficients=25*nbBeaconsAvailable;
+        beaconsCoefficientsindex=0;
+    }
+
+    for (uint32_t index = 0; index < nbBeaconsAvailable; index++) {
         BeaconCoefficients coef;
         memcpy(coef.beaconId, beaconsData[index].ID, sizeof(beaconsData[index].ID));
         coef.positionId = msg->calibrationPosition.id;
         coef.attenuationCoefficient = Mathematician_getAttenuationCoefficient(&(beaconsData[index].power), &(beaconsData[index].position), &(msg->calibrationPosition));
-        beaconsCoefficient[index] = coef;
-        nbBeaconsCoefficients++;
+        beaconsCoefficients[beaconsCoefficientsindex] = coef;
+        beaconsCoefficientsindex++;
     }
     Geographer_signalEndUpdateAttenuation();
 }
 
 static void perform_askCalibrationAverage(MqMsg* msg) {
-    sortBeaconsCoefficientId(beaconsCoefficient);
+    sortBeaconsCoefficientId(beaconsCoefficients);
     for (uint32_t index_balise = 0; index_balise < nbBeaconsAvailable; index_balise++) {
         CalibrationData cd;
         uint32_t index_coef = 0;
         for (uint32_t j = 0; j < nbBeaconsCoefficients; j++) {
-            if (beaconsCoefficient[j].beaconId[2] == beaconsIds[index_balise]) {
+            if (beaconsCoefficients[j].beaconId[2] == beaconsIds[index_balise]) {
                 index_coef++;
             }
         }
@@ -390,13 +398,15 @@ static void perform_askCalibrationAverage(MqMsg* msg) {
         BeaconCoefficients* coef = calloc(1, index_coef);
 
         for (uint32_t j = 0; j < nbBeaconsCoefficients; j++)             {
-            if (beaconsCoefficient[j].beaconId[2] == beaconsIds[index_balise]) {
-                coef[index_coef] = beaconsCoefficient[j];
-                memcpy(cd.beaconId, beaconsCoefficient[j].beaconId, sizeof(beaconsCoefficient[j].beaconId));
+            if (beaconsCoefficients[j].beaconId[2] == beaconsIds[index_balise]) {
+                coef[j] = beaconsCoefficients[j];
+                memcpy(cd.beaconId, beaconsCoefficients[j].beaconId, sizeof(beaconsCoefficients[j].beaconId));
             }
         }
     }
-    Geographer_signalEndAverageCalcul(calibrationData, sizeof(calibrationData));
+    free(beaconsCoefficients);
+    beaconsCoefficients=NULL;
+    Geographer_signalEndAverageCalcul(calibrationData, sizeof(calibrationData)); //TODO
 }
 static void perform_askCalibrationFromPositionTimer(MqMsg * msg){
     Watchdog_cancel(wtd_TMaj);
@@ -543,7 +553,7 @@ extern void Scanner_new() {
 
 
     // beaconsData = malloc(sizeof(beaconsData[3]));
-    // beaconsCoefficient = malloc(sizeof(beaconsCoefficient[25]));
+    // beaconsCoefficients = malloc(sizeof(beaconsCoefficients[25]));
     // beaconsSignal = malloc(sizeof(beaconsSignal[3]));
     // calibrationData = malloc(sizeof(CalibrationData[25]));
 
