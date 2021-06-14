@@ -473,14 +473,14 @@ static int8_t socketReadMessage(Trame* destTrame, uint8_t nbToRead) {
         } else if (returnError == 0) {
             LOG("[PostmanLOG] Client is disconnect ... Disconnection all.%s", "\n");
             stopAll();
-            returnError = -1;
+            returnError = 1;
         }
     } else {
-        DispatcherLOG_setConnectionState(DISCONNECTED);
+        // DispatcherLOG_setConnectionState(DISCONNECTED);
     }
 
     TRACE("%sRead a message%s", "\033[36m", "\033[0m\n");
-    return returnError >= 0 ? 0 : -1;
+    return returnError;
 }
 
 static int8_t socketSendMessage(Trame* trame, uint8_t size) {
