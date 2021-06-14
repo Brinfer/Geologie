@@ -67,8 +67,6 @@ static void setScreen(IdScreen newScreen);
 
 static IdScreen getScreen(void);
 
-static void modeRaw(bool modeRaw);
-
 static void executeCommand(char command);
 
 static void performCalibrationPosition(void);
@@ -197,24 +195,6 @@ static IdScreen getScreen(void) {
     return returnValue;
 }
 
-static void modeRaw(bool modeRaw) {
-    static struct termios old, new;
-    static bool oldMode = false;
-
-    if (oldMode != modeRaw) {
-        if (modeRaw) {
-            tcgetattr(STDIN_FILENO, &old);
-
-            new = old;
-            new.c_lflag &= ~(ICANON | ECHO);
-
-            tcsetattr(STDIN_FILENO, TCSANOW, &new);
-        } else {
-            tcsetattr(STDIN_FILENO, TCSANOW, &old);
-        }
-    }
-}
-
 static void executeCommand(char command) {
     switch (getScreen()) {
         case CALIBRATION:
@@ -322,14 +302,10 @@ static void* runView(void* _) {
         FD_ZERO(&env);
         FD_SET(STDIN_FILENO, &env);
 
-        //modeRaw(true);
-
         if (select(FD_SETSIZE, &env, NULL, NULL, &l_timeout) == -1) {
             ERROR(true, "[View] Error with select() ... Exit");
             exit(EXIT_FAILURE);
         }
-
-        //modeRaw(false);
 
         if (FD_ISSET(STDIN_FILENO, &env)) {
             char charInput[2]; // Size 2 for the null character
