@@ -69,7 +69,7 @@ extern int8_t ProxyGUI_stop() {
     return EXIT_SUCCESS;
 }
 
-extern int8_t ProxyGUI_setCalibrationPositions(CalibrationPosition* calibrationPositions, uint8_t nbCalibrationPosition) {
+extern int8_t ProxyGUI_setCalibrationPositions(const CalibrationPosition* calibrationPositions, uint8_t nbCalibrationPosition) {
     LOG("[ProxyGUI] Send the calibration position.%s", "\n");
 
     int8_t returnError = EXIT_FAILURE;
