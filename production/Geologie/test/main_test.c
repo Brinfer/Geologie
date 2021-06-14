@@ -10,7 +10,7 @@
 /**
  * @brief Nombre de suites de tests a excuter.
  */
-#define NB_SUITE_TESTS (3)
+#define NB_SUITE_TESTS (4)
 
 /**
  * @brief Fonction lançant la suite des tests pour TranslatorLOG.
@@ -33,13 +33,14 @@ extern int32_t translatorBeacon_run_tests(void);
  */
 extern int scanner_run_tests(void);
 
+extern int geographer_run_tests(void);
+
 /**
  * @brief Liste des suites de tests a excuter.
  */
 static int32_t (*suite_tests[])(void) = {
-    translatorLOG_run_tests,
-    translatorBeacon_run_tests,
-    scanner_run_tests
+    scanner_run_tests,
+    geographer_run_tests
 };
 
 /**
