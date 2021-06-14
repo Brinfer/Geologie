@@ -366,7 +366,7 @@ static int8_t updateProcessorLoad(void) {
         ERROR(true, "[Bookkeeper] Error when opening /proc/stat file");
         returnError = -1;
     } else {
-        returnError = fscanf(file, "cpu %llu %llu %llu %llu", &currentTotalUser, &currentTotalUserLow, &currentTotalSys, &currentTotalIdle);
+        returnError = fscanf(file, "cpu %lu %lu %lu %lu", &currentTotalUser, &currentTotalUserLow, &currentTotalSys, &currentTotalIdle);
         if (returnError < 0) {
             ERROR(true, "[Bookkeeper] Error when parsing /proc/stat file");
             fclose(file); // Don't get the error message to not overwrite the value

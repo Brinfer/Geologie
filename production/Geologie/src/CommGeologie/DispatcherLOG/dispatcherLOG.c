@@ -262,6 +262,6 @@ static void* readMsg() {
         }
     }
 
-    TRACE("[Dispactcher] No more serving%s" "\n");
+    TRACE("[Dispactcher] No more serving%s","\n");
     return 0;
 }
