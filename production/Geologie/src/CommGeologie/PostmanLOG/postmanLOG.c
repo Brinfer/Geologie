@@ -174,7 +174,7 @@ static int8_t tearDownSocket(void);
  *
  * @param destTrame La trame ou place le resultat de la lecture.
  * @param nbToRead Le nombre d'octet a lire.
- * @return int8_t -1 en cas d'erreur, 0 sinon.
+ * @return int8_t -1 en cas d'erreur, 1 en cas de deconnexion du client, 0 sinon.
  */
 static int8_t socketReadMessage(Trame* destTrame, uint8_t nbToRead);
 
@@ -474,18 +474,18 @@ static int8_t socketReadMessage(Trame* destTrame, uint8_t nbToRead) {
             LOG("[PostmanLOG] Client is disconnect ... Disconnection all.%s", "\n");
             stopAll();
             returnError = 1;
+        } else {
+            returnError = 0;
+            TRACE("%sRead a message%s", "\033[36m", "\033[0m\n");
         }
     } else {
         // DispatcherLOG_setConnectionState(DISCONNECTED);
     }
 
-    TRACE("%sRead a message%s", "\033[36m", "\033[0m\n");
     return returnError;
 }
 
 static int8_t socketSendMessage(Trame* trame, uint8_t size) {
-    TRACE("%sSend a message%s", "\033[36m", "\033[0m\n");
-
     int16_t quantityWritten = 0;
     uint8_t quantityToWrite = size;
     int8_t returnError = EXIT_SUCCESS;
