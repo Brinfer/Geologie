@@ -368,8 +368,8 @@ static void perform_setCurrentProcessorAndMemoryLoad(MqMsg* msg) {
 static void perform_askCalibrationFromPosition(MqMsg* msg) {
 
     if(beaconsCoefficients==NULL){ //on fait ca pour pas redefinir a chaque fois qu'on retourne dans cette methode
-        beaconsCoefficients=malloc(25*nbBeaconsAvailable*sizeof(BeaconCoefficients)); //TODO TODO TODO METTRE UN DEFINE
         nbBeaconsCoefficients=25*nbBeaconsAvailable;
+        beaconsCoefficients=malloc(nbBeaconsCoefficients*sizeof(BeaconCoefficients)); //TODO TODO TODO METTRE UN DEFINE
         beaconsCoefficientsindex=0;
     }
 
