@@ -757,7 +757,7 @@ static int8_t actionSetCalibrationPosition(const CalibrationPosition* calibratio
 }
 
 static int8_t actionIncreaseCalibrationCounter(void) {
-    calibrationCounter += 5; // TODO on release calibrationCounter++
+    calibrationCounter ++;
 
     TRACE("[Geographer] calibrate %d / %d%s", calibrationCounter, NB_CALIBRATION_POSITION, "\n");
     return 0;
