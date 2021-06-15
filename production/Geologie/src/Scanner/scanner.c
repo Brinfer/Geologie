@@ -280,6 +280,7 @@ static void mqInit() {
     if (descripteur == -1) {
         perror("Erreur Open :\n");
     }
+    TRACE("[Scanner] BAL init%s", "\n");
 }
 
 static void sendMsg(MqMsg* msg) {
@@ -311,6 +312,7 @@ static void translateBeaconsSignalToBeaconsData(BeaconSignal* beaconsSignal, Bea
 }
 
 static void sortBeaconsCoefficientId(BeaconCoefficients* beaconsCoefficients) {
+    TRACE("[Scanner] sortCoefficient%s", "\n");    
     uint32_t index_beaconCoef;
     uint32_t index_beaconsIds = 0;
     uint32_t j;
@@ -385,6 +387,7 @@ static void perform_askCalibrationFromPosition(MqMsg* msg) {
 }
 
 static void perform_askCalibrationAverage(MqMsg* msg) {
+    TRACE("[Scanner] perform_askCalibrationAverage%s", "\n");
     sortBeaconsCoefficientId(beaconsCoefficients);
     for (uint32_t index_balise = 0; index_balise < nbBeaconsAvailable; index_balise++) {
         CalibrationData cd;
@@ -405,8 +408,9 @@ static void perform_askCalibrationAverage(MqMsg* msg) {
         }
     }
     free(beaconsCoefficients);
-    beaconsCoefficients=NULL;
-    Geographer_signalEndAverageCalcul(calibrationData, sizeof(calibrationData)); //TODO
+    beaconsCoefficients=NULL;   
+    Geographer_signalEndAverageCalcul(calibrationData, nbBeaconsAvailable * sizeof(calibrationData)); //TODO
+    TRACE("[Scanner] signalEndAverageCalcul%s", "\n"); 
 }
 static void perform_askCalibrationFromPositionTimer(MqMsg * msg){
     Watchdog_cancel(wtd_TMaj);
