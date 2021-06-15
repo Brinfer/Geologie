@@ -442,16 +442,10 @@ static int8_t tearDownSocket(void) {
     TRACE("%sTear down the server%s", "\033[44m\033[37m", "\033[0m\n");
     int8_t returnError = EXIT_SUCCESS;
 
-    if (myClientSocket > 0) {
-        returnError = close(myClientSocket);
-
-        ERROR(returnError < 0, "[PostmanLOG] Error when closing the client socket");
-    }
-
-    returnError -= close(myServerSocket);
+    returnError = close(myServerSocket);
     ERROR(returnError < 0, "[PostmanLOG] Error when closing the server socket");
 
-    return returnError < 0 ? -1 : 0;
+    return returnError;
 }
 
 static int8_t socketReadMessage(Trame* destTrame, uint8_t nbToRead) {
