@@ -86,7 +86,7 @@ static ParameterTestHeader parameterTest[] = {
         }
     },
     {
-        .headerExpected = {.commande = SIGNAL_END_CALIBRATION_POSITION, .size = 21845},
+        .headerExpected = {.commande = SIGNAL_CALIBRATION_END_POSITION, .size = 21845},
         .trameInput = {
             0x0C,           // CMD
             0x55, 0x55      // SIZE

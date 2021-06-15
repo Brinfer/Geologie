@@ -40,7 +40,9 @@ extern int geographer_run_tests(void);
  */
 static int32_t (*suite_tests[])(void) = {
     scanner_run_tests,
-    geographer_run_tests
+    geographer_run_tests,
+    translatorBeacon_run_tests,
+    translatorLOG_run_tests
 };
 
 /**
