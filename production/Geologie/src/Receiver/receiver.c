@@ -258,7 +258,7 @@ static int8_t sendMsg(MqMsgReceiver* msg) {
     if (mq_send(descripteur, (char*) msg, sizeof(MqMsgReceiver), 0) == 0) {
         returnError = EXIT_SUCCESS;
     }
-		TRACE("SEND MESSAGE%s", "\n");
+		TRACE("SEND MESSAGE Event:%d%s", msg->event ,"\n");
 
     return returnError;
 }
@@ -298,6 +298,7 @@ static void Receiver_translateChannelToBeaconsSignal(){
                 };
     sendMsg(&msg);
 	TRACE("on a finit de translate %s","\n");
+	TRACE("Voici un BeaconsSignal :%s%s", beaconsSignal[0].name ,"\n");
 }
 
 static void reset_beaconsChannelAndSignal(){
@@ -307,7 +308,7 @@ static void reset_beaconsChannelAndSignal(){
 
 static void Receiver_getAllBeaconsChannel(){
 	TRACE("[Receiver] ON VA CHERCHER LES BALISES%s", "\n"); 
-    int32_t ret, status;
+    /*int32_t ret, status;
 
 	// Get HCI device.
 
@@ -424,7 +425,7 @@ static void Receiver_getAllBeaconsChannel(){
 		perror("Failed to disable scan.");
 	}
 
-	hci_close_dev(device);
+	hci_close_dev(device);*/
 }
 
 static void performAction(Action_RECEIVER action, MqMsgReceiver * msg){
