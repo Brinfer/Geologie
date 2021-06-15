@@ -53,15 +53,16 @@ make help
 
 Afin de pouvoir developer, certains logiciels sont nécessaire. Référer vous à la documentation de votre distribution (ou OS) pour savoir comment les installer.
 
-* [CppCheck](http://cppcheck.sourceforge.net/) : outil d'analyse statique pour le C et le C++
-* [Make](https://www.gnu.org/software/make/) : outil permettant de controller la génération des éxécutables et d'autres type de génération
 * [arm-ostl-linux-gnueabi-gcc](https://wiki.st.com/stm32mpu/wiki/Getting_started/STM32MP1_boards/STM32MP157x-EV1/Develop_on_Arm%C2%AE_Cortex%C2%AE-A7/Install_the_SDK) : ensemble des paquets utilisés dans le processus de compilation d'un programme, pour [_OpenSt8Linux_](#cross-compilation)
+* [CMocka](https://cmocka.org/) : framework de test unitaire, son installation peut nécessiter  [CMake](https://cmake.org/) (dépends de votre distribution / OS), de plus, il faut installer les [__librairies statiques__](https://embeddedartistry.com/blog/2017/10/26/building-cmocka-as-a-static-library/)
+* [CppCheck](http://cppcheck.sourceforge.net/) : outil d'analyse statique pour le C et le C++
 * [Doxygen](https://www.doxygen.nl/index.html) : outil permettant de générer la documentation des annotations dans le code source.
 * [GCC](https://gcc.gnu.org/) : ensemble de compilateur pour le C, C++, Objectif-C ...
 * [GCovr](https://gcovr.com/en/stable/) : utilitaire pour générer les rapport de couverture de code
-* [CMocka](https://cmocka.org/) : framework de test unitaire, son installation peut nécessiter  [CMake](https://cmake.org/) (dépends de votre distribution / OS), de plus, il faut installer les [__librairies statiques__](https://embeddedartistry.com/blog/2017/10/26/building-cmocka-as-a-static-library/)
+* [libbluetooth-dev](https://packages.debian.org/stretch/libbluetooth-dev) : Fichiers de développement pour utiliser la bibliothèque BlueZ (Bluetooth) sous Linux
+* [Make](https://www.gnu.org/software/make/) : outil permettant de controller la génération des éxécutables et d'autres type de génération
 
-Il est fortement recommandé d'utiliser les dernières versions des ces logiciels
+Il est fortement recommandé d'utiliser les dernières versions des ces logiciels et librairies.
 
 ### Architecture du projet
 

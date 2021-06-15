@@ -56,7 +56,7 @@
  * @brief Le numero de port que le serveur ecoute.
  *
  */
-#define ROBOT_PORT (12345)
+#define ROBOT_PORT (1234)
 
 /**
  * @brief Le type de transmission des messages
@@ -111,8 +111,8 @@ typedef enum {
 typedef struct {
     Trame* trame;   /**< Un pointeur vers la #Trame a faire passer. */
     uint16_t size;  /**< La taille de la #Trame a faire passer. */
-    Flag flag;
-} MqMsg;
+    Flag flag;      /**< #Flag indiquant le type du message*/
+} MqMsgPostmanLOG;
 
 /**
  * @brief Socket serveur qui ecoute les connexions sur le port #ROBOT_PORT.
@@ -217,24 +217,24 @@ static int8_t setUpMq(void);
 static int8_t tearDownMq(void);
 
 /**
- * @brief Ecrit la #MqMsg dans la boite aux lettres de PostmanLOG.
+ * @brief Ecrit la #MqMsgPostmanLOG dans la boite aux lettres de PostmanLOG.
  *
  * @param message Le message a ecrire.
  * @return int8_t -1 en cas d'erreur, 0 sinon.
  *
  * @warning La fonction appelante est en charge de la garantie de la validite du message (passage de pointeur).
  */
-static int8_t mqSendMessage(MqMsg* message);
+static int8_t mqSendMessage(MqMsgPostmanLOG* message);
 
 /**
- * @brief Lie une #MqMsg dans la boite au lettre de PostmanLOG.
+ * @brief Lie une #MqMsgPostmanLOG dans la boite au lettre de PostmanLOG.
  *
  * Le message lue est place dans @a dest.
  *
- * @param dest La #MqMsg ou place le message lue.
+ * @param dest La #MqMsgPostmanLOG ou place le message lue.
  * @return int8_t -1 en cas d'erreur, 0 sinon.
  */
-static int8_t mqReadMessage(MqMsg* dest);
+static int8_t mqReadMessage(MqMsgPostmanLOG* dest);
 
 /**
  * @brief Retourne l'indication du thread de PostmanLOG sur s'il doit continuer ou non sa routine.
@@ -324,7 +324,7 @@ extern int8_t PostmanLOG_start(void) {
 extern int8_t PostmanLOG_sendMsg(Trame* trame, uint16_t size) {
     int8_t returnError = EXIT_SUCCESS;
 
-    MqMsg msg = { .size = size, .trame = trame, .flag = SEND };
+    MqMsgPostmanLOG msg = { .size = size, .trame = trame, .flag = SEND };
 
     returnError = mqSendMessage(&msg);
 
@@ -380,7 +380,7 @@ extern int8_t PostmanLOG_stop(void) {
     ERROR(returnError < 0, "[PostmanLOG] Error when shutdown the socket");
 
     if (returnError >= 0) {
-        MqMsg msg = { .size = 0, .trame = NULL, .flag = STOP };
+        MqMsgPostmanLOG msg = { .size = 0, .trame = NULL, .flag = STOP };
         returnError = mqSendMessage(&msg); // wake up the PostmanLOG's thread to stop him
         ERROR(returnError < 0, "[PostmanLOG] Error when sending the STOP message");
 
@@ -455,9 +455,8 @@ static int8_t tearDownSocket(void) {
 }
 
 static int8_t socketReadMessage(Trame* destTrame, uint8_t nbToRead) {
+    int16_t returnError = 0;
     errno = 0;
-
-    int16_t returnError = EXIT_SUCCESS;
 
     if (getConnectionState() == CONNECTED) {
         returnError = recv(myClientSocket, destTrame, nbToRead, RECV_FLAGS);
@@ -469,10 +468,19 @@ static int8_t socketReadMessage(Trame* destTrame, uint8_t nbToRead) {
         } else if (returnError == 0) {
             LOG("[PostmanLOG] Client is disconnect.%s", "\n");
             disconnectClient();
-            MqMsg msg = { .size = 0, .trame = NULL, .flag = WAKE_UP };
+            MqMsgPostmanLOG msg = { .size = 0, .trame = NULL, .flag = WAKE_UP };
             returnError = mqSendMessage(&msg); // wake up the PostmanLOG's thread to stop him
 
-            returnError = 1;
+            if (returnError < 0) {
+                ERROR(true, "[PostmanLOG] Error when sending the internal signal WAKE_UP ... Retry");
+                returnError = mqSendMessage(&msg); // wake up the PostmanLOG's thread to stop him
+
+                ERROR(returnError < 0, "[PostmanLOG] Error when sending the internal signal WAKE_UP ... Abandonment");
+            }
+
+            if (returnError >= 0) {
+                returnError = 1;
+            }
         } else {
             returnError = 0;
             TRACE("%sRead a message%s", "\033[36m", "\033[0m\n");
@@ -551,7 +559,7 @@ static int8_t setUpMq(void) {
     struct mq_attr attr;
     attr.mq_flags = 0;
     attr.mq_maxmsg = MQ_MAX_MESSAGES;
-    attr.mq_msgsize = sizeof(MqMsg);
+    attr.mq_msgsize = sizeof(MqMsgPostmanLOG);
     attr.mq_curmsgs = 0;
     myMq = mq_open(MQ_LABEL, MQ_FLAGS, MQ_MODE, &attr);
 
@@ -578,20 +586,20 @@ static int8_t tearDownMq(void) {
     return returnError;
 }
 
-static int8_t mqSendMessage(MqMsg* message) {
+static int8_t mqSendMessage(MqMsgPostmanLOG* message) {
     int8_t returnError = EXIT_SUCCESS;
     errno = 0;
 
-    returnError = mq_send(myMq, (char*) message, sizeof(MqMsg), 0); // put char to avoid a warning
+    returnError = mq_send(myMq, (char*) message, sizeof(MqMsgPostmanLOG), 0); // put char to avoid a warning
     ERROR(returnError < 0, "[PostmanLOG] Error when sending the message in the queue");
 
     return returnError;
 }
 
-static int8_t mqReadMessage(MqMsg* dest) {
+static int8_t mqReadMessage(MqMsgPostmanLOG* dest) {
     int8_t returnError = EXIT_SUCCESS;
 
-    returnError = mq_receive(myMq, (char*) dest, sizeof(MqMsg), NULL); // put char to avoid a warning
+    returnError = mq_receive(myMq, (char*) dest, sizeof(MqMsgPostmanLOG), NULL); // put char to avoid a warning
     ERROR(returnError < 0, "[PostmanLOG] Error when reading the message in the queue");
 
     return returnError;
@@ -632,7 +640,7 @@ static void setConnectionState(ConnectionState newValue) {
 static void* run(void* _) {
     while (getKeepGoing() == true) {
         int8_t returnError = EXIT_SUCCESS;
-        MqMsg msg;
+        MqMsgPostmanLOG msg;
 
         if (getConnectionState() == DISCONNECTED) {
             LOG("[PostmanLOG] Try to connect to the client%s", "\n");
@@ -651,7 +659,7 @@ static void* run(void* _) {
             }
         }
 
-        if (returnError >= 0) {
+        if (returnError >= 0 && getKeepGoing() == true) {
             returnError = mqReadMessage(&msg);
 
             if (returnError < 0) {
@@ -695,7 +703,7 @@ static void* run(void* _) {
                 }
             } else if (msg.flag == STOP) {
                 setKeepGoing(false);
-            } else if (msg.flag != WAKE_UP){
+            } else if (msg.flag != WAKE_UP) {
                 LOG("[PostmanLOG] Unknown message in the message queue, flag's value: %d ... Ignore it.%s", msg.flag, "\n");
             }
         }
