@@ -431,9 +431,13 @@ static void * run(){
 
         mqReceive(&msg);
         action = stateMachine[myState][msg.event].action;
-        performAction(action, &msg);
-        myState =  stateMachine[myState][msg.event].destinationState;
-
+		if (stateMachine[myState][msg.event].destinationState != S_FORGET) {
+			performAction(action, &msg);
+			myState =  stateMachine[myState][msg.event].destinationState;
+		}else {
+        	TRACE("MAE, perte evenement %i  \n", stateMachine[myState][msg.event].destinationState);
+    	}
+        
     }
 
    return 0;
@@ -458,7 +462,6 @@ static void time_out(){
 
 
 extern void Receiver_new(){
-    myState = S_DEATH;
 	wtd_TScan = Watchdog_construct(1000000, &(time_out));
 }
 
