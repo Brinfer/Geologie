@@ -51,7 +51,7 @@
 #define MQ_MAX_MESSAGES (5)
 
 static BeaconSignal beaconsSignal[NB_MAX_BEACONS_AVAILABLE];
-static BeaconsChannel * beaconsChannel[NB_MAX_ADVERTISING_CHANNEL];
+static BeaconsChannel * beaconsChannel;
 static uint32_t NbBeaconsChannel;
 static uint32_t NbBeaconsSignal;
 
@@ -252,7 +252,7 @@ static void Receiver_translateChannelToBeaconsSignal(){
 	{
 		BeaconSignal signal;
 		bool find = FALSE;
-		signal = TranslatorBeacon_translateChannelToBeaconsSignal(beaconsChannel[index_channel]);
+		signal = TranslatorBeacon_translateChannelToBeaconsSignal(&(beaconsChannel[index_channel]));
 		for(index_signal = 0; index_signal < NbBeaconsSignal; index_signal++)
 		{
 			if(signal.name == beaconsSignal[index_signal].name){
@@ -370,8 +370,8 @@ static void Receiver_getAllBeaconsChannel(){
 
 					memcpy(uuid, info->data + 21, 2);
 
-					if(uuid[0] == BEACONS_UUID_1 && uuid[1 ]== BEACONS_UUID_2){
-						beaconsChannel[index_channel] = info;
+					if(uuid[0] == BEACONS_UUID_1 && uuid[1]== BEACONS_UUID_2){
+						beaconsChannel[index_channel] = *(info);
 						index_channel ++;
 						NbBeaconsChannel++;
 					}
