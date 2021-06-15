@@ -846,6 +846,8 @@ static int8_t actionAskComputeAttenuationCoefficient(CalibrationPositionId calib
 }
 
 static int8_t actionSetCalibrationData(const CalibrationData* calibrationData, uint8_t nbCalibrationData) {
+    TRACE("[Geographer] action Set Calibration Data%s", "\n"); 
+
     int8_t returnErrorData;
     int8_t returnErrorSignal;
 
