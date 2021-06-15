@@ -29,7 +29,7 @@
 #include "../Watchdog/watchdog.h"
 #include "../Scanner/scanner.h"
 #include "../common.h"
-
+#include "../tools.h"
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -56,7 +56,8 @@ static uint32_t NbBeaconsChannel;
 static uint32_t NbBeaconsSignal;
 
 typedef enum{
-	S_BEGINNING = 0,
+	S_FORGET=0,
+	S_BEGINNING,
     S_SCANNING,
     S_TRANSLATING,
     S_DEATH,
@@ -91,7 +92,10 @@ static Transition_RECEIVER stateMachine[NB_STATE - 1][NB_EVENT_RECEIVER] =
     [S_BEGINNING] [E_MAJ_BEACONS_CHANNEL] = {S_SCANNING, A_MAJ_BEACONS_CHANNELS},
     [S_SCANNING] [E_ASK_BEACONS_SIGNAL] = {S_SCANNING, A_SEND_BEACONS_SIGNAL},
 	[S_SCANNING] [E_TIME_OUT] = {S_TRANSLATING, A_TRANSLATE},
-    [S_TRANSLATING] [E_TRANSLATING_DONE] = {S_SCANNING, A_MAJ_BEACONS_CHANNELS}
+	[S_SCANNING] [E_STOP] = {S_DEATH, A_STOP},
+    [S_TRANSLATING] [E_TRANSLATING_DONE] = {S_SCANNING, A_MAJ_BEACONS_CHANNELS},
+	[S_TRANSLATING] [E_STOP] = {S_DEATH, A_STOP},
+
 };
 
 struct hci_request ble_hci_request(uint16_t ocf, uint8_t clen, void * status, void * cparam)
@@ -409,6 +413,8 @@ static void performAction(Action_RECEIVER action, MqMsg * msg){
 		case A_TRANSLATE:
 			Receiver_translateChannelToBeaconsSignal(beaconsChannel);
 
+		case A_STOP:
+			break;
         default:
             break;
     }
@@ -457,6 +463,8 @@ extern void Receiver_new(){
 }
 
 extern int8_t Receiver_ask4StartReceiver(){
+    TRACE("[Receiver] Receiver_ask4StartReceiver%s", "\n"); 
+	
 	int8_t returnError = EXIT_FAILURE;
     myState = S_SCANNING;
     mqInit();
@@ -470,6 +478,11 @@ extern int8_t Receiver_ask4StartReceiver(){
 }
 
 extern int8_t Receiver_ask4StopReceiver(){
+    TRACE("[Receiver] Receiver_ask4StopReceiver%s", "\n"); 
+    MqMsg msg = {
+                .event = E_STOP
+                };
+    sendMsg(&msg);
     int8_t returnError = EXIT_FAILURE;
 	returnError = pthread_join(myThreadMq, NULL);
 	return returnError;
@@ -481,6 +494,8 @@ extern void Receiver_free(){
 }
 
 extern int8_t Receiver_ask4BeaconsSignal(){
+    TRACE("[Receiver] Receiver_ask4BeaconsSignal%s", "\n"); 
+
 	int8_t returnError = EXIT_FAILURE;
     MqMsg msg = {
                 .event = E_ASK_BEACONS_SIGNAL
