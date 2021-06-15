@@ -637,7 +637,7 @@ extern void Scanner_ask4AverageCalcul() {
 
 
 extern void Scanner_setAllBeaconsSignal(BeaconSignal* beaconsSignal, uint32_t nbBeaconsAvailable) {
-    
+    TRACE("[Scanner] Scanner_setAllBeaconsSignal%s", "\n");
     MqMsg msg = {
                 .event = E_SET_BEACONS_SIGNAL,
                 .beaconsSignal = beaconsSignal,
