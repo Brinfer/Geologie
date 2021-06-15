@@ -92,8 +92,7 @@ int main(int argc, char* argv[]) {
 
     atexit(errorHandler);
 
-    sleep(30);
-    // pthread_cond_wait(&cond, &clientMutex);
+    pthread_cond_wait(&cond, &clientMutex);
 
     return 0;
 }

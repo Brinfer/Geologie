@@ -447,7 +447,7 @@ static int8_t tearDownMq(void) {
 
     if (returnError >= 0) {
         returnError = mq_unlink(MQ_LABEL);
-        ERROR(true, "[Bookkeeper] Error when destroying the queue");
+        ERROR(returnError < 0, "[Bookkeeper] Error when destroying the queue");
     } else {
         ERROR(true, "[Bookkeeper] Error when closing the queue");
     }

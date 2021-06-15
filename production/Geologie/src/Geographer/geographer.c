@@ -5,7 +5,6 @@
  *
  * @version 2.0
  * @date 15-06-2021
- * @author BRIENT Nathan
  * @author GAUTIER Pierre-Louis
  * @copyright Geo-Boot
  * @license BSD 2-clauses

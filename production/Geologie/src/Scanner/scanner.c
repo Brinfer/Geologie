@@ -124,7 +124,6 @@ static Transition_SCANNER stateMachine[NB_STATE][NB_EVENT_SCANNER] =
     [S_COMPUTE_LOAD][E_STOP] = {S_DEATH, A_STOP},
     [S_COMPUTE_LOAD][E_ASK_UPDATE_COEF_FROM_POSITION] = {S_COMPUTE_LOAD, A_ASK_CALIBRATION_FROM_POSITION_TIMER},
     [S_COMPUTE_LOAD][E_ASK_AVERAGE_CALCUL] = {S_COMPUTE_LOAD, A_ASK_CALIBRATION_AVERAGE_TIMER},
-
 };
 
 typedef struct {
@@ -398,14 +397,14 @@ static void perform_askCalibrationAverage(MqMsgScanner* msg) {
     Geographer_signalEndAverageCalcul(calibrationData, nbBeaconsAvailable * sizeof(calibrationData)); //TODO
 }
 static void perform_askCalibrationFromPositionTimer(MqMsgScanner* msg) {
-    // Watchdog_cancel(wtd_TMaj);
+    Watchdog_cancel(wtd_TMaj);
     perform_askCalibrationFromPosition(msg);
-    // Watchdog_start(wtd_TMaj);
+    Watchdog_start(wtd_TMaj);
 }
 static void perform_askCalibrationAverageTimer(MqMsgScanner* msg) {
-    // Watchdog_cancel(wtd_TMaj);
+    Watchdog_cancel(wtd_TMaj);
     perform_askCalibrationAverage(msg);
-    // Watchdog_start(wtd_TMaj);
+    Watchdog_start(wtd_TMaj);
 }
 
 
