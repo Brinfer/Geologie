@@ -205,6 +205,8 @@ static void time_out();
 
 
 static void mqInit() {
+    TRACE("[Scanner] : mqInit %s","\n");
+
     attr.mq_flags = 0; //Flags de la file
     attr.mq_maxmsg = MQ_MAX_MESSAGES; //Nombre maximum de messages dans la file
     attr.mq_msgsize = sizeof(MqMsgReceiver); //Taille maximale de chaque message
@@ -238,9 +240,9 @@ static int8_t sendMsg(MqMsgReceiver* msg) {
     return returnError;
 }
 
-static void mqReceive(MqMsgReceiver* this) {
+static void mqReceive(MqMsgReceiver* msg) {
 
-    mq_receive(descripteur, (char*) this, sizeof(*this), NULL);
+    mq_receive(descripteur, (char*) msg, sizeof(msg), NULL);
 
 }
 
@@ -471,10 +473,13 @@ extern int8_t Receiver_ask4StartReceiver(){
 
 	int8_t returnError = EXIT_FAILURE;
     myState = S_BEGINNING;
-    MqMsgReceiver msg = {
-                .event = E_MAJ_BEACONS_CHANNEL
-                };
-    sendMsg(&msg);
+    // MqMsgReceiver msg = {
+    //             .event = E_MAJ_BEACONS_CHANNEL
+    //             };
+    // sendMsg(&msg);
+	Watchdog_start(wtd_TScan);
+	// reset_beaconsChannelAndSignal();
+    Receiver_getAllBeaconsChannel();
     returnError = pthread_create(&myThreadMq, NULL, &run, NULL);
 	assert(returnError >= 0);
 	return returnError;
