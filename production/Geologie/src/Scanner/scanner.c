@@ -350,8 +350,8 @@ static void perform_setCurrentPosition(MqMsg* msg) {
     // calibrationData = malloc(sizeof(CalibrationData[25]));
     nbBeaconsAvailable = msg->nbBeaconsAvailable;
 
-    free(beaconsSignal); //on free
-    free(beaconsData);
+    //free(beaconsSignal); //on free
+    //free(beaconsData);
 
     beaconsSignal = malloc(nbBeaconsAvailable * sizeof(BeaconSignal)); //on re alloue et on le met a jour
     beaconsSignal = msg->beaconsSignal;
@@ -595,6 +595,8 @@ extern void Scanner_ask4StartScanner() {
     Receiver_ask4StartReceiver();
     Bookkeeper_askStartBookkeeper();
     sleep(1);
+    beaconsSignal = malloc(1);
+    beaconsData = malloc(1);
     //mqInit();
     // MqMsg msg = {
     //             .event = E_ASK_BEACONS_SIGNAL
