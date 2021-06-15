@@ -240,11 +240,12 @@ static int8_t sendMsg(MqMsg* msg) {
 
 static void mqReceive(MqMsg* this) {
 
-    mq_receive(descripteur, (char*) this, sizeof(*this), NULL);
+    mq_receive(descripteur, (char*) this, sizeof(this), NULL);
 
 }
 
 static void Receiver_translateChannelToBeaconsSignal(){
+	TRACE("[Receiver] ON VA TRADUIRE LES CHANNELS%s", "\n"); 
 	uint8_t index_signal;
 	uint8_t index_channel;
 
@@ -280,6 +281,7 @@ static void reset_beaconsChannelAndSignal(){
 }
 
 static void Receiver_getAllBeaconsChannel(){
+	TRACE("[Receiver] ON VA CHERCHER LES BALISES%s", "\n"); 
     int32_t ret, status;
 
 	// Get HCI device.
@@ -401,10 +403,12 @@ static void performAction(Action_RECEIVER action, MqMsg * msg){
     switch (action) {
 
         case A_SEND_BEACONS_SIGNAL:
+			TRACE("[Receiver] SEND BEACONS SIGNAL%s", "\n"); 
             Scanner_setAllBeaconsSignal(beaconsSignal, NbBeaconsSignal);
             break;
 
         case A_MAJ_BEACONS_CHANNELS:
+			TRACE("[Receiver] MAJ BEACONS CHANNEL%s", "\n"); 
 			Watchdog_start(wtd_TScan);
 			reset_beaconsChannelAndSignal();
             Receiver_getAllBeaconsChannel();
@@ -431,6 +435,7 @@ static void * run(){
 
         mqReceive(&msg);
         action = stateMachine[myState][msg.event].action;
+		printf("ACTION_RECEIVER : %s", action);
         performAction(action, &msg);
         myState =  stateMachine[myState][msg.event].destinationState;
 
@@ -472,6 +477,10 @@ extern int8_t Receiver_ask4StartReceiver(){
                 };
     sendMsg(&msg);
     returnError = pthread_create(&myThreadMq, NULL, &run, NULL);
+	if(returnError != -1){
+		TRACE("[Receiver] Reveiver RUN lancé%s", "\n"); 
+
+	}
 	assert(returnError >= 0);
 	return returnError;
 }
