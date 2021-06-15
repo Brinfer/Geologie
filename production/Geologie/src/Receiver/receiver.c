@@ -43,14 +43,20 @@
 
 #define NB_BEACONS_AVAILABLE (5)
 #define NB_MAX_ADVERTISING_CHANNEL (100)
-#define NB_MAX_BEACONS_AVAILABLE (10)
+#define NB_MAX_BEACONS_AVAILABLE (4)
 
 #define BEACONS_UUID_1 (0x18)
 #define BEACONS_UUID_2 (0x1A)
 
 #define MQ_MAX_MESSAGES (5)
 
-static BeaconSignal beaconsSignal[NB_MAX_BEACONS_AVAILABLE];
+static BeaconSignal beaconsSignal[NB_MAX_BEACONS_AVAILABLE] = {
+	{{'B','1','\0'},  {BEACONS_UUID_1, BEACONS_UUID_2}, 60, {20000, 30000}},
+	{{'B','2','\0'},  {BEACONS_UUID_1, BEACONS_UUID_2}, 30, {10000, 50000}},
+	{{'B','3','\0'},  {BEACONS_UUID_1, BEACONS_UUID_2}, 40, {40000, 70000}},
+	{{'B','4','\0'},  {BEACONS_UUID_1, BEACONS_UUID_2}, 90, {60000, 90000}}
+};
+
 static BeaconsChannel * beaconsChannel;
 static uint32_t NbBeaconsChannel;
 static uint32_t NbBeaconsSignal;
@@ -308,7 +314,7 @@ static void reset_beaconsChannelAndSignal(){
 
 static void Receiver_getAllBeaconsChannel(){
 	TRACE("[Receiver] ON VA CHERCHER LES BALISES%s", "\n"); 
-    /*int32_t ret, status;
+    int32_t ret, status;
 
 	// Get HCI device.
 
@@ -425,7 +431,7 @@ static void Receiver_getAllBeaconsChannel(){
 		perror("Failed to disable scan.");
 	}
 
-	hci_close_dev(device);*/
+	hci_close_dev(device);
 }
 
 static void performAction(Action_RECEIVER action, MqMsgReceiver * msg){
