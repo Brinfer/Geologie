@@ -594,6 +594,7 @@ extern void Scanner_ask4StartScanner() {
     myState = S_BEGINNING;
     Receiver_ask4StartReceiver();
     Bookkeeper_askStartBookkeeper();
+    sleep(1);
     //mqInit();
     // MqMsg msg = {
     //             .event = E_ASK_BEACONS_SIGNAL
