@@ -154,9 +154,7 @@ extern int8_t DispatcherLOG_stop() {
 
     returnError = pthread_join(myThreadListen, NULL);
 
-    if (returnError == 0) {
-        setKeepGoing(false);
-    } else {
+    if (returnError != 0) {
         ERROR(true, "[DispatcheurLOG] Error when joining the processus");
         returnError = pthread_join(myThreadListen, NULL);
         ERROR(returnError != 0, "[DispatcheurLOG] Error when joining the processus ... Abondement");
@@ -175,8 +173,7 @@ extern int8_t DispatcherLOG_setConnectionState(ConnectionState connectionState) 
 
     } else {
         Geographer_signalConnectionDown();
-        returnError = DispatcherLOG_stop();
-        ERROR(returnError < 0, "[DispatcheurLOG] Error when stopping the processus");
+        setKeepGoing(false);
     }
 
     return returnError;
@@ -249,7 +246,7 @@ static void* readMsg() {
         if (returnError < 0) {
             ERROR(true, "[DispatcheurLOG] Can't read the header ... Stop the processus");
             setKeepGoing(false);
-        } else if(returnError == 0) {
+        } else if (returnError == 0) {
             Trame trame[header.size];
 
             if (header.size > 0) {
@@ -267,6 +264,6 @@ static void* readMsg() {
         }
     }
 
-    TRACE("[Dispactcher] No more serving%s","\n");
+    TRACE("[Dispactcher] No more serving%s", "\n");
     return 0;
 }

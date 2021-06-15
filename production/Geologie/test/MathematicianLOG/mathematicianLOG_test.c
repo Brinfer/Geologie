@@ -37,7 +37,7 @@
 #define EPSILONPOSITION (1)
 /**
  * @struct ParametersTestCalculDistancePosition
- * 
+ *
  * @brief Structure des donnees passees en parametre des fonctions de test pour la conversion des Position
  * en tableau d'octet.
  */
@@ -61,7 +61,7 @@ typedef struct {
 /**
  * @struct ParametersTestGetAverageCalcul
  *
- * @brief Structure des donnees passees en parametre des fonctions de test pour le calcul des moyennes des coefficients d'atténuation. 
+ * @brief Structure des donnees passees en parametre des fonctions de test pour le calcul des moyennes des coefficients d'atténuation.
  */
 
 
@@ -75,7 +75,7 @@ typedef struct {
 /**
  * @struct ParametersTestGetAttenuation
  *
- * @brief Structure des donnees passees en parametre des fonctions de test pour le calcul d'un coefficient d'attenuation. 
+ * @brief Structure des donnees passees en parametre des fonctions de test pour le calcul d'un coefficient d'attenuation.
  */
 
 
@@ -166,20 +166,6 @@ static ParametersTestCalculDistancePower parametersTestCalculDistancePower[] = {
 static void test_distanceCalculWithPosition(void** state);
 
 /**
- * @brief Teste la position actuelle en Y en fonction de plusieurs paramètres.
- *
- * @param state
- */
-
-static void test_getCurrentPositionY(void** state);
-/**
- * @brief Teste la position actuelle en X en fonction de plusieurs paramètre.
- *
- * @param state
- */
-
-static void test_getCurrentPositionX(void** state);
-/**
  * @brief Teste le calcul du coefficient d'atténuation pour une balise
  *
  * @param state
@@ -188,8 +174,8 @@ static void test_getAttenuationCoefficient(void** state);
 
 /**
  * @brief les données coefficients des données balises du test A
- * 
-**/
+ *
+ */
 static BeaconCoefficients beaconsDataTest_A[3] = {
     {
         .positionId = 01,
@@ -207,7 +193,7 @@ static BeaconCoefficients beaconsDataTest_A[3] = {
 
 /**
  * @brief les données coefficients des données balises du test B
- * 
+ *
 **/
 
 static BeaconCoefficients beaconsDataTest_B[5] = {
@@ -266,12 +252,9 @@ static ParametersTestGetAverageCalcul parameterTest[] = {
     }
 };
 
-
-
 /**
  * @brief Ensemble des donnees de tests pour le calcul des moyennes d'un' coefficient d'attenuation.
 */
-
 static ParametersTestGetAttenuationCoefficient parametersTestGetAttenuationCoefficientA[1] = {
     {
         .power = -60,
@@ -284,7 +267,6 @@ static ParametersTestGetAttenuationCoefficient parametersTestGetAttenuationCoeff
 /**
  * @brief Ensemble des donnees de tests pour le calcul des moyennes d'un' coefficient d'attenuation.
 */
-
 static ParametersTestGetAttenuationCoefficient parametersTestGetAttenuationCoefficientB[1] = {
 
     {
@@ -298,7 +280,6 @@ static ParametersTestGetAttenuationCoefficient parametersTestGetAttenuationCoeff
 /**
  * @brief Ensemble des donnees de tests pour le calcul de la position actuelle.
 */
-
 static BeaconData parametersTestGetCurrentPositionA[3] = {
 
     {
@@ -321,7 +302,6 @@ static BeaconData parametersTestGetCurrentPositionA[3] = {
 /**
  * @brief Ensemble des donnees de tests pour le calcul de la position actuelle.
 */
-
 static BeaconData parametersTestGetCurrentPositionB[4] = {
 
     {
@@ -349,7 +329,6 @@ static BeaconData parametersTestGetCurrentPositionB[4] = {
 /**
  * @brief Ensemble des donnees de tests pour le calcul de la position actuelle.
 */
-
 static BeaconData parametersTestGetCurrentPositionC[4] = {
 
     {
@@ -372,7 +351,6 @@ static BeaconData parametersTestGetCurrentPositionC[4] = {
 /**
  * @brief Ensemble des donnees de tests pour le calcul de la position actuelle.
 */
-
 static BeaconData parametersTestGetCurrentPositionD[4] = {
 
     {
@@ -485,19 +463,14 @@ static const struct CMUnitTest tests[] =
     cmocka_unit_test_prestate(test_getCurrentPosition, &(parameterTestCurrentPosition[1])),
     cmocka_unit_test_prestate(test_getCurrentPosition, &(parameterTestCurrentPosition[2])),
     cmocka_unit_test_prestate(test_getCurrentPosition, &(parameterTestCurrentPosition[3])),
-    
-
 };
-
-
-
 
 /**
  * @brief Lance la suite de test du module MathematicianLOG.
  *
  * @return 0 en cas de succees ou le numero du test qui a echoue.
  */
-int mathematician_run_tests() {
+extern int mathematician_run_tests() {
     return cmocka_run_group_tests_name("Test of the module mathematicianLOG", tests, NULL, NULL);
 }
 
@@ -537,5 +510,3 @@ static void test_getCurrentPosition(void** state) {
     assert_float_equal(param->currentPosition.X, param->expectedCurrentPosition.X,EPSILONPOSITION);
     assert_float_equal(param->currentPosition.Y, param->expectedCurrentPosition.Y,EPSILONPOSITION);
 }
-
-

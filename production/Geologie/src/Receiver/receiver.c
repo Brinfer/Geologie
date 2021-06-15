@@ -48,7 +48,7 @@
 #define BEACONS_UUID_1 (0x18)
 #define BEACONS_UUID_2 (0x1A)
 
-#define MQ_MAX_MESSAGES (5)
+#define MQ_MAX_MESSAGES (10)
 
 static BeaconSignal beaconsSignal[NB_MAX_BEACONS_AVAILABLE] = {
     {{'B','1','\0'},  {BEACONS_UUID_1, BEACONS_UUID_2}, -69.51544993, {400, 700}},
@@ -62,7 +62,6 @@ static uint32_t NbBeaconsSignal = 3;
 
 typedef enum {
     S_FORGET = 0,
-    S_BEGINNING,
     S_SCANNING,
     S_TRANSLATING,
     S_DEATH,
@@ -130,19 +129,10 @@ typedef struct {
 static Watchdog* wtd_TScan;
 static pthread_mutex_t myMutex = PTHREAD_MUTEX_INITIALIZER;
 
-/**
- * @brief variable static pour la boucle while dans le thread
- *
- */
-static bool keepGoing = false;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 //
-
 //                                              Fonctions static
-
 //
-
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
@@ -206,22 +196,6 @@ static void* run(void* _);
 */
 static void time_out();
 
-
-static bool getKeepGoing(void) {
-    bool returnValue;
-    pthread_mutex_lock(&myMutex);
-    returnValue = keepGoing;
-    pthread_mutex_unlock(&myMutex);
-
-    return returnValue;
-}
-
-static void setKeepGoing(bool newValue) {
-    pthread_mutex_lock(&myMutex);
-    keepGoing = newValue;
-    pthread_mutex_unlock(&myMutex);
-}
-
 static void mqInit() {
 
     attr.mq_flags = 0; //Flags de la file
@@ -263,18 +237,12 @@ static void mqReceive(MqMsgReceiver* msg) {
 }
 
 static void Receiver_translateChannelToBeaconsSignal() {
-    MqMsgReceiver msg = {
-                .event = E_TRANSLATING_DONE
-    };
+    MqMsgReceiver msg = { .event = E_TRANSLATING_DONE };
     sendMsg(&msg);
 }
 
 static void Receiver_getAllBeaconsChannel() {
-    setKeepGoing(true);
-
-    while (getKeepGoing()) {
-        /* Simulate the time to scan */
-    }
+    // Do something in a other process
 }
 
 static void performAction(Action_RECEIVER action, MqMsgReceiver* msg) {
@@ -294,7 +262,6 @@ static void performAction(Action_RECEIVER action, MqMsgReceiver* msg) {
             break;
 
         case A_TRANSLATE:
-            setKeepGoing(false);
             Receiver_translateChannelToBeaconsSignal(beaconsChannel);
 
         case A_STOP:
@@ -306,11 +273,10 @@ static void performAction(Action_RECEIVER action, MqMsgReceiver* msg) {
 }
 
 static void* run(void* _) {
-    MqMsgReceiver msg;
-
-    Action_RECEIVER action;
-
     while (myState != S_DEATH) {
+        MqMsgReceiver msg;
+        Action_RECEIVER action;
+
         mqReceive(&msg);
 
         action = stateMachine[myState][msg.event].action;
@@ -320,15 +286,13 @@ static void* run(void* _) {
         } else {
             TRACE("Receiver lost an event %d at state %d%s", msg.event, myState, "\n");
         }
-
     }
     return NULL;
 }
 
 static void time_out() {
-    MqMsgReceiver msg = {
-                .event = E_TIME_OUT
-    };
+    TRACE("[Receiver] Time out%s", "\n");
+    MqMsgReceiver msg = { .event = E_TIME_OUT };
     sendMsg(&msg);
 }
 
@@ -356,9 +320,7 @@ extern int8_t Receiver_ask4StartReceiver() {
 }
 
 extern int8_t Receiver_ask4StopReceiver() {
-    MqMsgReceiver msg = {
-                .event = E_STOP
-    };
+    MqMsgReceiver msg = { .event = E_STOP };
     sendMsg(&msg);
     int8_t returnError = EXIT_FAILURE;
     returnError = pthread_join(myThreadMq, NULL);

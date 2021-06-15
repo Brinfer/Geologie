@@ -291,7 +291,7 @@ extern int8_t Bookkeeper_askStopBookkeeper(void) {
             ERROR(true, "[Bookkeeper] Error when closing the processus for the queue");
         } else {
             returnError = pthread_join(myThreadUpdate, NULL);
-            ERROR(true, "[Bookkeeper] Error when closing the processus for update the value");
+            ERROR(returnError < 0, "[Bookkeeper] Error when closing the processus for update the value");
         }
     } else {
         ERROR(true, "[Bookkeeper] Error when sending the stop message");
@@ -534,7 +534,7 @@ static void* runUpdate(void* _) {
     while (getKeepGoing()) {
         usleep(T_MAJ_LOAD * 1000 * 1000);
 
-        if (alreadyFailMemory && updateMemoryLoad() < 0) {
+        if (updateMemoryLoad() < 0) {
             LOG("[Bookeeper] Error when reading the memory load%s", "\n");
             alreadyFailMemory++;
 

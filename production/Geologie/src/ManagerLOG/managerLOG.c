@@ -135,8 +135,12 @@ extern void ManagerLOG_stopGEOLOGIE(void) {
     }
 
     returnError = Geographer_askSignalStopGeographer();
-    assert(returnError >= 0);
+    if (returnError < 0) {
+        LOG("[ManagerLOG] Fail to stop Geographer ... Retry%s", "\n");
 
+        returnError = Geographer_askSignalStopGeographer();
+        ERROR(returnError < 0, "[ManagerLOG] Fail to stop Geographer ... Continue");
+    }
     returnError = UI_askSignalEndingGEOLOGIE();
     if (returnError < 0) {
         LOG("[ManagerLOG] Fail to stop UI ... Retry%s", "\n");
@@ -157,7 +161,11 @@ extern void ManagerLOG_stopGEOLOGIE(void) {
     }
 
     returnError = Geographer_free();
-    assert(returnError >= 0);
+    if (returnError < 0) {
+        LOG("[ManagerLOG] Fail to destroy Geographer ... Retry%s", "\n");
+        returnError = DispatcherLOG_free();
+        ERROR(returnError < 0, "[ManagerLOG] Fail to destroy Geographer ... Continue");
+    }
 
     PostmanLOG_free();
     if (returnError < 0) {
