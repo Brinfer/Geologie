@@ -378,6 +378,7 @@ static void Receiver_getAllBeaconsChannel(){
 						beaconsChannel[index_channel] = *(info);
 						index_channel ++;
 						NbBeaconsChannel++;
+						TRACE("[Receiver] NOUVELLE BALISE REPEREE !!!%s", "\n"); 
 					}
 
 					offset = info->data + info->length + 2;
@@ -469,7 +470,7 @@ static void time_out(){
 
 extern void Receiver_new(){
     mqInit();
-	wtd_TScan = Watchdog_construct(8000000, &(time_out));
+	wtd_TScan = Watchdog_construct(1000000, &(time_out));
 }
 
 extern int8_t Receiver_ask4StartReceiver(){
