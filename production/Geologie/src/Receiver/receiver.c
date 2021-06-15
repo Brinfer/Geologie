@@ -467,7 +467,7 @@ static void time_out(){
 
 extern void Receiver_new(){
     mqInit();
-	wtd_TScan = Watchdog_construct(1000000, &(time_out));
+	wtd_TScan = Watchdog_construct(8000000, &(time_out));
 }
 
 extern int8_t Receiver_ask4StartReceiver(){

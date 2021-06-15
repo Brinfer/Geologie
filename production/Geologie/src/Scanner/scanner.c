@@ -569,7 +569,7 @@ static void* run() {
 extern void Scanner_new() {
     TRACE("Scanner_new %s", "\n");
     mqInit();
-    wtd_TMaj = Watchdog_construct(1000000, &(ScannerTime_out));
+    wtd_TMaj = Watchdog_construct(50000000, &(ScannerTime_out));
     Receiver_new();
     Bookkeeper_new();
 
