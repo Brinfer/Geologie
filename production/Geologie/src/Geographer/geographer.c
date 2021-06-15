@@ -172,12 +172,6 @@ typedef struct {
     ActionGeographer action;            /**< L'action a effectuer lors de la transition */
 } TransitionGeographer;
 
-
-/**
- * @brief Etat de la connexion.
- */
-static ConnectionState connectionState;
-
 /**
  * @brief L'etat courant de la machine a etat de Geographer.
  */
@@ -302,7 +296,7 @@ static const ExperimentalTraject EXPERIMENTAL_TRAJECTS[NB_EXPERIMENTAL_TRAJECT] 
  *
  */
 static const TransitionGeographer stateMachine[S_NB_STATE][E_NB_EVENT] = {
-    [S_WATING_FOR_CONNECTION][E_CONNECTION_ESTABLISHED] = {S_IDLE, A_SEND_EXPERIMENTAL_DATA},
+    [S_WATING_FOR_CONNECTION] [E_CONNECTION_ESTABLISHED] = {S_IDLE, A_SEND_EXPERIMENTAL_DATA},
     [S_WATING_FOR_CONNECTION][E_DATE_AND_SEND_DATA] = {S_WATING_FOR_CONNECTION, A_NONE},
     [S_WATING_FOR_CONNECTION][E_STOP] = {S_DEATH, A_STOP},
 
@@ -821,30 +815,28 @@ static int8_t actionSendAllData(BeaconData* beaconData, uint8_t nbBeaconData, Po
     int8_t returnErrorCurrentPosition = 0;
     int8_t returnErrorLoad = 0;
 
-    if (connectionState == CONNECTED) {
+    returnErrorBeaconData = ProxyLoggerMOB_setAllBeaconsData(beaconData, nbBeaconData, currentDate);
+    if (returnErrorBeaconData < 0) {
+        ERROR(true, "[Geographer] Fail to send the beacons data ... Retry");
         returnErrorBeaconData = ProxyLoggerMOB_setAllBeaconsData(beaconData, nbBeaconData, currentDate);
-        if (returnErrorBeaconData < 0) {
-            ERROR(true, "[Geographer] Fail to send the beacons data ... Retry");
-            returnErrorBeaconData = ProxyLoggerMOB_setAllBeaconsData(beaconData, nbBeaconData, currentDate);
-            ERROR(returnErrorBeaconData < 0, "[Geographer] Fail to send the beacons data ... Abandonment");
-        }
-
-        returnErrorCurrentPosition = ProxyLoggerMOB_setCurrentPosition(position, currentDate);
-        if (returnErrorCurrentPosition < 0) {
-            ERROR(true, "[Geographer] Fail to send the current position ... Retry");
-            returnErrorCurrentPosition = ProxyLoggerMOB_setCurrentPosition(position, currentDate);
-            ERROR(returnErrorCurrentPosition < 0, "[Geographer] Fail to send the current position ... Abandonment");
-        }
-
-        returnErrorLoad = ProxyLoggerMOB_setProcessorAndMemoryLoad(processorAndMemoryLoad, currentDate);
-        if (returnErrorLoad < 0) {
-            ERROR(true, "[Geographer] Fail to send the current processor and the memory load ... Retry");
-            returnErrorLoad = ProxyLoggerMOB_setProcessorAndMemoryLoad(processorAndMemoryLoad, currentDate);
-            ERROR(returnErrorLoad < 0, "[Geographer] Fail to send the beacons data ... Abandonment");
-        }
-
-        ERROR((returnErrorBeaconData + returnErrorCurrentPosition + returnErrorLoad) < 0, "[Geographer] Fail to send a curent data ... Abandonment");
+        ERROR(returnErrorBeaconData < 0, "[Geographer] Fail to send the beacons data ... Abandonment");
     }
+
+    returnErrorCurrentPosition = ProxyLoggerMOB_setCurrentPosition(position, currentDate);
+    if (returnErrorCurrentPosition < 0) {
+        ERROR(true, "[Geographer] Fail to send the current position ... Retry");
+        returnErrorCurrentPosition = ProxyLoggerMOB_setCurrentPosition(position, currentDate);
+        ERROR(returnErrorCurrentPosition < 0, "[Geographer] Fail to send the current position ... Abandonment");
+    }
+
+    returnErrorLoad = ProxyLoggerMOB_setProcessorAndMemoryLoad(processorAndMemoryLoad, currentDate);
+    if (returnErrorLoad < 0) {
+        ERROR(true, "[Geographer] Fail to send the current processor and the memory load ... Retry");
+        returnErrorLoad = ProxyLoggerMOB_setProcessorAndMemoryLoad(processorAndMemoryLoad, currentDate);
+        ERROR(returnErrorLoad < 0, "[Geographer] Fail to send the beacons data ... Abandonment");
+    }
+
+    ERROR((returnErrorBeaconData + returnErrorCurrentPosition + returnErrorLoad) < 0, "[Geographer] Fail to send a curent data ... Abandonment");
 
     free(beaconData);
     free(processorAndMemoryLoad);
@@ -962,7 +954,7 @@ static int8_t actionAskComputeAttenuationCoefficient(CalibrationPositionId calib
 }
 
 static int8_t actionSetCalibrationData(const CalibrationData* calibrationData, uint8_t nbCalibrationData) {
-    TRACE("[Geographer] action Set Calibration Data%s", "\n"); 
+    TRACE("[Geographer] action Set Calibration Data%s", "\n");
 
     int8_t returnErrorData;
     int8_t returnErrorSignal;
