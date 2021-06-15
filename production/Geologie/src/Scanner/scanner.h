@@ -148,6 +148,6 @@ extern void Scanner_setAllBeaconsSignal(BeaconSignal * beaconsSignal, uint32_t N
  *
  * @return retourne 1 s'il y a une erreur dans l'execution de la méthode
 */
-extern void Scanner_setCurrentProcessorAndMemoryLoad(ProcessorAndMemoryLoad* currentPAndMLoad);
+extern void Scanner_setCurrentProcessorAndMemoryLoad(ProcessorAndMemoryLoad currentPAndMLoad);
 
 #endif /* SCANNER_H */

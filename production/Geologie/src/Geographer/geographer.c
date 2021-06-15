@@ -615,7 +615,7 @@ extern int8_t Geographer_signalEndAverageCalcul(CalibrationData* calibrationData
     return returnError;
 }
 
-extern int8_t Geographer_dateAndSendData(BeaconData* beaconsData, int8_t beaconsDataSize, Position* currentPosition, ProcessorAndMemoryLoad* currentProcessorAndMemoryLoad) {
+extern int8_t Geographer_dateAndSendData(BeaconData* beaconsData, uint8_t nbBeacons, Position* currentPosition, ProcessorAndMemoryLoad* currentProcessorAndMemoryLoad) {
     int8_t returnError = EXIT_FAILURE;
 
     MqMsgGeographer msg = {
@@ -623,8 +623,12 @@ extern int8_t Geographer_dateAndSendData(BeaconData* beaconsData, int8_t beacons
         .data.current.position = currentPosition,
         .data.current.processorAndMemoryLoad = currentProcessorAndMemoryLoad,
         .data.current.beaconsData = beaconsData,
-        .data.current.nbBeaconData = beaconsDataSize,
+        .data.current.nbBeaconData = nbBeacons,
     };
+
+    LOG("[Geographer] Current ProcessorLoad=%d, MemoryLoad=%d\n", currentProcessorAndMemoryLoad->processorLoad, currentProcessorAndMemoryLoad->memoryLoad);
+    LOG("[Geographer] Current position: X=%d, Y=%d\n", currentPosition->X, currentPosition->Y);
+    LOG("[Geographer] Number of beacon data %d\n", nbBeacons);
 
     returnError = sendMsgMq(&msg);
     ERROR(returnError < 0, "[Geographer] Fail to send the message date and send data ... Abandonnement");
@@ -714,7 +718,7 @@ static void* runGeographer() {
         }
 
     }
-    return 0;
+    return NULL;
 }
 
 static int8_t performAction(ActionGeographer action, const MqMsgGeographer* msg) {
@@ -840,8 +844,8 @@ static int8_t actionSendAllData(BeaconData* beaconData, uint8_t nbBeaconData, Po
     ERROR((returnErrorBeaconData + returnErrorCurrentPosition + returnErrorLoad) < 0, "[Geographer] Fail to send a curent data ... Abandonment");
 
     free(beaconData);
-    free(processorAndMemoryLoad);
-    free(position);
+    // free(processorAndMemoryLoad);
+    // free(position);
 
     return (returnErrorBeaconData + returnErrorCurrentPosition + returnErrorLoad) < 0 ? -1 : 0;
 }

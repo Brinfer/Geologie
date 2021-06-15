@@ -77,7 +77,6 @@ Watchdog *Watchdog_construct(uint32_t thisDelay, WatchdogCallback callback)
 
 void Watchdog_start(Watchdog *this)
 {
-    TRACE("Launch the WATCHDOG%s", "\n");
     struct itimerspec spec;
 
     /* Period of the timer */

@@ -230,8 +230,6 @@ static void* runUpdate(void* _);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 extern int8_t Bookkeeper_new(void) {
-    TRACE("Set up Bookkeeper%s", "\n");
-
     int8_t returnError = 0;
 
     returnError = setUpMq();
@@ -247,8 +245,6 @@ extern int8_t Bookkeeper_new(void) {
 }
 
 extern int8_t Bookkeeper_free(void) {
-    TRACE("Tear down Bookkeeper%s", "\n");
-
     int8_t returnError = 0;
 
     returnError = tearDownMq();
@@ -264,8 +260,6 @@ extern int8_t Bookkeeper_free(void) {
 }
 
 extern int8_t Bookkeeper_askStartBookkeeper(void) {
-    TRACE("Start Bookkeeper%s", "\n");
-
     int8_t returnError = 0;
 
     setKeepGoing(true);
@@ -284,8 +278,6 @@ extern int8_t Bookkeeper_askStartBookkeeper(void) {
 }
 
 extern int8_t Bookkeeper_askStopBookkeeper(void) {
-    TRACE("Stop Bookkeeper%s", "\n");
-
     int8_t returnError = 0;
 
     setKeepGoing(false);
@@ -311,8 +303,6 @@ extern int8_t Bookkeeper_askStopBookkeeper(void) {
 }
 
 extern int8_t Bookkeeper_ask4CurrentProcessorAndMemoryLoad() {
-    TRACE("Ask value to Bookkeeper%s", "\n");
-
     int8_t returnError = 0;
 
     MqMsgBookkeeper msg = { .flag = GET_VALUE };
@@ -526,7 +516,7 @@ static void* runMq(void* _) {
                     .processorLoad = getPercentProcessorLoad(),
                     .memoryLoad = getPercentMemoryLoad()
                 };
-                Scanner_setCurrentProcessorAndMemoryLoad(&procAndMem);
+                Scanner_setCurrentProcessorAndMemoryLoad(procAndMem);
             } else if (msg.flag == STOP) {
                 setKeepGoing(false);
             } else {
