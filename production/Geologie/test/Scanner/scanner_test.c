@@ -61,14 +61,14 @@ static int tear_down(void** state) {
     return 0;
 }
 
-// Variables partagées entre le thread de test et le thread de l'objet actif 
+// Variables partagées entre le thread de test et le thread de l'objet actif
 // pour la configuration des mocks et des asserts
 int scanner_expected_p, scanner_mock_ret, scanner_expected_internal_value;
 
 Action_SCANNER expectedAction;
 Event_SCANNER expectedEvent;
 State_SCANNER expectedState;
-MqMsg expectedMsg;
+MqMsgScanner expectedMsg;
 BeaconData expectedBeaconsData;
 Position expectedPosition;
 int8_t expectedReturn;
@@ -82,7 +82,7 @@ void __wrap_ScannerTime_out() { // je fais ca pour avoir ma methode en externe e
 
 // Outillage de la fonction de transition à objectif de test
 // Rq: la fonction de transition réel est appelée via __real_Scanner_transitionFct (man ld, cf. /wrap)
-void __wrap_Scanner_transitionFct(MqMsg msg) {
+void __wrap_Scanner_transitionFct(MqMsgScanner msg) {
 
     //int8_t returnValue;
     switch (msg.event) {
@@ -279,4 +279,3 @@ static const struct CMUnitTest tests[] =
 int scanner_run_tests() {
     return cmocka_run_group_tests_name("Test du module scanner", tests, set_up, tear_down);
 }
-

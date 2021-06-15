@@ -56,7 +56,7 @@
  * @brief Le numero de port que le serveur ecoute.
  *
  */
-#define ROBOT_PORT (376563725)
+#define ROBOT_PORT (12345)
 
 /**
  * @brief Le type de transmission des messages
