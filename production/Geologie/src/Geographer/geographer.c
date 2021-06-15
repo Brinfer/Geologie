@@ -307,21 +307,25 @@ static const TransitionGeographer stateMachine[S_NB_STATE][E_NB_EVENT] = {
     [S_IDLE][E_STOP] = {S_DEATH, A_STOP},
 
     [S_WAITING_FOR_BE_PLACED][E_VALIDATE_POSITION] = {S_WAITING_FOR_ATTENUATION_COEFFICIENT_FROM_POSITION, A_ASK_COMPUTE_ATTENUATION_COEFFICIENT},
+    [S_WAITING_FOR_BE_PLACED][E_DATE_AND_SEND_DATA] = {S_WAITING_FOR_BE_PLACED, A_NONE},
     [S_WAITING_FOR_BE_PLACED][E_CONNECTION_DOWN] = {S_WATING_FOR_CONNECTION, A_NONE},
     [S_WAITING_FOR_BE_PLACED][E_STOP] = {S_DEATH, A_STOP},
 
     [S_WAITING_FOR_ATTENUATION_COEFFICIENT_FROM_POSITION][E_SIGNAL_END_UPDATE_ATTENUATION] = {S_TEST_IF_FINISH_ALL_POSITION, A_SIGNAL_END_CALIBRATION_POSITION},
     [S_WAITING_FOR_ATTENUATION_COEFFICIENT_FROM_POSITION][E_CONNECTION_DOWN] = {S_WATING_FOR_CONNECTION, A_NONE},
     [S_WAITING_FOR_ATTENUATION_COEFFICIENT_FROM_POSITION][E_STOP] = {S_DEATH, A_STOP},
+    [S_WAITING_FOR_ATTENUATION_COEFFICIENT_FROM_POSITION][E_DATE_AND_SEND_DATA] = {S_WAITING_FOR_ATTENUATION_COEFFICIENT_FROM_POSITION, A_NONE},
 
     [S_TEST_IF_FINISH_ALL_POSITION][E_FINISH_CALIBRATE_ALL_POSITION] = {S_WAITING_FOR_CALCUL_AVERAGE_COEFFICIENT, A_ASK_AVERAGE_CALCUL},
     [S_TEST_IF_FINISH_ALL_POSITION][E_NOT_FINISH_CALIBRATE_ALL_POSITION] = {S_WAITING_FOR_BE_PLACED, A_INCREASE_CALIBRATION_COUNTER},
     [S_TEST_IF_FINISH_ALL_POSITION][E_CONNECTION_DOWN] = {S_WATING_FOR_CONNECTION, A_NONE},
     [S_TEST_IF_FINISH_ALL_POSITION][E_STOP] = {S_DEATH, A_STOP},
+    [S_TEST_IF_FINISH_ALL_POSITION][E_DATE_AND_SEND_DATA] = {S_TEST_IF_FINISH_ALL_POSITION, A_NONE},
 
     [S_WAITING_FOR_CALCUL_AVERAGE_COEFFICIENT][E_SIGNAL_END_AVERAGE_CALCUL] = {S_IDLE,A_SET_CALIBRATION_DATA},
     [S_WAITING_FOR_CALCUL_AVERAGE_COEFFICIENT][E_CONNECTION_DOWN] = {S_WATING_FOR_CONNECTION, A_NONE},
     [S_WAITING_FOR_CALCUL_AVERAGE_COEFFICIENT][E_STOP] = {S_DEATH, A_STOP},
+    [S_WAITING_FOR_CALCUL_AVERAGE_COEFFICIENT][E_DATE_AND_SEND_DATA] = {S_WAITING_FOR_CALCUL_AVERAGE_COEFFICIENT, A_NONE},
 };
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -626,7 +630,7 @@ extern int8_t Geographer_dateAndSendData(BeaconData* beaconsData, uint8_t nbBeac
         .data.current.nbBeaconData = nbBeacons,
     };
 
-    LOG("[Geographer] Current ProcessorLoad=%d, MemoryLoad=%d\n", currentProcessorAndMemoryLoad->processorLoad, currentProcessorAndMemoryLoad->memoryLoad);
+    LOG("[Geographer] Current ProcessorLoad=%.2f, MemoryLoad=%.2f\n", currentProcessorAndMemoryLoad->processorLoad, currentProcessorAndMemoryLoad->memoryLoad);
     LOG("[Geographer] Current position: X=%d, Y=%d\n", currentPosition->X, currentPosition->Y);
     LOG("[Geographer] Number of beacon data %d\n", nbBeacons);
 
@@ -869,7 +873,7 @@ static int8_t actionSetCalibrationPosition(const CalibrationPosition* calibratio
 static int8_t actionIncreaseCalibrationCounter(void) {
     calibrationCounter++;
 
-    TRACE("[Geographer] calibrate %d / %d%s", calibrationCounter, NB_CALIBRATION_POSITION, "\n");
+    LOG("[Geographer] calibrate %d / %d%s", calibrationCounter, NB_CALIBRATION_POSITION, "\n");
     return 0;
 }
 
@@ -985,6 +989,8 @@ static int8_t actionSetCalibrationData(const CalibrationData* calibrationData, u
 }
 
 static int8_t signalFinishCalibrateAllPosition(void) {
+    LOG("[Geographer] calibrate %d / %d%s", calibrationCounter, NB_CALIBRATION_POSITION, "\n");
+
     MqMsgGeographer msg = { .event = E_FINISH_CALIBRATE_ALL_POSITION };
 
     int8_t returnError = sendMsgMq(&msg);

@@ -145,13 +145,9 @@ static struct mq_attr attr;
 static Watchdog* wtd_TMaj;
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 //
-
 //                                              Fonctions privee
-
 //
-
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
@@ -303,7 +299,7 @@ static void translateBeaconsSignalToBeaconsData(BeaconSignal* beaconsSignal, Bea
         data.coefficientAverage = 3;
 
         for (j = 0; j < nbBeaconsAvailable; j++) {
-            if (strcmp(data.ID, calibrationData[j].beaconId) == 0) {
+            if (strcmp((char*) data.ID, (char*) calibrationData[j].beaconId) == 0) {
                 data.coefficientAverage = calibrationData[j].coefficientAverage;
             }
         }
@@ -402,18 +398,19 @@ static void perform_askCalibrationAverage(MqMsgScanner* msg) {
     Geographer_signalEndAverageCalcul(calibrationData, nbBeaconsAvailable * sizeof(calibrationData)); //TODO
 }
 static void perform_askCalibrationFromPositionTimer(MqMsgScanner* msg) {
-    Watchdog_cancel(wtd_TMaj);
+    // Watchdog_cancel(wtd_TMaj);
     perform_askCalibrationFromPosition(msg);
-    Watchdog_start(wtd_TMaj);
+    // Watchdog_start(wtd_TMaj);
 }
 static void perform_askCalibrationAverageTimer(MqMsgScanner* msg) {
-    Watchdog_cancel(wtd_TMaj);
+    // Watchdog_cancel(wtd_TMaj);
     perform_askCalibrationAverage(msg);
-    Watchdog_start(wtd_TMaj);
+    // Watchdog_start(wtd_TMaj);
 }
 
 
 static void perform_stop() {
+    Watchdog_cancel(wtd_TMaj);
     Receiver_ask4StopReceiver();
     Bookkeeper_askStopBookkeeper();
 }
@@ -428,6 +425,7 @@ static void scanner_performAction(Action_SCANNER action, MqMsgScanner* msg) {
         case A_NOP:
             break;
         case A_ASK_CALIBRATION_FROM_POSITION_TIMER:
+            Watchdog_cancel(wtd_TMaj);
             perform_askCalibrationFromPositionTimer(msg);
             break;
 
@@ -512,13 +510,9 @@ static void* run() {
 
     while (myState != S_DEATH) {
         mqReceive(&msg);
-        if (msg.event == E_STOP) {
-            perform_stop();
-        } else if (msg.event > NB_EVENT_SCANNER) {
 
-        } else {
-            Scanner_transitionFct(msg);
-        }
+        Scanner_transitionFct(msg);
+
     }
 
     return 0;

@@ -10,7 +10,7 @@
 /**
  * @brief Nombre de suites de tests a excuter.
  */
-#define NB_SUITE_TESTS (4)
+#define NB_SUITE_TESTS (3)
 
 /**
  * @brief Fonction lançant la suite des tests pour TranslatorLOG.
@@ -27,22 +27,19 @@ extern int32_t translatorLOG_run_tests(void);
 extern int32_t translatorBeacon_run_tests(void);
 
 /**
- * @brief Lance la suite de test du module Scanner.
+ * @brief Lance la suite de test du module MathematicianLOG.
  *
- * @return int32_t 0 en cas de succee ou le numero du test qui a echoue.
+ * @return 0 en cas de succees ou le numero du test qui a echoue.
  */
-extern int scanner_run_tests(void);
-
-extern int geographer_run_tests(void);
+extern int mathematician_run_tests();
 
 /**
  * @brief Liste des suites de tests a excuter.
  */
 static int32_t (*suite_tests[])(void) = {
-    scanner_run_tests,
-    geographer_run_tests,
     translatorBeacon_run_tests,
-    translatorLOG_run_tests
+    translatorLOG_run_tests,
+    mathematician_run_tests
 };
 
 /**
