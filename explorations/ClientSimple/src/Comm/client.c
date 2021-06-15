@@ -357,12 +357,11 @@ static int8_t socketReadMessage(Trame* destTrame, uint16_t nbToRead) {
             returnError = EXIT_FAILURE;
         } else {
             returnError = EXIT_SUCCESS;
+            TRACE("%sRead a message%s", "\033[36m", "\033[0m\n");
         }
     } else {
         returnError = EXIT_FAILURE;
     }
-
-    TRACE("%sRead a message%s", "\033[36m", "\033[0m\n");
 
     return returnError;
 }
@@ -417,7 +416,10 @@ static void* runClient(void* _) {
             /* Read the Data */
             Trame dataTrame[header.size];
 
-            returnError = socketReadMessage(dataTrame, header.size);
+            if (header.size > 0) {
+                returnError = socketReadMessage(dataTrame, header.size);
+            }
+
             // TODO exploit the data
 
             if (header.commande == REP_CALIBRATION_POSITIONS) {
@@ -432,6 +434,10 @@ static void* runClient(void* _) {
                 pthread_mutex_unlock(&clientMutex);
 
                 View_signalGetCalibrationData();
+            } else if (header.commande ==  SIGNAL_CALIBRATION_END_POSITION) {
+                View_signalEndCalibrationPosition();
+            } else if (header.commande == SIGNAL_CALIRATION_END) {
+                View_signalEndCalibration();
             }
         }
     }

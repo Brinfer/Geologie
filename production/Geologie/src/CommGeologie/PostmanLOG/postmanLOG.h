@@ -74,7 +74,7 @@ extern int8_t PostmanLOG_sendMsg(Trame* trame, uint16_t size);
  *
  * @param destTrame La trame ou ecrire le message lue.
  * @param nbToRead Le nombre d'octet a lire.
- * @return int8_t -1 en cas d'erreur, 0 sinon.
+ * @return int8_t -1 en cas d'erreur, 1 en cas de deconnexion, 0 sinon.
  *
  * @warning Fonction bloquante.
  */

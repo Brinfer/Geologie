@@ -19,6 +19,7 @@
 //                                              Define
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 /**
  * @def GEOGRAPHER_H
  * @def ROBOT_HEIGHT_MM
@@ -27,12 +28,12 @@
 #ifndef GEOGRAPHER_H
 #define GEOGRAPHER_H
 
-
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //                                              Include
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #include "../Scanner/scanner.h"
 #include "../CommGeologie/ProxyLoggerMOB/proxyLoggerMOB.h"
 #include "../CommGeologie/ProxyGUI/proxyGUI.h"
@@ -42,8 +43,11 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//                                              Variable et structure extern
+//                                              Define
+//
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#define NB_CALIBRATION_POSITION (25)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -178,12 +182,13 @@ extern int8_t Geographer_signalConnectionDown();
  *
  * Cette methode intervient dans la mise a jour automatique des donnees
  *
- * @param beaconsData[] tableau contenant les donnees des balises
+ * @param beaconsData tableau contenant les donnees des balises
+ * @param nbBeacons Le nombre de balise dans le tableau beaconsData
  * @param currentPosition position actuelle de la carte mere
  * @param currentProcessorAndMemoryLoad charge processeur et memoire actuelle
  * @return retourne 1 s'il y a une erreur dans l'execution de la methode
  *
 */
-extern int8_t Geographer_dateAndSendData(BeaconData * beaconsData, int8_t beaconsDataSize, Position * currentPosition, ProcessorAndMemoryLoad * currentProcessorAndMemoryLoad);
+extern int8_t Geographer_dateAndSendData(BeaconData * beaconsData, uint8_t nbBeacons, Position * currentPosition, ProcessorAndMemoryLoad * currentProcessorAndMemoryLoad);
 
 #endif /* GEOGRAPHER_H */
