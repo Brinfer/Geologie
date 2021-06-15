@@ -4,7 +4,8 @@
  * @brief Est en quelque sorte le chef d'orchestre de Geologie
  *
  * @version 1.0
- * @date 15-06-2021
+ * @date 03-06-2021
+ * @author BRIENT Nathan
  * @author GAUTIER Pierre-Louis
  * @copyright Geo-Boot
  * @license BSD 2-clauses
