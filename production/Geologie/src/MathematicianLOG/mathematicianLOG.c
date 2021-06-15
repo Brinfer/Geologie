@@ -1,5 +1,5 @@
 /**
- * @file mathematician.c
+ * @file mathematicianLOG.c
  *
  * @version 1.0.1
  * @date 9/05/2021
@@ -8,7 +8,7 @@
  * @license BSD 2-clauses
  */
 
-#include "mathematician.h"
+#include "mathematicianLOG.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>

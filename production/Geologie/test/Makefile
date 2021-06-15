@@ -5,7 +5,7 @@
 #################################################################################
 
 # Packages.
-PACKAGES = Geographer ManagerLOG UI Scanner CommGeologie Led TranslatorBeacon
+PACKAGES = Geographer ManagerLOG UI Scanner CommGeologie Led TranslatorBeacon MathematicianLOG
 
 #################################################################################
 #																				#
