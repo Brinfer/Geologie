@@ -462,6 +462,7 @@ static void time_out(){
 
 
 extern void Receiver_new(){
+    mqInit();
 	wtd_TScan = Watchdog_construct(1000000, &(time_out));
 }
 
@@ -469,8 +470,7 @@ extern int8_t Receiver_ask4StartReceiver(){
     TRACE("[Receiver] Receiver_ask4StartReceiver%s", "\n"); 
 	
 	int8_t returnError = EXIT_FAILURE;
-    myState = S_SCANNING;
-    mqInit();
+    myState = S_BEGINNING;
     MqMsg msg = {
                 .event = E_MAJ_BEACONS_CHANNEL
                 };
