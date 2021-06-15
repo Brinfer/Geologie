@@ -340,7 +340,7 @@ static void sortBeaconsCoefficientId(BeaconCoefficients * beaconsCoefficient){
 static void perform_setCurrentPosition(MqMsg * msg){
         beaconSignal = msg->beaconsSignal;
         translateBeaconsSignalToBeaconsData(msg->beaconsSignal, beaconsData);
-        currentPosition = Mathematician_getCurrentPosition(beaconsData, NbBeaconsAvailable);
+        Mathematician_getCurrentPosition(beaconsData, NbBeaconsAvailable , &currentPosition);
         Bookkeeper_ask4CurrentProcessorAndMemoryLoad();
 }
 

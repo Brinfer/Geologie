@@ -1,7 +1,7 @@
 /**
  * @file mathematician_test.c
  *
- * @brief Ensemble de fonction permettant de tester le module mathematician.
+ * @brief Ensemble de fonction permettant de tester le module mathematicianLOG.
  *
  * @version 1.0
  * @date 11/05/2021
@@ -9,8 +9,8 @@
  * @author MOLARD Simon
  * @copyright ESD 2-clauses
  *
- * @see ReceptionistLOG/mathematician.h
- * @see ReceptionistLOG/mathematician.c
+ * @see ReceptionistLOG/mathematicianLOG.h
+ * @see ReceptionistLOG/mathematicianLOG.c
  */
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -25,7 +25,7 @@
 #include <setjmp.h>
 #include <limits.h>
 #include "cmocka.h"
-#include "Mathematician/mathematician.c"
+#include "MathematicianLOG/mathematicianLOG.c"
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -493,12 +493,12 @@ static const struct CMUnitTest tests[] =
 
 
 /**
- * @brief Lance la suite de test du module Mathematician.
+ * @brief Lance la suite de test du module MathematicianLOG.
  *
  * @return 0 en cas de succees ou le numero du test qui a echoue.
  */
 int mathematician_run_tests() {
-    return cmocka_run_group_tests_name("Test of the module mathematician", tests, NULL, NULL);
+    return cmocka_run_group_tests_name("Test of the module mathematicianLOG", tests, NULL, NULL);
 }
 
 static void test_distanceCalculWithPosition(void** state) {

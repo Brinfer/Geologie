@@ -1,6 +1,6 @@
 
 /**
- * @file mathematician.h
+ * @file mathematicianLOG.h
  *
  * @brief Module permettant d'effectuer des calculs de positions et de coefficients
  *
