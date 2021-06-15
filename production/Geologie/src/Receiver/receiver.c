@@ -30,7 +30,7 @@
 #include "../Scanner/scanner.h"
 #include "../common.h"
 #include "../tools.h"
-
+#include "stdbool.h"
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //
@@ -89,7 +89,7 @@ typedef struct {
 
 static Transition_RECEIVER stateMachine[NB_STATE - 1][NB_EVENT_RECEIVER] =
 {
-    [S_BEGINNING] [E_MAJ_BEACONS_CHANNEL] = {S_SCANNING, A_MAJ_BEACONS_CHANNELS},
+    [S_SCANNING] [E_MAJ_BEACONS_CHANNEL] = {S_SCANNING, A_MAJ_BEACONS_CHANNELS},
     [S_SCANNING] [E_ASK_BEACONS_SIGNAL] = {S_SCANNING, A_SEND_BEACONS_SIGNAL},
 	[S_SCANNING] [E_TIME_OUT] = {S_TRANSLATING, A_TRANSLATE},
 	[S_SCANNING] [E_STOP] = {S_DEATH, A_STOP},
@@ -123,8 +123,13 @@ typedef struct {
 } MqMsgReceiver;
 
 static Watchdog * wtd_TScan;
+static pthread_mutex_t myMutex = PTHREAD_MUTEX_INITIALIZER;
 
-
+/**
+ * @brief variable static pour la boucle while dans le thread
+ *
+ */
+static bool keepGoing = false;
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //
@@ -195,7 +200,7 @@ static void performAction(Action_RECEIVER action, MqMsgReceiver * msg);
  * @fn static void * run()
  * @brief thread qui lit la BAL et met a jour l'action a realiser
 */
-static void * run();
+static void * run(void* _);
 
 /**
  * @fn static void time_out()
@@ -203,6 +208,21 @@ static void * run();
 */
 static void time_out();
 
+
+static bool getKeepGoing(void) {
+    bool returnValue;
+    pthread_mutex_lock(&myMutex);
+    returnValue = keepGoing;
+    pthread_mutex_unlock(&myMutex);
+
+    return returnValue;
+}
+
+static void setKeepGoing(bool newValue) {
+    pthread_mutex_lock(&myMutex);
+    keepGoing = newValue;
+    pthread_mutex_unlock(&myMutex);
+}
 
 static void mqInit() {
     TRACE("[Scanner] : mqInit %s","\n");
@@ -230,20 +250,23 @@ static void mqInit() {
     if (descripteur == -1) {
         perror("Erreur Open :\n");
     }
+	TRACE("INIT MQ %d%s",descripteur, "\n");
 }
 
 static int8_t sendMsg(MqMsgReceiver* msg) {
     int8_t returnError = EXIT_FAILURE;
-    if (mq_send(descripteur, (char*) msg, sizeof(msg), 0) == 0) {
+    if (mq_send(descripteur, (char*) msg, sizeof(MqMsgReceiver), 0) == 0) {
         returnError = EXIT_SUCCESS;
     }
+		TRACE("SEND MESSAGE%s", "\n");
+
     return returnError;
 }
 
 static void mqReceive(MqMsgReceiver* msg) {
-
-    mq_receive(descripteur, (char*) msg, sizeof(msg), NULL);
-
+	TRACE("START READ%s", "\n");
+    mq_receive(descripteur, (char*) msg, sizeof(MqMsgReceiver), NULL);
+	TRACE("READ MESSAGE%s", "\n");
 }
 
 static void Receiver_translateChannelToBeaconsSignal(){
@@ -274,7 +297,7 @@ static void Receiver_translateChannelToBeaconsSignal(){
                 .event = E_TRANSLATING_DONE
                 };
     sendMsg(&msg);
-
+	TRACE("on a finit de translate %s","\n");
 }
 
 static void reset_beaconsChannelAndSignal(){
@@ -358,7 +381,9 @@ static void Receiver_getAllBeaconsChannel(){
 	uint32_t uuid[2];
 	uint32_t len;
 
-	while(1){
+	setKeepGoing(true);
+
+	while(getKeepGoing()){
 		len = read(device, buf, sizeof(buf));
 		if ( len >= HCI_EVENT_HDR_SIZE ){
 			meta_event = (evt_le_meta_event*)(buf+HCI_EVENT_HDR_SIZE+1);
@@ -408,6 +433,7 @@ static void performAction(Action_RECEIVER action, MqMsgReceiver * msg){
         case A_SEND_BEACONS_SIGNAL:
 			TRACE("[Receiver] SEND BEACONS SIGNAL%s", "\n"); 
             Scanner_setAllBeaconsSignal(beaconsSignal, NbBeaconsSignal);
+			Watchdog_start(wtd_TScan);
             break;
 
         case A_MAJ_BEACONS_CHANNELS:
@@ -418,6 +444,8 @@ static void performAction(Action_RECEIVER action, MqMsgReceiver * msg){
             break;
 
 		case A_TRANSLATE:
+		TRACE("COUCOUCOUC%s", "\n");
+			setKeepGoing(false);
 			Receiver_translateChannelToBeaconsSignal(beaconsChannel);
 
 		case A_STOP:
@@ -428,17 +456,23 @@ static void performAction(Action_RECEIVER action, MqMsgReceiver * msg){
 
 }
 
-static void * run(){
+static void * run(void*_){
+	TRACE("STRAT PROCESSUS%d%s",myState, "\n");
 
     MqMsgReceiver msg;
 
     Action_RECEIVER action;
 
     while (myState != S_DEATH) {
+		TRACE("RUN%s", "\n");
 
         mqReceive(&msg);
+
+		TRACE("FINISH READ%s", "\n");
+
         action = stateMachine[myState][msg.event].action;
 		if (stateMachine[myState][msg.event].destinationState != S_FORGET) {
+			TRACE("Action %d EVENT %d", action, msg.event);
 			performAction(action, &msg);
 			myState =  stateMachine[myState][msg.event].destinationState;
 		}else {
@@ -446,14 +480,16 @@ static void * run(){
     	}
         
     }
-
-   return 0;
+	TRACE("END PROCESSUS%s","\n");
+	return NULL;
 }
 
 static void time_out(){
+	TRACE("TIME OUT%s", "\n");
     MqMsgReceiver msg = {
                 .event = E_TIME_OUT
                 };
+	TRACE("%d\n", myState);
     sendMsg(&msg);
 }
 
@@ -470,23 +506,25 @@ static void time_out(){
 
 extern void Receiver_new(){
     mqInit();
-	wtd_TScan = Watchdog_construct(1000000, &(time_out));
+	pthread_mutex_init(&myMutex, NULL);
+
+	wtd_TScan = Watchdog_construct(1000000, (WatchdogCallback) time_out);
 }
 
 extern int8_t Receiver_ask4StartReceiver(){
     TRACE("[Receiver] Receiver_ask4StartReceiver%s", "\n");
 
 	int8_t returnError = EXIT_FAILURE;
-    myState = S_BEGINNING;
+    myState = S_SCANNING;
     // MqMsgReceiver msg = {
     //             .event = E_MAJ_BEACONS_CHANNEL
     //             };
     // sendMsg(&msg);
-	Watchdog_start(wtd_TScan);
 	// reset_beaconsChannelAndSignal();
-    Receiver_getAllBeaconsChannel();
     returnError = pthread_create(&myThreadMq, NULL, &run, NULL);
-	if(returnError != -1){
+	Watchdog_start(wtd_TScan);
+    //Receiver_getAllBeaconsChannel();
+	if(returnError >= 0){
 		TRACE("[Receiver] Reveiver RUN lancé%s", "\n"); 
 
 	}
@@ -506,13 +544,16 @@ extern int8_t Receiver_ask4StopReceiver(){
 }
 
 extern void Receiver_free(){
+	TRACE("\n");
 	myState = S_DEATH;
+    pthread_mutex_destroy(&myMutex);
+
     Watchdog_destroy(wtd_TScan);
 }
 
 extern int8_t Receiver_ask4BeaconsSignal(){
     TRACE("[Receiver] Receiver_ask4BeaconsSignal%s", "\n");
-
+	
 	int8_t returnError = EXIT_FAILURE;
     MqMsgReceiver msg = {
                 .event = E_ASK_BEACONS_SIGNAL

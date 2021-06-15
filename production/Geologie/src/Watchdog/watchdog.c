@@ -31,6 +31,7 @@
 #include <malloc.h>
 #include <time.h>
 #include <signal.h>
+#include "../tools.h"
 
 struct Watchdog_t
 {
@@ -76,6 +77,7 @@ Watchdog *Watchdog_construct(uint32_t thisDelay, WatchdogCallback callback)
 
 void Watchdog_start(Watchdog *this)
 {
+    TRACE("Launch the WATCHDOG%s", "\n");
     struct itimerspec spec;
 
     /* Period of the timer */
