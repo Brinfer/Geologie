@@ -120,7 +120,7 @@ static struct mq_attr attr;
 
 typedef struct {
     Event_RECEIVER event;
-} MqMsg;
+} MqMsgReceiver;
 
 static Watchdog * wtd_TScan;
 
@@ -144,22 +144,22 @@ static Watchdog * wtd_TScan;
 static void mqInit();
 
 /**
- * @fn static void sendMsg(MqMsg* this)
+ * @fn static void sendMsg(MqMsgReceiver* this)
  * @brief Envoie des messages a la BAL
  *
  * @param this structure du message envoye a la BAL
  * @return renvoie 1 si une erreur est detectee, sinon 0
 */
-static int8_t sendMsg(MqMsg* this);
+static int8_t sendMsg(MqMsgReceiver* this);
 
 /**
- * @fn static void mqReceive(MqMsg* this)
+ * @fn static void mqReceive(MqMsgReceiver* this)
  * @brief Va chercher les messages dans la BAL
  *
  * @param msg structure du message a recuperer
  * @return renvoie 1 si une erreur est detectee, sinon 0
 */
-static void mqReceive(MqMsg* this);
+static void mqReceive(MqMsgReceiver* this);
 
 /**
  * @fn static void Receiver_translateChannelToBeaconsSignal()
@@ -183,13 +183,13 @@ static void reset_beaconsChannelAndSignal();
 static void Receiver_getAllBeaconsChannel();
 
 /**
- * @fn static void performAction(Action_SCANNER action, MqMsg * msg)
+ * @fn static void performAction(Action_SCANNER action, MqMsgReceiver * msg)
  * @brief execute les fonctions a realiser en fonction du parametre action
  *
  * @param action action a executer
  * @param msg message qui contient les donnees necessaire a l'execution de la fonction
 */
-static void performAction(Action_RECEIVER action, MqMsg * msg);
+static void performAction(Action_RECEIVER action, MqMsgReceiver * msg);
 
 /**
  * @fn static void * run()
@@ -207,7 +207,7 @@ static void time_out();
 static void mqInit() {
     attr.mq_flags = 0; //Flags de la file
     attr.mq_maxmsg = MQ_MAX_MESSAGES; //Nombre maximum de messages dans la file
-    attr.mq_msgsize = sizeof(MqMsg); //Taille maximale de chaque message
+    attr.mq_msgsize = sizeof(MqMsgReceiver); //Taille maximale de chaque message
     attr.mq_curmsgs = 0; //Nombre de messages actuellement dans la file
 
     /* destruction de la BAL si toutefois préexistante */
@@ -230,7 +230,7 @@ static void mqInit() {
     }
 }
 
-static int8_t sendMsg(MqMsg* msg) {
+static int8_t sendMsg(MqMsgReceiver* msg) {
     int8_t returnError = EXIT_FAILURE;
     if (mq_send(descripteur, (char*) msg, sizeof(msg), 0) == 0) {
         returnError = EXIT_SUCCESS;
@@ -238,7 +238,7 @@ static int8_t sendMsg(MqMsg* msg) {
     return returnError;
 }
 
-static void mqReceive(MqMsg* this) {
+static void mqReceive(MqMsgReceiver* this) {
 
     mq_receive(descripteur, (char*) this, sizeof(*this), NULL);
 
@@ -267,7 +267,7 @@ static void Receiver_translateChannelToBeaconsSignal(){
 		}
 	}
 
-	MqMsg msg = {
+	MqMsgReceiver msg = {
                 .event = E_TRANSLATING_DONE
                 };
     sendMsg(&msg);
@@ -397,7 +397,7 @@ static void Receiver_getAllBeaconsChannel(){
 	hci_close_dev(device);
 }
 
-static void performAction(Action_RECEIVER action, MqMsg * msg){
+static void performAction(Action_RECEIVER action, MqMsgReceiver * msg){
     switch (action) {
 
         case A_SEND_BEACONS_SIGNAL:
@@ -423,7 +423,7 @@ static void performAction(Action_RECEIVER action, MqMsg * msg){
 
 static void * run(){
 
-    MqMsg msg;
+    MqMsgReceiver msg;
 
     Action_RECEIVER action;
 
@@ -444,7 +444,7 @@ static void * run(){
 }
 
 static void time_out(){
-    MqMsg msg = {
+    MqMsgReceiver msg = {
                 .event = E_TIME_OUT
                 };
     sendMsg(&msg);
@@ -467,11 +467,11 @@ extern void Receiver_new(){
 }
 
 extern int8_t Receiver_ask4StartReceiver(){
-    TRACE("[Receiver] Receiver_ask4StartReceiver%s", "\n"); 
-	
+    TRACE("[Receiver] Receiver_ask4StartReceiver%s", "\n");
+
 	int8_t returnError = EXIT_FAILURE;
     myState = S_BEGINNING;
-    MqMsg msg = {
+    MqMsgReceiver msg = {
                 .event = E_MAJ_BEACONS_CHANNEL
                 };
     sendMsg(&msg);
@@ -481,8 +481,8 @@ extern int8_t Receiver_ask4StartReceiver(){
 }
 
 extern int8_t Receiver_ask4StopReceiver(){
-    TRACE("[Receiver] Receiver_ask4StopReceiver%s", "\n"); 
-    MqMsg msg = {
+    TRACE("[Receiver] Receiver_ask4StopReceiver%s", "\n");
+    MqMsgReceiver msg = {
                 .event = E_STOP
                 };
     sendMsg(&msg);
@@ -497,10 +497,10 @@ extern void Receiver_free(){
 }
 
 extern int8_t Receiver_ask4BeaconsSignal(){
-    TRACE("[Receiver] Receiver_ask4BeaconsSignal%s", "\n"); 
+    TRACE("[Receiver] Receiver_ask4BeaconsSignal%s", "\n");
 
 	int8_t returnError = EXIT_FAILURE;
-    MqMsg msg = {
+    MqMsgReceiver msg = {
                 .event = E_ASK_BEACONS_SIGNAL
                 };
     returnError = sendMsg(&msg);

@@ -1,25 +1,14 @@
 /**
- * @file geographer.c
+ * @file Geographer.c
  *
  * @brief Est en quelque sorte le chef d'orchestre de Geologie
  *
  * @version 1.0
- * @date 03-06-2021
- * @author BRIENT Nathan
+ * @date 15-06-2021
+ * @author GAUTIER Pierre-Louis
  * @copyright Geo-Boot
  * @license BSD 2-clauses
  */
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-//                                              Define
-//
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-#define NB_EXPERIMENTAL_POSITION (25)
-#define NB_EXPERIMENTAL_TRAJECT (3)
-
-#define MQ_MAX_MESSAGES (10)
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -42,119 +31,160 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//                                              Variable et structure privee
+//                                              Define
 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * @brief The name of the queue
+ * @brief Le nombre de position experimentale.
  */
-#define MQ_LABEL "/MQ_Geographer"
+#define NB_EXPERIMENTAL_POSITION (25)
 
 /**
- * @brief Les indicateurs de la boite au lettre de PostmanLOG.
+ * @brief Le nombre de trajet experimentaux.
+ */
+#define NB_EXPERIMENTAL_TRAJECT (3)
+
+/**
+ * @brief Le nombre maximale de message dans la boite aux lettre de PostmanLOG.
+ */
+#define MQ_MAX_MESSAGES (10)
+
+/**
+ * @brief Le nom de la boite au lettre de Geographer.
+ */
+#define MQ_LABEL "/MQ_GEOGRAPHER"
+
+/**
+ * @brief Les indicateurs de la boite au lettre de Geographer.
  *
  */
 #define MQ_FLAGS (O_CREAT | O_RDWR)
 
 /**
- * @brief Les modes de la boite aux lettre de PostmanLOG.
+ * @brief Les modes de la boite aux lettre de Geographer.
  */
 #define MQ_MODE (S_IRUSR | S_IWUSR)
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//                                              Variable et structure privee
+//
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 /**
- * @brief Structure contenant les etat que peut prendre Geographer
+ * @brief Enumeration des etat que peut prendre Geographer.
  */
 typedef enum {
-    S_NONE = 0,
+    S_NONE = 0,                                             /**< Etat par defaut, celui ne devrait jamais arriver */
 
-    S_DEATH,
-    S_WATING_FOR_CONNECTION,
-    S_IDLE,
+    S_DEATH,                                                /**< Etat indiquant l'arret de la machine a etat */
+    S_WATING_FOR_CONNECTION,                                /**< Etat d'attente de la connexion avec un client */
+    S_IDLE,                                                 /**< Etat pricipale de la machine a etat */
 
     // Calibrating
-    S_WAITING_FOR_BE_PLACED,
-    S_WAITING_FOR_ATTENUATION_COEFFICIENT_FROM_POSITION,
-    S_WAITING_FOR_CALCUL_AVERAGE_COEFFICIENT,
-    S_TEST_IF_FINISH_ALL_POSITION,
+    S_WAITING_FOR_BE_PLACED,                                /**< Etat d'attente durant la calibration ou GEOLOGIE attent d'etre place sur une position de calibration */
+    S_WAITING_FOR_ATTENUATION_COEFFICIENT_FROM_POSITION,    /**< Etat d'attente durant la calibration ou GEOLOGIE attent que Scanner est fini de calculer les coefficient d'attenuation a la position de calibration actuelle */
+    S_WAITING_FOR_CALCUL_AVERAGE_COEFFICIENT,               /**< Etat d'attente durant la calibration ou GEOLOGIE attent que Scanner est fini de calculer la moyenne des coefficient d'attenuation */
+    S_TEST_IF_FINISH_ALL_POSITION,                          /**< Etat permettant d'estimer si tout les coefficient d'attenuation ont ete calcule */
 
-    S_NB_STATE
+    S_NB_STATE                                              /**< Le nombre d'etat de la machine a etat de Geographer */
 } StateGeographer;
 
 /**
- * @brief Structure contenant les evenement que geographer peut recevoir
+ * @brief Enumeration des evenement que Geographer peut recevoir.
  */
 typedef enum {
-    E_NONE = 0,
+    E_NONE = 0,                             /**< Evenement par defaut, celui ne devrait jamais arriver */
 
-    E_STOP,
-    E_CONNECTION_ESTABLISHED,
-    E_CONNECTION_DOWN,
+    E_STOP,                                 /**< Evenement demandant l'arret de Geographer */
+    E_CONNECTION_ESTABLISHED,               /**< Evenement indiquant que la connection a ete etablie */
+    E_CONNECTION_DOWN,                      /**< Evenement indiquant que la connection a ete perdu */
 
-    E_DATE_AND_SEND_DATA,
-    E_ASK_CALIBRATION_POSITIONS,
-    E_VALIDATE_POSITION,
-    E_SIGNAL_END_UPDATE_ATTENUATION,
-    E_FINISH_CALIBRATE_ALL_POSITION,
-    E_NOT_FINISH_CALIBRATE_ALL_POSITION,
-    E_SIGNAL_END_AVERAGE_CALCUL,
+    E_DATE_AND_SEND_DATA,                   /**< Evenement indiquant qu'il faut envoyer l'ensemble des donnees */
+    E_ASK_CALIBRATION_POSITIONS,            /**< Evenement demandant a Geographer d'envoyer les position de calibration */
+    E_VALIDATE_POSITION,                    /**< Evenement indiquant a Geographer de calibrer a la position de calibration actuelle */
+    E_SIGNAL_END_UPDATE_ATTENUATION,        /**< Evenement indiquant a Geographer que Scanner a fini de calculer les coefficient d'attenuation a la position actuelle */
+    E_FINISH_CALIBRATE_ALL_POSITION,        /**< Evenement indiquant a Geographer que l'ensemble des coefficients d'attenuations ont ete calculer */
+    E_NOT_FINISH_CALIBRATE_ALL_POSITION,    /**< Evenement indiquant a Geographer que l'ensemble des coefficient d'attenuation n'ont pas tous ete calculer */
+    E_SIGNAL_END_AVERAGE_CALCUL,            /**< Evenement indiquant a Geographer que le calcul de la moyenne des coefficient d'attenuation a ete fait */
 
-    E_NB_EVENT
+    E_NB_EVENT                              /**< Le nombre d'evenement */
 } EventGeographer;
 
+/**
+ * @brief Enumeration des actions que Geographer peut effectuer.
+ */
 typedef enum {
-    A_NONE,
+    A_NONE,                                 /**< Action par defaut, celle-ci ne permet de rien faire. */
 
-    A_STOP,
-    A_SEND_EXPERIMENTAL_DATA,
-    A_SEND_ALL_DATA,
-    A_SET_CALIBRATION_DATA,
-    A_INCREASE_CALIBRATION_COUNTER,
-    A_SIGNAL_END_CALIBRATION_POSITION,
-    A_ASK_AVERAGE_CALCUL,
-    A_ASK_COMPUTE_ATTENUATION_COEFFICIENT,
-    A_SET_CALIBRATION_POSITION,
+    A_STOP,                                 /**< Arret de Geographer */
+    A_SEND_EXPERIMENTAL_DATA,               /**< Envoie des donnees experimentales */
+    A_SEND_ALL_DATA,                        /**< Envoie de toutes les donnees courantes */
+    A_SET_CALIBRATION_DATA,                 /**< Envoie a GEOMOBILE les donnees de calibration */
+    A_INCREASE_CALIBRATION_COUNTER,         /**< Incrementation du compteur de position calibrer */
+    A_SIGNAL_END_CALIBRATION_POSITION,      /**< Signale la fin de la calibration a la position de calibration */
+    A_ASK_AVERAGE_CALCUL,                   /**< Demande le calcul de la moyenne des coefficient d'attenuation */
+    A_ASK_COMPUTE_ATTENUATION_COEFFICIENT,  /**< Demande de calculer les coefficient d'attenuation */
+    A_SET_CALIBRATION_POSITION,             /**< Envoie a GEOMOBILE les position de calibration */
 
-    A_NB_ACTION,
+    A_NB_ACTION,                            /**< Le nombre d'action */
 } ActionGeographer;
 
+/**
+ * @brief Struture contenant les donnees courantes.
+ */
 typedef struct {
-    EventGeographer event;
+    Position* position;                                 /**< La position courante a envoyer a GEOMOBILE */
+    ProcessorAndMemoryLoad* processorAndMemoryLoad;     /**< La charge processeur et memoire a envoyer a GEOMOBILE */
+    BeaconData* beaconsData;                            /**< Les donnees balises courante a envoyer a GEOMOBILE */
+    int8_t nbBeaconData;                                /**< Le nombre de balises composant les donnees balises */
+} DataCurrent;
 
-    union {
-        struct {
-            Position* position;
-            ProcessorAndMemoryLoad* processorAndMemoryLoad;
-            BeaconData* beaconsData;
-            int8_t nbBeaconData;            // Same size but more readable in the rest of the program
-        } current;
-        struct {
-            CalibrationData* calibrationData;   // Same size but more readable in the rest of the program
-            int8_t nbCalibrationData;
-        } calibration;
+/**
+ * @brief Les donnees de calibration.
+ *
+ */
+typedef struct {
+    CalibrationData* calibrationData;   /**< Les donnees de calibration a envoyer a GEOMOBILE */
+    int8_t nbCalibrationData;           /**< Le nombre de donnees de calibration */
+} DataCalibration;
 
-        CalibrationPositionId calibrationPositionId;
-    }data;
-} MqMsg;
+typedef union {
+    DataCurrent current;                            /**< Les donnees courantes a envoyer a GEOMOBILE */
+    DataCalibration calibration;                    /**< Les donnees de calibration a envoyer a GEOMOBILE. */
+    CalibrationPositionId calibrationPositionId;    /**< L'identifiant de calibration ou se calibrer */
+} DataToShare;
+
+/**
+ * @brief La structure correspondant aux message passant par la boite aux letres de Geographer.
+ */
+typedef struct {
+    EventGeographer event;  /**< L'evement associer au message */
+    DataToShare data;       /**< L'union des donnees a passer a Geographer et qu'il devra traiter. */
+} MqMsgGeographer;
 
 /**
  * @brief Contient les informations necessaire a une transition entre les etats.
  */
 typedef struct {
-    StateGeographer destinationState;   /**< L'état suivant */
-    ActionGeographer action;            /**< L'action à effectuer lors de la transition */
+    StateGeographer destinationState;   /**< L'etat suivant */
+    ActionGeographer action;            /**< L'action a effectuer lors de la transition */
 } TransitionGeographer;
 
-
 /**
- * @brief Etat de la connexion.
+ * @brief L'etat courant de la machine a etat de Geographer.
  */
-static ConnectionState connectionState;
-
 static StateGeographer currentState;
 
+/**
+ * @brief Le thread de Geographer.
+ */
 static pthread_t geographerThread;
 
+/**
+ * @brief La queue de Geographer
+ */
 static mqd_t geographerMq;
 
 /**
@@ -164,7 +194,6 @@ static uint8_t calibrationCounter;
 
 /**
 * @brief Tableau contenant les positions experimentales
-*
 */
 static const ExperimentalPosition EXPERIMENTAL_POSITIONS[NB_EXPERIMENTAL_POSITION] = {
     {.id = 1, .position = {.X = 550, .Y = 200}},
@@ -196,7 +225,6 @@ static const ExperimentalPosition EXPERIMENTAL_POSITIONS[NB_EXPERIMENTAL_POSITIO
 
 /**
 * @brief Tableau contenant les positions de calibration
-*
 */
 static const  CalibrationPosition CALIBRATION_POSITION[NB_CALIBRATION_POSITION] = {
     {.id = 1, .position = {.X = 550, .Y = 200}},
@@ -228,7 +256,6 @@ static const  CalibrationPosition CALIBRATION_POSITION[NB_CALIBRATION_POSITION] 
 
 /**
 * @brief Tableau contenant le premier trajet experimental
-*
 */
 static Position TRAJECT_1[] = {
     {.X = 100, .Y = 1300 },
@@ -240,7 +267,6 @@ static Position TRAJECT_1[] = {
 
 /**
 * @brief Tableau contenant le deuxieme trajet experimental
-*
 */
 static Position TRAJECT_2[] = {
     {.X = 50, .Y = 1300 },
@@ -249,7 +275,6 @@ static Position TRAJECT_2[] = {
 
 /**
 * @brief Tableau contenant le troisieme trajet experimental
-*
 */
 static Position TRAJECT_3[] = {
     {.X = 950, .Y = 1000 },
@@ -259,7 +284,6 @@ static Position TRAJECT_3[] = {
 
 /**
 * @brief Tableau contenant les trajets experimentaux
-*
 */
 static const ExperimentalTraject EXPERIMENTAL_TRAJECTS[NB_EXPERIMENTAL_TRAJECT] = {
     {.id = 1, .traject = TRAJECT_1, .nbPosition = 5},
@@ -267,8 +291,13 @@ static const ExperimentalTraject EXPERIMENTAL_TRAJECTS[NB_EXPERIMENTAL_TRAJECT] 
     {.id = 3, .traject = TRAJECT_3, .nbPosition = 3}
 };
 
+/**
+ * @brief L'ensemble des #TransitionGeographer a effectuer pour la machine a etat en fonction de l'etat actuel et de l'evenement.
+ *
+ */
 static const TransitionGeographer stateMachine[S_NB_STATE][E_NB_EVENT] = {
     [S_WATING_FOR_CONNECTION] [E_CONNECTION_ESTABLISHED] = {S_IDLE, A_SEND_EXPERIMENTAL_DATA},
+    [S_WATING_FOR_CONNECTION][E_DATE_AND_SEND_DATA] = {S_WATING_FOR_CONNECTION, A_NONE},
     [S_WATING_FOR_CONNECTION][E_STOP] = {S_DEATH, A_STOP},
 
     [S_IDLE][E_ASK_CALIBRATION_POSITIONS] = {S_WAITING_FOR_BE_PLACED, A_SET_CALIBRATION_POSITION},
@@ -294,7 +323,6 @@ static const TransitionGeographer stateMachine[S_NB_STATE][E_NB_EVENT] = {
     [S_WAITING_FOR_CALCUL_AVERAGE_COEFFICIENT][E_STOP] = {S_DEATH, A_STOP},
 };
 
-
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //                                              Prototypes de fonctions
@@ -304,72 +332,151 @@ static const TransitionGeographer stateMachine[S_NB_STATE][E_NB_EVENT] = {
 /**
  * @brief Recupere la date ecoulee depuis le 1 er janvier 1970
  * *
- * @return renvoie la date actuelle en secondes
+ * @return int8_t -1 en cas d'erreur, 0 sinon.
 */
 static Date getCurrentDate();
 
 /**
  * @brief initialise la boite aux lettres
  *
- * @return 1 si erreur detectee, sinon retourne 0
+ * @return int8_t -1 en cas d'erreur, 0 sinon.
 */
 static int8_t setUpMq();
 
 /**
- * @brief] Ferme et detruit la boite aux lettres
+ * @brief Ferme et detruit la boite aux lettres
  *
- * @return -1 si erreur detectee, sinon retourne 0
+ * @return int8_t -1 en cas d'erreur, 0 sinon.
 */
 static int8_t tearDoneMq();
 
 /**
- * @brief] Ferme et detruit la boite aux lettres
+ * @brief Ferme et detruit la boite aux lettres
  *
- * @return -1 si erreur detectee, sinon retourne 0
- * @param dest message a envoyer a la queue
+ * @return int8_t -1 en cas d'erreur, 0 sinon.
 */
-static int8_t readMsgMq(MqMsg* dest);
+static int8_t readMsgMq(MqMsgGeographer* dest);
 
 /**
- * @brief methode appelee par un thread pour recevoir les action a] Faire grace a une boite au lettre et les effectuer
+ * @brief methode appelee par un thread pour recevoir les action a faire grace a une boite au lettre et les effectuer.
  *
- * cette metode lira la boite au lettre et effectuera les actions
+ * Cette methode lira la boite au lettre et effectuera les actions.
  */
 static void* runGeographer();
 
 /**
- * @brief methode pour envoyer des message a la queue
+ * @brief Envoye des messages a la queue
  *
- * @param sizeOfMsg taille du message a envoyer
- * @param msg structure contenant les donnees a utiliser pour effectuer l'action
- * @return 1 si erreur 0 si
+ * @param sizeOfMsg La taille du message a envoyer
+ * @param msg Les donnees a utiliser pour effectuer l'action
+ * @return int8_t -1 en cas d'erreur, 0 sinon.
  */
-static int8_t sendMsgMq(MqMsg* msg);
+static int8_t sendMsgMq(MqMsgGeographer* msg);
 
-static int8_t performAction(ActionGeographer action, const MqMsg* msg);
+/**
+ * @brief Execute la fonction associer a l'#ActionGeographer et passe les donnees contenue dans #MqMsgGeographer.
+ *
+ * @param action L'action a effectuer.
+ * @param msg Le message contenant les donnees a passer aux fonction.
+ * @return int8_t -1 en cas d'erreur, 0 sinon.
+ */
+static int8_t performAction(ActionGeographer action, const MqMsgGeographer* msg);
 
+/**
+ * @brief Signale en interne que toutes les positions de calibration ont ete calculer.
+ *
+ * @return int8_t -1 en cas d'erreur, 0 sinon.
+ */
 static int8_t signalFinishCalibrateAllPosition(void);
 
+/**
+ * @brief Signale en interne que toutes les positions de calibration n'ont pas ete calculer.
+ *
+ * @return int8_t -1 en cas d'erreur, 0 sinon.
+ */
 static int8_t signalNotFinishCalibrateAllPosition(void);
 
+/**
+ * @brief N'effectue rien
+ *
+ * @retval int8_t 0
+ */
 static int8_t actionNone(void);
 
+/**
+ * @brief Execute le processus d'arret de Geographer.
+ *
+ * @return int8_t -1 en cas d'erreur, 0 sinon.
+ */
 static int8_t actionStop(void);
 
+/**
+ * @brief Envoie a GEOMOBILE les donnees experimentales.
+ *
+ * @param experimentalPositions Les positions experimentales
+ * @param nbExperimentalPosition Le nombre de position experimentales
+ * @param experimentalTrajects Les trajects experimentaux
+ * @param nbExperimentalTraject Le nombre de trajet experimentaux
+ * @return int8_t -1 en cas d'erreur, 0 sinon.
+ */
 static int8_t actionSendExperimentalData(const ExperimentalPosition* experimentalPositions, uint8_t nbExperimentalPosition, const ExperimentalTraject* experimentalTrajects, uint8_t nbExperimentalTraject);
 
+/**
+ * @brief Envoie les donnees d'experimentation a GEOMOBILE
+ *
+ * @param beaconData Les donnees balises
+ * @param nbBeaconData Le nombre de balise / Le nombre de donnees balise
+ * @param position La position de GEOLOGIE
+ * @param processorAndMemoryLoad La charge processeur et memoire de GEOLOGIE
+ * @return int8_t -1 en cas d'erreur, 0 sinon.
+ */
 static int8_t actionSendAllData(BeaconData* beaconData, uint8_t nbBeaconData, Position* position, ProcessorAndMemoryLoad* processorAndMemoryLoad);
 
+/**
+ * @brief Envoie les position de calibration a GEOMOBILE.
+ *
+ * @param calibrationPosition Les positions de calibration.
+ * @param nbCalibrationPosition Le nombre de position de calibration
+ * @return int8_t -1 en cas d'erreur, 0 sinon.
+ */
 static int8_t actionSetCalibrationPosition(const CalibrationPosition* calibrationPosition, uint8_t nbCalibrationPosition);
 
+/**
+ * @brief Incremente la valeur de #calibrationCounter
+ *
+ * @retval int8_t 0
+ */
 static int8_t actionIncreaseCalibrationCounter(void);
 
+/**
+ * @brief Signal a GEOMOBILE la fin de la calibration a la position de calibration actuelle.
+ *
+ * @return int8_t -1 en cas d'erreur, 0 sinon.
+ */
 static int8_t actionSignalEndCalibrationPosition(void);
 
+/**
+ * @brief Demande a Scanner de calculer la moyenne des coefficient de calibration
+ *
+ * @return int8_t -1 en cas d'erreur, 0 sinon.
+ */
 static int8_t actionAskAverageCalcul(void);
 
+/**
+ * @brief Demande a Scanner de se calibrer a la position de calibration dont l'#CalibrationPositionId est donnee.
+ *
+ * @param calibrationPositionId L'identifiant de la position de calibration ou se calibrer
+ * @return int8_t -1 en cas d'erreur, 0 sinon.
+ */
 static int8_t actionAskComputeAttenuationCoefficient(CalibrationPositionId calibrationPositionId);
 
+/**
+ * @brief Envoie a GEOMOBILE les donnees de calibration.
+ *
+ * @param calibrationData Les donnees de calibration
+ * @param nbCalibrationData Le nombre de donnees de calibration
+ * @return int8_t -1 en cas d'erreur, 0 sinon.
+ */
 static int8_t actionSetCalibrationData(const CalibrationData* calibrationData, uint8_t nbCalibrationData);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -422,7 +529,7 @@ extern int8_t Geographer_askSignalStartGeographer() {
 extern int8_t Geographer_askSignalStopGeographer() {
     int8_t returnError;
 
-    MqMsg msg = { .event = E_STOP };
+    MqMsgGeographer msg = { .event = E_STOP };
     returnError = sendMsgMq(&msg);
 
     if (returnError < 0) {
@@ -440,7 +547,7 @@ extern int8_t Geographer_askSignalStopGeographer() {
 extern int8_t Geographer_signalConnectionEstablished() {
     int8_t returnError;
 
-    MqMsg msg = { .event = E_CONNECTION_ESTABLISHED };
+    MqMsgGeographer msg = { .event = E_CONNECTION_ESTABLISHED };
     returnError = sendMsgMq(&msg);
 
     ERROR(returnError < 0, "[Geographer] Fail to send the message signal connection established ... Abandonnement");
@@ -451,7 +558,7 @@ extern int8_t Geographer_signalConnectionEstablished() {
 extern int8_t Geographer_signalConnectionDown() {
     int8_t returnError;
 
-    MqMsg msg = { .event = E_CONNECTION_DOWN };
+    MqMsgGeographer msg = { .event = E_CONNECTION_DOWN };
     returnError = sendMsgMq(&msg);
 
     ERROR(returnError < 0, "[Geographer] Fail to send the message signal connection down ... Abandonnement");
@@ -462,7 +569,7 @@ extern int8_t Geographer_signalConnectionDown() {
 extern int8_t Geographer_askCalibrationPositions() {
     int8_t returnError;
 
-    MqMsg msg = { .event = E_ASK_CALIBRATION_POSITIONS };
+    MqMsgGeographer msg = { .event = E_ASK_CALIBRATION_POSITIONS };
     returnError = sendMsgMq(&msg);
 
     ERROR(returnError < 0, "[Geographer] Fail to send the message stop ... retry");
@@ -473,7 +580,7 @@ extern int8_t Geographer_askCalibrationPositions() {
 extern int8_t Geographer_validatePosition(CalibrationPositionId calibrationPositionId) {
     int8_t returnError;
 
-    MqMsg msg = {
+    MqMsgGeographer msg = {
         .event = E_VALIDATE_POSITION,
         .data.calibrationPositionId = calibrationPositionId,
     };
@@ -488,7 +595,7 @@ extern int8_t Geographer_validatePosition(CalibrationPositionId calibrationPosit
 extern int8_t Geographer_signalEndUpdateAttenuation() {
     int8_t returnError;
 
-    MqMsg msg = { .event = E_SIGNAL_END_UPDATE_ATTENUATION };
+    MqMsgGeographer msg = { .event = E_SIGNAL_END_UPDATE_ATTENUATION };
     returnError = sendMsgMq(&msg);
 
     ERROR(returnError < 0, "[Geographer] Fail to send the message singal end update attenuation ... Abandonnement");
@@ -499,7 +606,7 @@ extern int8_t Geographer_signalEndUpdateAttenuation() {
 extern int8_t Geographer_signalEndAverageCalcul(CalibrationData* calibrationData, int8_t nbCalibration) { //comment
     int8_t returnError;
 
-    MqMsg msg = { .event = E_SIGNAL_END_AVERAGE_CALCUL };
+    MqMsgGeographer msg = { .event = E_SIGNAL_END_AVERAGE_CALCUL };
 
     returnError = sendMsgMq(&msg);
     ERROR(returnError < 0, "[Geographer] Fail to send the message signal end average calcul ... Abandonnement");
@@ -510,7 +617,7 @@ extern int8_t Geographer_signalEndAverageCalcul(CalibrationData* calibrationData
 extern int8_t Geographer_dateAndSendData(BeaconData* beaconsData, int8_t beaconsDataSize, Position* currentPosition, ProcessorAndMemoryLoad* currentProcessorAndMemoryLoad) {
     int8_t returnError = EXIT_FAILURE;
 
-    MqMsg msg = {
+    MqMsgGeographer msg = {
         .event = E_DATE_AND_SEND_DATA,
         .data.current.position = currentPosition,
         .data.current.processorAndMemoryLoad = currentProcessorAndMemoryLoad,
@@ -543,7 +650,7 @@ static int8_t setUpMq(void) {
     struct mq_attr attr;
     attr.mq_flags = 0;
     attr.mq_maxmsg = MQ_MAX_MESSAGES;
-    attr.mq_msgsize = sizeof(MqMsg);
+    attr.mq_msgsize = sizeof(MqMsgGeographer);
     attr.mq_curmsgs = 0;
     geographerMq = mq_open(MQ_LABEL, MQ_FLAGS, MQ_MODE, &attr);
 
@@ -570,20 +677,20 @@ static int8_t tearDoneMq(void) {
     return returnError;
 }
 
-static int8_t readMsgMq(MqMsg* dest) {
+static int8_t readMsgMq(MqMsgGeographer* dest) {
     int8_t returnError = EXIT_SUCCESS;
 
-    returnError = mq_receive(geographerMq, (char*) dest, sizeof(MqMsg), NULL); // put char to avoid a warning
+    returnError = mq_receive(geographerMq, (char*) dest, sizeof(MqMsgGeographer), NULL); // put char to avoid a warning
     ERROR(returnError < 0, "[Geographer] Error when reading the message in the queue");
 
     return returnError;
 }
 
-static int8_t sendMsgMq(MqMsg* msg) {
+static int8_t sendMsgMq(MqMsgGeographer* msg) {
     int8_t returnError;
     errno = 0;
 
-    returnError = mq_send(geographerMq, (char*) msg, sizeof(MqMsg), 0); // put char to avoid a warning
+    returnError = mq_send(geographerMq, (char*) msg, sizeof(MqMsgGeographer), 0); // put char to avoid a warning
     ERROR(returnError < 0, "[Geographer] Error when sending the message in the queue");
 
     return returnError;
@@ -591,7 +698,7 @@ static int8_t sendMsgMq(MqMsg* msg) {
 
 static void* runGeographer() {
     while (currentState != S_DEATH) {
-        MqMsg msg;
+        MqMsgGeographer msg;
 
         readMsgMq(&msg);
         TransitionGeographer transition = stateMachine[currentState][msg.event];
@@ -609,7 +716,7 @@ static void* runGeographer() {
     return 0;
 }
 
-static int8_t performAction(ActionGeographer action, const MqMsg* msg) {
+static int8_t performAction(ActionGeographer action, const MqMsgGeographer* msg) {
     int8_t returnError;
 
     switch (action) {
@@ -704,38 +811,36 @@ static int8_t actionSendExperimentalData(const ExperimentalPosition* experimenta
 
 static int8_t actionSendAllData(BeaconData* beaconData, uint8_t nbBeaconData, Position* position, ProcessorAndMemoryLoad* processorAndMemoryLoad) {
     Date currentDate = getCurrentDate();
-    int8_t returnErrorBeaconData;
-    int8_t returnErrorCurrentPosition;
-    int8_t returnErrorLoad;
+    int8_t returnErrorBeaconData = 0;
+    int8_t returnErrorCurrentPosition = 0;
+    int8_t returnErrorLoad = 0;
 
-    if (connectionState == CONNECTED) {
+    returnErrorBeaconData = ProxyLoggerMOB_setAllBeaconsData(beaconData, nbBeaconData, currentDate);
+    if (returnErrorBeaconData < 0) {
+        ERROR(true, "[Geographer] Fail to send the beacons data ... Retry");
         returnErrorBeaconData = ProxyLoggerMOB_setAllBeaconsData(beaconData, nbBeaconData, currentDate);
-        if (returnErrorBeaconData < 0) {
-            ERROR(true, "[Geographer] Fail to send the beacons data ... Retry");
-            returnErrorBeaconData = ProxyLoggerMOB_setAllBeaconsData(beaconData, nbBeaconData, currentDate);
-            ERROR(true, "[Geographer] Fail to send the beacons data ... Abandonment");
-        }
-
-        returnErrorCurrentPosition = ProxyLoggerMOB_setCurrentPosition(position, currentDate);
-        if (returnErrorCurrentPosition < 0) {
-            ERROR(true, "[Geographer] Fail to send the current position ... Retry");
-            returnErrorCurrentPosition = ProxyLoggerMOB_setCurrentPosition(position, currentDate);
-            ERROR(true, "[Geographer] Fail to send the current position ... Abandonment");
-        }
-
-        returnErrorLoad = ProxyLoggerMOB_setProcessorAndMemoryLoad(processorAndMemoryLoad, currentDate);
-        if (returnErrorLoad < 0) {
-            ERROR(true, "[Geographer] Fail to send the current processor and the memory load ... Retry");
-            returnErrorLoad = ProxyLoggerMOB_setProcessorAndMemoryLoad(processorAndMemoryLoad, currentDate);
-            ERROR(true, "[Geographer] Fail to send the beacons data ... Abandonment");
-        }
+        ERROR(returnErrorBeaconData < 0, "[Geographer] Fail to send the beacons data ... Abandonment");
     }
+
+    returnErrorCurrentPosition = ProxyLoggerMOB_setCurrentPosition(position, currentDate);
+    if (returnErrorCurrentPosition < 0) {
+        ERROR(true, "[Geographer] Fail to send the current position ... Retry");
+        returnErrorCurrentPosition = ProxyLoggerMOB_setCurrentPosition(position, currentDate);
+        ERROR(returnErrorCurrentPosition < 0, "[Geographer] Fail to send the current position ... Abandonment");
+    }
+
+    returnErrorLoad = ProxyLoggerMOB_setProcessorAndMemoryLoad(processorAndMemoryLoad, currentDate);
+    if (returnErrorLoad < 0) {
+        ERROR(true, "[Geographer] Fail to send the current processor and the memory load ... Retry");
+        returnErrorLoad = ProxyLoggerMOB_setProcessorAndMemoryLoad(processorAndMemoryLoad, currentDate);
+        ERROR(returnErrorLoad < 0, "[Geographer] Fail to send the beacons data ... Abandonment");
+    }
+
+    ERROR((returnErrorBeaconData + returnErrorCurrentPosition + returnErrorLoad) < 0, "[Geographer] Fail to send a curent data ... Abandonment");
 
     free(beaconData);
     free(processorAndMemoryLoad);
     free(position);
-
-    ERROR((returnErrorBeaconData + returnErrorCurrentPosition + returnErrorLoad) < 0, "[Geographer] Fail to send a curent data ... Abandonment");
 
     return (returnErrorBeaconData + returnErrorCurrentPosition + returnErrorLoad) < 0 ? -1 : 0;
 }
@@ -757,7 +862,7 @@ static int8_t actionSetCalibrationPosition(const CalibrationPosition* calibratio
 }
 
 static int8_t actionIncreaseCalibrationCounter(void) {
-    calibrationCounter ++;
+    calibrationCounter++;
 
     TRACE("[Geographer] calibrate %d / %d%s", calibrationCounter, NB_CALIBRATION_POSITION, "\n");
     return 0;
@@ -837,6 +942,9 @@ static int8_t actionAskComputeAttenuationCoefficient(CalibrationPositionId calib
 
     if (returnError < 0) {
         ERROR(true, "[Geographer] Can't find a position associated to the id");
+        // TODO make a better exit
+        calibrationCounter--;                       // Prevent the increasing in the next step
+        Geographer_signalEndUpdateAttenuation();    // To not be blocked
     } else {
         Scanner_ask4UpdateAttenuationCoefficientFromPosition(&calibrationPosition);
     }
@@ -846,7 +954,7 @@ static int8_t actionAskComputeAttenuationCoefficient(CalibrationPositionId calib
 }
 
 static int8_t actionSetCalibrationData(const CalibrationData* calibrationData, uint8_t nbCalibrationData) {
-    TRACE("[Geographer] action Set Calibration Data%s", "\n"); 
+    TRACE("[Geographer] action Set Calibration Data%s", "\n");
 
     int8_t returnErrorData;
     int8_t returnErrorSignal;
@@ -872,7 +980,7 @@ static int8_t actionSetCalibrationData(const CalibrationData* calibrationData, u
 }
 
 static int8_t signalFinishCalibrateAllPosition(void) {
-    MqMsg msg = { .event = E_FINISH_CALIBRATE_ALL_POSITION };
+    MqMsgGeographer msg = { .event = E_FINISH_CALIBRATE_ALL_POSITION };
 
     int8_t returnError = sendMsgMq(&msg);
     ERROR(returnError < 0, "[Geographer] Fail to signal in intern the message finnish calibrate all position ... Abandonnement");
@@ -881,7 +989,7 @@ static int8_t signalFinishCalibrateAllPosition(void) {
 }
 
 static int8_t signalNotFinishCalibrateAllPosition(void) {
-    MqMsg msg = { .event = E_NOT_FINISH_CALIBRATE_ALL_POSITION };
+    MqMsgGeographer msg = { .event = E_NOT_FINISH_CALIBRATE_ALL_POSITION };
 
     int8_t returnError = sendMsgMq(&msg);
     ERROR(returnError < 0, "[Geographer] Fail to signal in intern the message not finnish calibrate all position ... Abandonnement");
