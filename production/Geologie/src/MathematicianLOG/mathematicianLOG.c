@@ -1,9 +1,11 @@
 /**
  * @file mathematicianLOG.c
  *
- * @version 1.0.1
- * @date 9/05/2021
- * @author Nathan BRIENT
+ * @brief Permet de faire differents calculs, calcul position, calcul moyenne des coefficients d'attenuations, ...
+ *
+ * @version 1.0
+ * @date 09-05-2021
+ * @author BRIENT Nathan
  * @copyright Geo-Boot
  * @license BSD 2-clauses
  */
@@ -74,7 +76,7 @@ extern AttenuationCoefficient Mathematician_getAttenuationCoefficient(const Powe
     double distance = distanceCalculWithPosition(beaconPosition, &calibrationPosition->position);
 
 
-    attenuationCoefficient = ((*power) - POWER_1_METER) / (-10 * log10f(distance/100)); 
+    attenuationCoefficient = ((*power) - POWER_1_METER) / (-10 * log10f(distance/100));
     return attenuationCoefficient;
 }
 
@@ -89,7 +91,7 @@ extern AttenuationCoefficient Mathematician_getAverageCalcul(const BeaconCoeffic
 }
 
 
-extern void Mathematician_getCurrentPosition(const BeaconData * beaconsData,  uint8_t nbBeacon, Position * currentPosition) {
+extern void Mathematician_getCurrentPosition(const BeaconData* beaconsData, uint8_t nbBeacon, Position * currentPosition) {
 
     Position A = beaconsData[0].position;
     double Ax = (double) beaconsData[0].position.X;
@@ -99,17 +101,17 @@ extern void Mathematician_getCurrentPosition(const BeaconData * beaconsData,  ui
     Position B = beaconsData[1].position;
     double dB = distanceCalculWithPower(&beaconsData[1].power, &beaconsData[1].coefficientAverage);
     double Bx=(double)beaconsData[1].position.X;
-    double By=(double)beaconsData[1].position.Y;  
+    double By=(double)beaconsData[1].position.Y;
 
     Position C = beaconsData[2].position;
     double dC = distanceCalculWithPower(&beaconsData[2].power, &beaconsData[2].coefficientAverage);
     double Cx=(double)beaconsData[2].position.X;
     double Cy=(double)beaconsData[2].position.Y;
 
-    double a=0;
-    double b;
-    double c;
-    double d;
+    double a = 0;
+    double b = 0;
+    double c = 0;
+    double d = 0;
 
 //considérons que uniquement deux balises max peuvent etre sur le meme Y, jamais 3
     if (A.Y == B.Y) { // si A et B meme ordonnee
@@ -142,7 +144,8 @@ extern void Mathematician_getCurrentPosition(const BeaconData * beaconsData,  ui
         d = (Cx * Cx + Cy * Cy - dC * dC - Bx * Bx - By * By + dB * dB) / (2 * (Cy - By));
     }
     double x = (d - b) / (a - c);
-    double y = a*x+b;
+    double y = a * x + b;
     currentPosition->X = (uint32_t) x;
-    currentPosition->Y = (uint32_t) y;
+    currentPosition->Y= (uint32_t) y;
+    //return currentPosition;
 }

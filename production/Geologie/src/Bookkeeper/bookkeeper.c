@@ -72,7 +72,7 @@ typedef enum {
  */
 typedef struct {
     MqFlags flag;
-} MqMsg;
+} MqMsgBookkeeper;
 
 /**
  * @brief Le pourcentage courant de memoire utilisee.
@@ -145,24 +145,24 @@ static int8_t setUpMq(void);
 static int8_t tearDownMq(void);
 
 /**
- * @brief Ecrit la #MqMsg dans la boite aux lettres de Bookkeeper.
+ * @brief Ecrit la #MqMsgBookkeeper dans la boite aux lettres de Bookkeeper.
  *
  * @param message Le message a ecrire.
  * @return int8_t -1 en cas d'erreur, 0 sinon.
  *
  * @warning La fonction appelante est en charge de la garantie de la validite du message (passage de pointeur).
  */
-static int8_t sendMsgMq(MqMsg* msg);
+static int8_t sendMsgMq(MqMsgBookkeeper* msg);
 
 /**
- * @brief Lie une #MqMsg dans la boite au lettre de Bookkeeper.
+ * @brief Lie une #MqMsgBookkeeper dans la boite au lettre de Bookkeeper.
  *
  * Le message lue est place dans @a dest.
  *
- * @param dest La #MqMsg ou place le message lue.
+ * @param dest La #MqMsgBookkeeper ou place le message lue.
  * @return int8_t -1 en cas d'erreur, 0 sinon.
  */
-static int8_t readMsgMq(MqMsg* dest);
+static int8_t readMsgMq(MqMsgBookkeeper* dest);
 
 /**
  * @brief Retourne le pourcentage de la charge memoire utilise.
@@ -230,8 +230,6 @@ static void* runUpdate(void* _);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 extern int8_t Bookkeeper_new(void) {
-    TRACE("Set up Bookkeeper%s", "\n");
-
     int8_t returnError = 0;
 
     returnError = setUpMq();
@@ -247,8 +245,6 @@ extern int8_t Bookkeeper_new(void) {
 }
 
 extern int8_t Bookkeeper_free(void) {
-    TRACE("Tear down Bookkeeper%s", "\n");
-
     int8_t returnError = 0;
 
     returnError = tearDownMq();
@@ -264,8 +260,6 @@ extern int8_t Bookkeeper_free(void) {
 }
 
 extern int8_t Bookkeeper_askStartBookkeeper(void) {
-    TRACE("Start Bookkeeper%s", "\n");
-
     int8_t returnError = 0;
 
     setKeepGoing(true);
@@ -284,13 +278,11 @@ extern int8_t Bookkeeper_askStartBookkeeper(void) {
 }
 
 extern int8_t Bookkeeper_askStopBookkeeper(void) {
-    TRACE("Stop Bookkeeper%s", "\n");
-
     int8_t returnError = 0;
 
     setKeepGoing(false);
 
-    MqMsg msg = { .flag = STOP };
+    MqMsgBookkeeper msg = { .flag = STOP };
     returnError = sendMsgMq(&msg);
     if (returnError >= 0) {
         returnError = pthread_join(myThreadMq, NULL);
@@ -311,11 +303,9 @@ extern int8_t Bookkeeper_askStopBookkeeper(void) {
 }
 
 extern int8_t Bookkeeper_ask4CurrentProcessorAndMemoryLoad() {
-    TRACE("Ask value to Bookkeeper%s", "\n");
-
     int8_t returnError = 0;
 
-    MqMsg msg = { .flag = GET_VALUE };
+    MqMsgBookkeeper msg = { .flag = GET_VALUE };
 
     returnError = sendMsgMq(&msg);
     ERROR(returnError < 0, "[Bookkeeper] Error when sending the get value message");
@@ -359,7 +349,6 @@ static int8_t updateProcessorLoad(void) {
     uint64_t currentTotalUserLow;
     uint64_t currentTotalSys;
     uint64_t currentTotalIdle;
-    uint64_t currentTotal;
 
     file = fopen("/proc/stat", "r");
     if (file == NULL) {
@@ -381,7 +370,7 @@ static int8_t updateProcessorLoad(void) {
                     // NOTE can arrive at the start up when it's the first runMq
                     ERROR(true, "[Bookkeeper] Overflown detection ... Skip the value and continue");
                 } else {
-                    currentTotal = (currentTotalUser - previousTotalUser) + (currentTotalUserLow - previousTotalUserLow)
+                    uint64_t currentTotal = (currentTotalUser - previousTotalUser) + (currentTotalUserLow - previousTotalUserLow)
                         + (currentTotalSys - previousTotalSys);
 
                     setPercentProcessorLoad((currentTotal / (currentTotal + (currentTotalIdle - previousTotalIdle))) * 100);
@@ -440,7 +429,7 @@ static int8_t setUpMq(void) {
 
     attr.mq_flags = 0;
     attr.mq_maxmsg = MQ_MAX_MESSAGES;
-    attr.mq_msgsize = sizeof(MqMsg);
+    attr.mq_msgsize = sizeof(MqMsgBookkeeper);
     attr.mq_curmsgs = 0;
 
     myMq = mq_open(MQ_LABEL, O_CREAT | O_RDWR, S_IRUSR | S_IWUSR, &attr);
@@ -465,19 +454,19 @@ static int8_t tearDownMq(void) {
     return returnError;
 }
 
-static int8_t sendMsgMq(MqMsg* msg) {
+static int8_t sendMsgMq(MqMsgBookkeeper* msg) {
     int8_t returnError = 0;
 
-    returnError = mq_send(myMq, (char*) msg, sizeof(MqMsg), 0); // put char to avoid a warning
+    returnError = mq_send(myMq, (char*) msg, sizeof(MqMsgBookkeeper), 0); // put char to avoid a warning
     ERROR(returnError < 0, "[Bookkeeper] Error when sending the message in the queue");
 
     return returnError;
 }
 
-static int8_t readMsgMq(MqMsg* dest) {
+static int8_t readMsgMq(MqMsgBookkeeper* dest) {
     int8_t returnError = 0;
 
-    returnError = mq_receive(myMq, (char*) dest, sizeof(MqMsg), NULL); // put char to avoid a warning
+    returnError = mq_receive(myMq, (char*) dest, sizeof(MqMsgBookkeeper), NULL); // put char to avoid a warning
     ERROR(returnError < 0, "[Bookkeeper] Error when reading the message in the queue");
 
     return returnError;
@@ -503,7 +492,7 @@ static void* runMq(void* _) {
     int8_t returnError;
 
     while (getKeepGoing()) {
-        MqMsg msg;
+        MqMsgBookkeeper msg;
         returnError = readMsgMq(&msg);
         if (returnError < 0) {
             LOG("[Bookkeeper] Can't read the message in the queue ... Re set up the queue.%s", "\n");
@@ -527,7 +516,7 @@ static void* runMq(void* _) {
                     .processorLoad = getPercentProcessorLoad(),
                     .memoryLoad = getPercentMemoryLoad()
                 };
-                Scanner_setCurrentProcessorAndMemoryLoad(&procAndMem);
+                Scanner_setCurrentProcessorAndMemoryLoad(procAndMem);
             } else if (msg.flag == STOP) {
                 setKeepGoing(false);
             } else {

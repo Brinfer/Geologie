@@ -70,7 +70,8 @@ extern AttenuationCoefficient Mathematician_getAverageCalcul(const BeaconCoeffic
 * @brief calcule la position actuelle de la carte mere
 *
 * @param  beaconsData tableau contenant les informations des balises
-* @return la position actuelle de la carte
+* @param  nbBeacon nombre de beacons
+* @param  currentPosition position actuelle a changer
 */
 extern void Mathematician_getCurrentPosition(const BeaconData * beaconsData,  uint8_t nbBeacon,Position * currentPosition);
 

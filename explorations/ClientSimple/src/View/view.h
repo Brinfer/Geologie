@@ -39,3 +39,7 @@ extern int8_t View_displayMessage(const char* message);
 extern void View_setConnectionStatus(ConnectionState state);
 
 extern void View_signalGetCalibrationData(void);
+
+extern void View_signalEndCalibrationPosition(void);
+
+extern void View_signalEndCalibration(void);

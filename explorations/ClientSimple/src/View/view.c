@@ -157,6 +157,14 @@ extern void View_signalGetCalibrationData(void) {
     setScreen(CALIBRATION);
 }
 
+extern void View_signalEndCalibrationPosition(void) {
+    setScreen(CALIBRATION);
+}
+
+extern void View_signalEndCalibration(void) {
+    setScreen(MAIN);
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //                                              Fonctions static

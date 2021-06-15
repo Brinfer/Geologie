@@ -153,12 +153,13 @@ extern int8_t DispatcherLOG_stop() {
     setKeepGoing(false);
 
     returnError = pthread_join(myThreadListen, NULL);
-    if (returnError >= 0) {
+
+    if (returnError == 0) {
         setKeepGoing(false);
     } else {
         ERROR(true, "[DispatcheurLOG] Error when joining the processus");
         returnError = pthread_join(myThreadListen, NULL);
-        ERROR(returnError < 0, "[DispatcheurLOG] Error when joining the processus ... Abondement");
+        ERROR(returnError != 0, "[DispatcheurLOG] Error when joining the processus ... Abondement");
     }
 
     return returnError;
@@ -229,8 +230,10 @@ static int16_t readHeader(Header* header) {
 
     returnError = PostmanLOG_readMsg(headerTrame, SIZE_HEADER);//on lit la trame contenant le header
 
-    if (returnError >= 0) {
+    if (returnError == 0) {
         TranslatorLOG_translateTrameToHeader(headerTrame, header); //on traduit la trame header en header
+    } else if (returnError == 1) {
+        LOG("[Dispatcher] Client is disconneted%s", "\n");
     }
 
     return returnError;
@@ -246,7 +249,7 @@ static void* readMsg() {
         if (returnError < 0) {
             ERROR(true, "[DispatcheurLOG] Can't read the header ... Stop the processus");
             setKeepGoing(false);
-        } else {
+        } else if(returnError == 0) {
             Trame trame[header.size];
 
             if (header.size > 0) {
@@ -259,9 +262,11 @@ static void* readMsg() {
             } else {
                 dispatch(trame, &header);
             }
+        } else {
+            setKeepGoing(false);
         }
     }
 
-    TRACE("[Dispactcher] No more serving%s" "\n");
+    TRACE("[Dispactcher] No more serving%s","\n");
     return 0;
 }

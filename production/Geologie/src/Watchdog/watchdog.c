@@ -31,6 +31,7 @@
 #include <malloc.h>
 #include <time.h>
 #include <signal.h>
+#include "../tools.h"
 
 struct Watchdog_t
 {

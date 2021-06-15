@@ -69,7 +69,7 @@ extern int8_t ProxyGUI_stop() {
     return EXIT_SUCCESS;
 }
 
-extern int8_t ProxyGUI_setCalibrationPositions(CalibrationPosition* calibrationPositions, uint8_t nbCalibrationPosition) {
+extern int8_t ProxyGUI_setCalibrationPositions(const CalibrationPosition* calibrationPositions, uint8_t nbCalibrationPosition) {
     LOG("[ProxyGUI] Send the calibration position.%s", "\n");
 
     int8_t returnError = EXIT_FAILURE;
@@ -91,7 +91,7 @@ extern int8_t ProxyGUI_signalEndCalibrationPosition() {
     int8_t returnError = EXIT_FAILURE;
     Trame* trame;
 
-    u_int16_t sizeTrame = TranslatorLOG_getTrameSize(SIGNAL_END_CALIBRATION_POSITION, 0);
+    u_int16_t sizeTrame = TranslatorLOG_getTrameSize(SIGNAL_CALIBRATION_END_POSITION, 0);
 
     trame = malloc(sizeTrame);
     TranslatorLOG_translateForSignalCalibrationEndPosition(trame);
