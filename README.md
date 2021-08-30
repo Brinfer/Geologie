@@ -68,7 +68,7 @@ La structure du projet doit donc être (en se plaçant les dossiers au dessus de
 |  └── ...
 ├── SDK
 |  └── ...
-└── se2022-a1.c
+└── Geologie
    ├── explorations
    ├── production
    |  ├── Geobalise
